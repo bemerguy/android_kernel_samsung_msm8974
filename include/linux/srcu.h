@@ -34,6 +34,11 @@ struct srcu_struct_array {
 	int c[2];
 };
 
+/* Bit definitions for field ->c above and ->snap below. */
+#define SRCU_USAGE_BITS		1
+#define SRCU_REF_MASK		(ULONG_MAX >> SRCU_USAGE_BITS)
+#define SRCU_USAGE_COUNT	(SRCU_REF_MASK + 1)
+
 struct srcu_struct {
 	int completed;
 	struct srcu_struct_array __percpu *per_cpu_ref;
