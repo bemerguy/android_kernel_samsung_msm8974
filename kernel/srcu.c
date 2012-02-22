@@ -170,7 +170,7 @@ EXPORT_SYMBOL_GPL(__srcu_read_unlock);
  */
 static void __synchronize_srcu(struct srcu_struct *sp, void (*sync_func)(void))
 {
-	int idx;
+	int idx = 0;
 
 	rcu_lockdep_assert(!lock_is_held(&sp->dep_map) &&
 			   !lock_is_held(&rcu_bh_lock_map) &&
@@ -178,34 +178,13 @@ static void __synchronize_srcu(struct srcu_struct *sp, void (*sync_func)(void))
 			   !lock_is_held(&rcu_sched_lock_map),
 			   "Illegal synchronize_srcu() in same-type SRCU (or RCU) read-side critical section");
 
-	idx = sp->completed;
 	mutex_lock(&sp->mutex);
 
 	/*
-	 * Check to see if someone else did the work for us while we were
-	 * waiting to acquire the lock.  We need -two- advances of
-	 * the counter, not just one.  If there was but one, we might have
-	 * shown up -after- our helper's first synchronize_sched(), thus
-	 * having failed to prevent CPU-reordering races with concurrent
-	 * srcu_read_unlock()s on other CPUs (see comment below).  So we
-	 * either (1) wait for two or (2) supply the second ourselves.
-	 */
-
-	if ((sp->completed - idx) >= 2) {
-		mutex_unlock(&sp->mutex);
-		return;
-	}
-
-	sync_func();  /* Force memory barrier on all CPUs. */
-
-	/*
-	 * The preceding synchronize_sched() ensures that any CPU that
-	 * sees the new value of sp->completed will also see any preceding
-	 * changes to data structures made by this CPU.  This prevents
-	 * some other CPU from reordering the accesses in its SRCU
-	 * read-side critical section to precede the corresponding
-	 * srcu_read_lock() -- ensuring that such references will in
-	 * fact be protected.
+	 * If there were no helpers, then we need to do two flips of
+	 * the index.  The first flip is required if there are any
+	 * outstanding SRCU readers even if there are no new readers
+	 * running concurrently with the first counter flip.
 	 *
 	 * So it is now safe to do the flip.
 	 */
