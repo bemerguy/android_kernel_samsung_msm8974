@@ -211,13 +211,8 @@ EXPORT_SYMBOL_GPL(__srcu_read_lock);
 void __srcu_read_unlock(struct srcu_struct *sp, int idx)
 {
 	preempt_disable();
-<<<<<<< HEAD
-	srcu_barrier();  /* ensure compiler won't misorder critical section. */
-	per_cpu_ptr(sp->per_cpu_ref, smp_processor_id())->c[idx]--;
-=======
 	smp_mb(); /* C */  /* Avoid leaking the critical section. */
 	ACCESS_ONCE(this_cpu_ptr(sp->per_cpu_ref)->c[idx]) -= 1;
->>>>>>> 8c8e55638ac... rcu: Increment upper bit only for srcu_read_lock()
 	preempt_enable();
 }
 EXPORT_SYMBOL_GPL(__srcu_read_unlock);
@@ -230,15 +225,76 @@ EXPORT_SYMBOL_GPL(__srcu_read_unlock);
  * we repeatedly block for 1-millisecond time periods.  This approach
  * has done well in testing, so there is no need for a config parameter.
  */
-#define SYNCHRONIZE_SRCU_READER_DELAY 10
+#define SYNCHRONIZE_SRCU_READER_DELAY 5
+
+static void wait_idx(struct srcu_struct *sp, int idx, bool expedited)
+{
+	int trycount = 0;
+
+	/*
+	 * If a reader fetches the index before the ->completed increment,
+	 * but increments its counter after srcu_readers_active_idx_check()
+	 * sums it, then smp_mb() D will pair with __srcu_read_lock()'s
+	 * smp_mb() B to ensure that the SRCU read-side critical section
+	 * will see any updates that the current task performed before its
+	 * call to synchronize_srcu(), or to synchronize_srcu_expedited(),
+	 * as the case may be.
+	 */
+	smp_mb(); /* D */
+
+	/*
+	 * SRCU read-side critical sections are normally short, so wait
+	 * a small amount of time before possibly blocking.
+	 */
+	if (!srcu_readers_active_idx_check(sp, idx)) {
+		udelay(SYNCHRONIZE_SRCU_READER_DELAY);
+		while (!srcu_readers_active_idx_check(sp, idx)) {
+			if (expedited && ++ trycount < 10)
+				udelay(SYNCHRONIZE_SRCU_READER_DELAY);
+			else
+				schedule_timeout_interruptible(1);
+		}
+	}
+
+	/*
+	 * The following smp_mb() E pairs with srcu_read_unlock()'s
+	 * smp_mb C to ensure that if srcu_readers_active_idx_check()
+	 * sees srcu_read_unlock()'s counter decrement, then any
+	 * of the current task's subsequent code will happen after
+	 * that SRCU read-side critical section.
+	 *
+	 * It also ensures the order between the above waiting and
+	 * the next flipping.
+	 */
+	smp_mb(); /* E */
+}
+>>>>>>> 900468c6d30... rcu: Flip ->completed only once per SRCU grace period
+
+/*
+ * Flip the readers' index by incrementing ->completed, then wait
+ * until there are no more readers using the counters referenced by
+ * the old index value.  (Recall that the index is the bottom bit
+ * of ->completed.)
+ *
+ * Of course, it is possible that a reader might be delayed for the
+ * full duration of flip_idx_and_wait() between fetching the
+ * index and incrementing its counter.  This possibility is handled
+ * by the next __synchronize_srcu() invoking wait_idx() for such readers
+ * before starting a new grace period.
+ */
+static void flip_idx_and_wait(struct srcu_struct *sp, bool expedited)
+{
+	int idx;
+
+	idx = sp->completed++ & 0x1;
+	wait_idx(sp, idx, expedited);
+}
 
 /*
  * Helper function for synchronize_srcu() and synchronize_srcu_expedited().
  */
 static void __synchronize_srcu(struct srcu_struct *sp, void (*sync_func)(void))
 {
-	int idx = 0;
-
 	rcu_lockdep_assert(!lock_is_held(&sp->dep_map) &&
 			   !lock_is_held(&rcu_bh_lock_map) &&
 			   !lock_is_held(&rcu_lock_map) &&
@@ -248,65 +304,39 @@ static void __synchronize_srcu(struct srcu_struct *sp, void (*sync_func)(void))
 	mutex_lock(&sp->mutex);
 
 	/*
-	 * If there were no helpers, then we need to do two flips of
-	 * the index.  The first flip is required if there are any
-	 * outstanding SRCU readers even if there are no new readers
-	 * running concurrently with the first counter flip.
+	 * Suppose that during the previous grace period, a reader
+	 * picked up the old value of the index, but did not increment
+	 * its counter until after the previous instance of
+	 * __synchronize_srcu() did the counter summation and recheck.
+	 * That previous grace period was OK because the reader did
+	 * not start until after the grace period started, so the grace
+	 * period was not obligated to wait for that reader.
 	 *
-	 * So it is now safe to do the flip.
+	 * However, the current SRCU grace period does have to wait for
+	 * that reader.  This is handled by invoking wait_idx() on the
+	 * non-active set of counters (hence sp->completed - 1).  Once
+	 * wait_idx() returns, we know that all readers that picked up
+	 * the old value of ->completed and that already incremented their
+	 * counter will have completed.
+	 *
+	 * But what about readers that picked up the old value of
+	 * ->completed, but -still- have not managed to increment their
+	 * counter?  We do not need to wait for those readers, because
+	 * they will have started their SRCU read-side critical section
+	 * after the current grace period starts.
+	 *
+	 * Because it is unlikely that readers will be preempted between
+	 * fetching ->completed and incrementing their counter, wait_idx()
+	 * will normally not need to wait.
 	 */
-
-	idx = sp->completed & 0x1;
-	sp->completed++;
-
-	sync_func();  /* Force memory barrier on all CPUs. */
+	wait_idx(sp, (sp->completed - 1) & 0x1, expedited);
 
 	/*
-	 * At this point, because of the preceding synchronize_sched(),
-	 * all srcu_read_lock() calls using the old counters have completed.
-	 * Their corresponding critical sections might well be still
-	 * executing, but the srcu_read_lock() primitives themselves
-	 * will have finished executing.  We initially give readers
-	 * an arbitrarily chosen 10 microseconds to get out of their
-	 * SRCU read-side critical sections, then loop waiting 1/HZ
-	 * seconds per iteration.  The 10-microsecond value has done
-	 * very well in testing.
+	 * Now that wait_idx() has waited for the really old readers,
+	 * invoke flip_idx_and_wait() to flip the counter and wait
+	 * for current SRCU readers.
 	 */
-
-	if (srcu_readers_active_idx(sp, idx))
-		udelay(SYNCHRONIZE_SRCU_READER_DELAY);
-	while (srcu_readers_active_idx(sp, idx))
-		schedule_timeout_interruptible(1);
-
-	sync_func();  /* Force memory barrier on all CPUs. */
-
-	/*
-	 * The preceding synchronize_sched() forces all srcu_read_unlock()
-	 * primitives that were executing concurrently with the preceding
-	 * for_each_possible_cpu() loop to have completed by this point.
-	 * More importantly, it also forces the corresponding SRCU read-side
-	 * critical sections to have also completed, and the corresponding
-	 * references to SRCU-protected data items to be dropped.
-	 *
-	 * Note:
-	 *
-	 *	Despite what you might think at first glance, the
-	 *	preceding synchronize_sched() -must- be within the
-	 *	critical section ended by the following mutex_unlock().
-	 *	Otherwise, a task taking the early exit can race
-	 *	with a srcu_read_unlock(), which might have executed
-	 *	just before the preceding srcu_readers_active() check,
-	 *	and whose CPU might have reordered the srcu_read_unlock()
-	 *	with the preceding critical section.  In this case, there
-	 *	is nothing preventing the synchronize_sched() task that is
-	 *	taking the early exit from freeing a data structure that
-	 *	is still being referenced (out of order) by the task
-	 *	doing the srcu_read_unlock().
-	 *
-	 *	Alternatively, the comparison with "2" on the early exit
-	 *	could be changed to "3", but this increases synchronize_srcu()
-	 *	latency for bulk loads.  So the current code is preferred.
-	 */
+	flip_idx_and_wait(sp, expedited);
 
 	mutex_unlock(&sp->mutex);
 }
