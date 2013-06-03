@@ -306,7 +306,7 @@ static long alarm_compat_ioctl(struct file *file, unsigned int cmd,
 		break;
 	}
 
-	return rv;
+	return 0;
 }
 #endif
 
