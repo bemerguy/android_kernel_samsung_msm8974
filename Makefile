@@ -657,6 +657,7 @@ endif # $(dot-config)
 all: vmlinux
 
 KBUILD_CFLAGS	+= -Os $(GCC8WARNINGS)
+KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
 
 #$(OPTS)
 include $(srctree)/arch/$(SRCARCH)/Makefile
