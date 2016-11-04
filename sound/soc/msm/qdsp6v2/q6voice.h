@@ -95,7 +95,7 @@ enum {
 struct mem_buffer {
 	dma_addr_t		phys;
 	void			*data;
-	uint32_t		size; /* size of buffer */
+	size_t			size; /* size of buffer */
 };
 
 struct share_mem_buf {
