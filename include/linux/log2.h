@@ -150,26 +150,10 @@ unsigned long __rounddown_pow_of_two(unsigned long n)
 		(n) & (1ULL <<  4) ?  4 :	\
 		(n) & (1ULL <<  3) ?  3 :	\
 		(n) & (1ULL <<  2) ?  2 :	\
-		1) :				\
-	-1)
-
-/**
- * ilog2 - log base 2 of 32-bit or a 64-bit unsigned value
- * @n: parameter
- *
- * constant-capable log of base 2 calculation
- * - this can be used to initialise global variables from constant data, hence
- * the massive ternary operator construction
- *
- * selects the appropriately-sized optimised version depending on sizeof(n)
- */
-#define ilog2(n) \
-( \
-	__builtin_constant_p(n) ?	\
-	const_ilog2(n) :		\
-	(sizeof(n) <= 4) ?		\
-	__ilog2_u32(n) :		\
-	__ilog2_u64(n)			\
+		1 ) :				\
+	(sizeof(n) <= 4) ?			\
+	__ilog2_u32(n) :			\
+	__ilog2_u64(n)				\
  )
 
 /**
