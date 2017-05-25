@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2017, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -49,6 +49,12 @@ int msm_vb2_buf_init(struct vb2_buffer *vb)
 		return -EINVAL;
 
 	read_lock_irqsave(&session->stream_rwlock, rl_flags);
+
+	session = msm_get_session_from_vb2q(vb->vb2_queue);
+	if (IS_ERR_OR_NULL(session))
+		return -EINVAL;
+
+	read_lock(&session->stream_rwlock);
 
 	stream = msm_get_stream_from_vb2q(vb->vb2_queue);
 	if (!stream) {
@@ -247,6 +253,14 @@ static struct vb2_buffer *msm_vb2_get_buf(int session_id,
 		return NULL;
 	}
 
+	read_lock(&session->stream_rwlock);
+
+	stream = msm_get_stream(session, stream_id);
+	if (IS_ERR_OR_NULL(stream)) {
+		read_unlock(&session->stream_rwlock);
+		return NULL;
+	}
+
 	spin_lock_irqsave(&stream->stream_lock, flags);
 
 	if (!stream->vb2_q) {
@@ -323,9 +337,18 @@ static int msm_vb2_buf_done(struct vb2_buffer *vb, int session_id,
 	struct vb2_buffer *vb2_buf = NULL;
 	int rc = 0;
 
-	stream = msm_get_stream(session_id, stream_id);
-	if (IS_ERR_OR_NULL(stream))
+	session = msm_get_session(session_id);
+	if (IS_ERR_OR_NULL(session))
 		return -EINVAL;
+
+	read_lock(&session->stream_rwlock);
+
+	stream = msm_get_stream(session, stream_id);
+	if (IS_ERR_OR_NULL(stream)) {
+		read_unlock(&session->stream_rwlock);
+		return -EINVAL;
+	}
+
 	spin_lock_irqsave(&stream->stream_lock, flags);
 	if (vb) {
 		list_for_each_entry(msm_vb2, &(stream->queued_list), list) {
