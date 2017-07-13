@@ -54,7 +54,7 @@ int msm_vb2_buf_init(struct vb2_buffer *vb)
 	if (IS_ERR_OR_NULL(session))
 		return -EINVAL;
 
-	read_lock(&session->stream_rwlock);
+	read_lock_irqsave(&session->stream_rwlock, rl_flags);
 
 	stream = msm_get_stream_from_vb2q(vb->vb2_queue);
 	if (!stream) {
@@ -253,11 +253,9 @@ static struct vb2_buffer *msm_vb2_get_buf(int session_id,
 		return NULL;
 	}
 
-	read_lock(&session->stream_rwlock);
-
 	stream = msm_get_stream(session, stream_id);
 	if (IS_ERR_OR_NULL(stream)) {
-		read_unlock(&session->stream_rwlock);
+		read_unlock_irqrestore(&session->stream_rwlock, rl_flags);
 		return NULL;
 	}
 
@@ -341,11 +339,11 @@ static int msm_vb2_buf_done(struct vb2_buffer *vb, int session_id,
 	if (IS_ERR_OR_NULL(session))
 		return -EINVAL;
 
-	read_lock(&session->stream_rwlock);
+	read_lock_irqsave(&session->stream_rwlock, rl_flags);
 
 	stream = msm_get_stream(session, stream_id);
 	if (IS_ERR_OR_NULL(stream)) {
-		read_unlock(&session->stream_rwlock);
+		read_unlock_irqrestore(&session->stream_rwlock, rl_flags);
 		return -EINVAL;
 	}
 
