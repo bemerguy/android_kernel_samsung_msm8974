@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
-HOSTCXXFLAGS = -O2
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3
+HOSTCXXFLAGS = -O3
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -356,13 +356,26 @@ CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
+
+OPTS           = -ffast-math -fsplit-loops \
+		-fmodulo-sched -fmodulo-sched-allow-regmoves \
+		-fsingle-precision-constant -ftree-partial-pre -fpredictive-commoning \
+		-ftree-vectorize -fvect-cost-model=cheap -ftree-loop-ivcanon \
+		-fgcse-sm -fgcse-las -fira-hoist-pressure -fivopts -fgcse-after-reload -ftree-loop-distribute-patterns \
+		-fsched-spec-load -fweb -frename-registers -fipa-pta -ftree-loop-im -fsection-anchors -funsafe-loop-optimizations \
+		-frerun-cse-after-loop -ftracer -floop-unroll-and-jam
+
+GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
+GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier -Wno-stringop-overflow \
+		-Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
+GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool
+
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	=
+CFLAGS_KERNEL   = -mfpu=neon-vfpv4
 AFLAGS_KERNEL	=
-CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
-
+CFLAGS_GCOV    =
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
 # Needed to be compatible with the O= option
@@ -570,7 +583,9 @@ all: vmlinux
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 else
-KBUILD_CFLAGS	+= -O2
+KBUILD_CFLAGS	+= -O3 $(OPTS) -fno-unswitch-loops -fno-ipa-cp-clone -freorder-blocks-algorithm=simple -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
+# -freorder-blocks-algorithm=simple -fno-unswitch-loops -fno-ipa-cp-clone -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
+#$(OPTS) -fno-inline-functions $(GCC8WARNINGS)
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
@@ -600,6 +615,23 @@ ifndef CONFIG_FUNCTION_TRACER
 KBUILD_CFLAGS	+= -fomit-frame-pointer
 endif
 endif
+
+# These flags need a special toolchain so split them off
+
+KBUILD_CFLAGS  += $(call cc-option,-mlow-precision-recip-sqrt,) \
+                  $(call cc-option,-mpc-relative-literal-loads,)
+
+
+# Disable format-truncation warnings
+KBUILD_CFLAGS   += $(call cc-disable-warning,format-truncation,)
+
+
+# Needed to unbreak GCC 7.x and above
+###KBUILD_CFLAGS   += $(call cc-option,-fno-store-merging,)
+
+
+# Tell gcc to never replace conditional load with a non-conditional one
+KBUILD_CFLAGS  += $(call cc-option,--param=allow-store-data-races=0)
 
 KBUILD_CFLAGS   += $(call cc-option, -fno-var-tracking-assignments)
 

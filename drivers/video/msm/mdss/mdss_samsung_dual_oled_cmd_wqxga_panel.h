@@ -31,7 +31,12 @@
 #define SAMSUNG_DSI_PANEL_H
 #define MAX_PANEL_NAME_SIZE 100
 #define RECOVERY_BRIGHTNESS 180
+
+#if 0
 #define LCD_DEBUG(X, ...) pr_info("[LCD]%s:"X, __func__, ## __VA_ARGS__);
+#else
+#define LCD_DEBUG(X, ...)
+#endif
 
 #include "smart_dimming.h"
 #include "smart_mtp_s6e3.h"

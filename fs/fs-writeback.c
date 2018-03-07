@@ -693,10 +693,10 @@ static bool over_bground_thresh(struct backing_dev_info *bdi)
 	unsigned long background_thresh, dirty_thresh;
 
 	global_dirty_limits(&background_thresh, &dirty_thresh);
-
+/*
 	if (global_page_state(NR_FILE_DIRTY) +
 	    global_page_state(NR_UNSTABLE_NFS) > background_thresh)
-		return true;
+		return true; */
 
 	if (bdi_stat(bdi, BDI_RECLAIMABLE) >
 				bdi_dirty_limit(bdi, background_thresh))

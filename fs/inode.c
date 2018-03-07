@@ -1516,7 +1516,7 @@ void touch_atime(struct path *path)
 	struct inode *inode = path->dentry->d_inode;
 	struct timespec now;
 
-	if (inode->i_flags & S_NOATIME)
+//	if (inode->i_flags & S_NOATIME)
 		return;
 	if (IS_NOATIME(inode))
 		return;

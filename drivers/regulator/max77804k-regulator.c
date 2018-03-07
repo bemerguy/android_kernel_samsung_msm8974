@@ -52,11 +52,11 @@ struct voltage_map_desc {
 static const struct voltage_map_desc charger_current_map_desc = {
 	.min = 60, .max = 2580, .step = 20, .n_bits = 7,
 };
-
+/*
 static const struct voltage_map_desc topoff_current_map_desc = {
 	.min = 50, .max = 200, .step = 10, .n_bits = 4,
 };
-
+*/
 static const struct voltage_map_desc *reg_voltage_map[] = {
 	[MAX77804K_ESAFEOUT1] = NULL,
 	[MAX77804K_ESAFEOUT2] = NULL,

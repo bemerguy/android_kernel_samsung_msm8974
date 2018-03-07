@@ -1,0 +1,21 @@
+--- fs/proc/cmdline.c	2018-03-05 17:54:36.427675029 -0300
++++ fs/proc/cmdline.c	2017-10-20 13:09:53.475770651 -0300
+@@ -3,6 +3,9 @@
+ #include <linux/proc_fs.h>
+ #include <linux/seq_file.h>
+ #include <linux/module.h>
++#include <asm/setup.h>
++
++static char new_command_line[COMMAND_LINE_SIZE];
+ 
+ static int cmdline_proc_show(struct seq_file *m, void *v)
+ {
+@@ -17,7 +20,7 @@
+ 		for(i=0;i<20;i++)	*(temp+i)='*';
+ 	}
+ 
+-	seq_printf(m, "%s\n", temp_saved_command_line);
++	seq_printf(m, "%s\n", new_command_line);
+ 
+ 	kfree(temp_saved_command_line);
+ 	return 0;

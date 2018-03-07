@@ -35,12 +35,17 @@ struct map_range {
 	unsigned page_size_mask;
 };
 
+<<<<<<< HEAD
 /*
  * First calculate space needed for kernel direct mapping page tables to cover
  * mr[0].start to mr[nr_range - 1].end, while accounting for possible 2M and 1GB
  * pages. Then find enough contiguous space for those page tables.
  */
 static void __init find_early_table_space(struct map_range *mr, int nr_range)
+=======
+static void __init find_early_table_space(struct map_range *mr, unsigned long end,
+					  int use_pse, int use_gbpages)
+>>>>>>> 722bc6b16771... x86/mm: Fix the size calculation of mapping tables
 {
 	int i;
 	unsigned long puds = 0, pmds = 0, ptes = 0, tables;
@@ -69,11 +74,20 @@ static void __init find_early_table_space(struct map_range *mr, int nr_range)
 #ifdef CONFIG_X86_32
 			extra += PMD_SIZE;
 #endif
+<<<<<<< HEAD
 			ptes += (extra + PAGE_SIZE - 1) >> PAGE_SHIFT;
 		} else {
 			ptes += (range + PAGE_SIZE - 1) >> PAGE_SHIFT;
 		}
 	}
+=======
+		/* The first 2/4M doesn't use large pages. */
+		extra += mr->end - mr->start;
+
+		ptes = (extra + PAGE_SIZE - 1) >> PAGE_SHIFT;
+	} else
+		ptes = (end + PAGE_SIZE - 1) >> PAGE_SHIFT;
+>>>>>>> 722bc6b16771... x86/mm: Fix the size calculation of mapping tables
 
 	tables = roundup(puds * sizeof(pud_t), PAGE_SIZE);
 	tables += roundup(pmds * sizeof(pmd_t), PAGE_SIZE);
@@ -275,7 +289,11 @@ unsigned long __init_refok init_memory_mapping(unsigned long start,
 	 * nodes are discovered.
 	 */
 	if (!after_bootmem)
+<<<<<<< HEAD
 		find_early_table_space(mr, nr_range);
+=======
+		find_early_table_space(&mr[0], end, use_pse, use_gbpages);
+>>>>>>> 722bc6b16771... x86/mm: Fix the size calculation of mapping tables
 
 	for (i = 0; i < nr_range; i++)
 		ret = kernel_physical_mapping_init(mr[i].start, mr[i].end,

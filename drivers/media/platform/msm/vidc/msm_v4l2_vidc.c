@@ -258,10 +258,10 @@ static const struct v4l2_ioctl_ops msm_v4l2_ioctl_ops = {
 	.vidioc_g_parm = msm_v4l2_g_parm,
 	.vidioc_enum_framesizes = msm_v4l2_enum_framesizes,
 };
-
+/*
 static const struct v4l2_ioctl_ops msm_v4l2_enc_ioctl_ops = {
 };
-
+*/
 static unsigned int msm_v4l2_poll(struct file *filp,
 	struct poll_table_struct *pt)
 {

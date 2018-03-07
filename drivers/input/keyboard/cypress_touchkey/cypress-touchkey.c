@@ -41,6 +41,10 @@
 #include "issp_extern.h"
 #include <linux/mfd/pm8xxx/pm8921.h>
 
+#ifdef CONFIG_BOEFFLA_TOUCH_KEY_CONTROL
+#include <linux/boeffla_touchkey_control.h>
+#endif
+
 #ifdef USE_OPEN_CLOSE
 static int cypress_input_open(struct input_dev *dev);
 static void cypress_input_close(struct input_dev *dev);
@@ -938,11 +942,23 @@ static irqreturn_t cypress_touchkey_interrupt(int irq, void *dev_id)
 				menu_data ? (menu_press ? "menu P " : "menu R ") : "",
 				back_data ? (back_press ? "back P " : "back R ") : "",
 				buf[0], info->ic_fw_ver, info->module_ver);
+
+#ifdef CONFIG_BOEFFLA_TOUCH_KEY_CONTROL
+	if ((menu_press != 0) || (back_press != 0))
+		btkc_touch();
+#endif
+
 #else
 		dev_info(&info->client->dev, "%s: key %s%s fw_ver: 0x%x, modue_ver: 0x%x\n", __func__,
 				menu_data ? (menu_press ? "P" : "R") : "",
 				back_data ? (back_press ? "P" : "R") : "",
 				info->ic_fw_ver, info->module_ver);
+
+#ifdef CONFIG_BOEFFLA_TOUCH_KEY_CONTROL
+	if ((menu_press != 0) || (back_press != 0))
+		btkc_touch();
+#endif
+
 #endif
 	} else {
 		press = !(buf[0] & PRESS_BIT_MASK);
@@ -952,10 +968,22 @@ static irqreturn_t cypress_touchkey_interrupt(int irq, void *dev_id)
 		dev_info(&info->client->dev,
 				"%s: code=%d %s. fw_ver=0x%x, module_ver=0x%x \n", __func__,
 				code, press ? "pressed" : "released", info->ic_fw_ver, info->module_ver);
+
+#ifdef CONFIG_BOEFFLA_TOUCH_KEY_CONTROL
+	if (press != 0)
+		btkc_touch();
+#endif
+
 #else
 		dev_info(&info->client->dev,
 				"%s: %s. fw_ver=0x%x, module_ver=0x%x \n", __func__,
 				press ? "pressed" : "released", info->ic_fw_ver, info->module_ver);
+
+#ifdef CONFIG_BOEFFLA_TOUCH_KEY_CONTROL
+	if (press != 0)
+		btkc_touch();
+#endif
+
 #endif
 		if (code < 0) {
 			dev_info(&info->client->dev,
@@ -1260,6 +1288,11 @@ static ssize_t cypress_touchkey_led_control(struct device *dev,
 			__func__, data);
 		return size;
 	}
+
+#ifdef CONFIG_BOEFFLA_TOUCH_KEY_CONTROL
+	if (btkc_block_touchkey_backlight(data))
+		return size;
+#endif
 
 	if (!info->enabled) {
 		touchled_cmd_reversed = 1;
@@ -2647,6 +2680,11 @@ static int __devinit cypress_touchkey_probe(struct i2c_client *client,
    cypress_power_onoff(info, 0);
 */
 	dev_info(&info->client->dev, "%s: done\n", __func__);
+
+#ifdef CONFIG_BOEFFLA_TOUCH_KEY_CONTROL
+	btkc_store_handle(info);
+#endif
+
 	return 0;
 
 err_sysfs_group:

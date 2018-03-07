@@ -503,7 +503,7 @@ armpmu_release_hardware(struct arm_pmu *armpmu)
 	int i, irq, irqs;
 	struct platform_device *pmu_device = armpmu->plat_device;
 
-	irqs = min(pmu_device->num_resources, num_possible_cpus());
+	irqs = min((int)pmu_device->num_resources, num_possible_cpus());
 
 	for (i = 0; i < irqs; ++i) {
 		if (!cpumask_test_and_clear_cpu(i, &armpmu->active_irqs))
@@ -548,7 +548,7 @@ armpmu_reserve_hardware(struct arm_pmu *armpmu)
 	else if (!armpmu->free_pmu_irq)
 		armpmu->free_pmu_irq = armpmu_generic_free_irq;
 
-	irqs = min(pmu_device->num_resources, num_possible_cpus());
+	irqs = min((int)pmu_device->num_resources, num_possible_cpus());
 	if (irqs < 1) {
 		pr_err("no irqs for PMUs defined\n");
 		return -ENODEV;
