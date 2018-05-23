@@ -28,8 +28,8 @@ MODULES_IN_SYSTEM="y"
 OUTPUT_FOLDER="output"
 
 DEFCONFIG="boeffla_defconfig"
-DEFCONFIG="lineage_kltekdi_defconfig"
-DEFCONFIG_VARIANT="boeffla_defconfig_variant"
+DEFCONFIG_VARIANT="msm8974pro_sec_klte_eur_defconfig"
+##msm8974_sec_defconfig VARIANT_DEFCONFIG=msm8974pro_sec_klte_eur_defconfig
 
 KERNEL_NAME="Boeffla-Kernel"
 
@@ -154,7 +154,7 @@ step3_compile()
 	if [ -z "$OUTPUT_FOLDER" ]; then
 		make -j$NUM_CPUS CFLAGS_KERNEL="$COMPILER_FLAGS_KERNEL" CFLAGS_MODULE="$COMPILER_FLAGS_MODULE" 2>&1 |tee ../compile.log
 	else
-		make -j$NUM_CPUS O=$OUTPUT_FOLDER CFLAGS_KERNEL="$COMPILER_FLAGS_KERNEL" CFLAGS_MODULE="$COMPILER_FLAGS_MODULE" 2>&1 |tee ../compile.log
+		make -j$NUM_CPUS O=$OUTPUT_FOLDER CFLAGS_KERNEL="$COMPILER_FLAGS_KERNEL" CFLAGS_MODULE="$COMPILER_FLAGS_MODULE" VARIANT_DEFCONFIG=$DEFCONFIG_VARIANT 2>&1 |tee ../compile.log
 	fi
 
 	# compile dtb if required

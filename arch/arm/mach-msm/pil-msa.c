@@ -147,7 +147,7 @@ static int pil_msa_wait_for_mba_ready(struct q6v5_data *drv)
 
 	/* Wait for PBL completion. */
 	ret = readl_poll_timeout(drv->rmb_base + RMB_PBL_STATUS, status,
-		status != 0, POLL_INTERVAL_US, pbl_mba_boot_timeout_ms * 1000);
+		status != 0, POLL_INTERVAL_US, (pbl_mba_boot_timeout_ms * 1000));
 	if (ret) {
 		dev_err(dev, "PBL boot timed out\n");
 		return ret;
@@ -159,7 +159,7 @@ static int pil_msa_wait_for_mba_ready(struct q6v5_data *drv)
 
 	/* Wait for MBA completion. */
 	ret = readl_poll_timeout(drv->rmb_base + RMB_MBA_STATUS, status,
-		status != 0, POLL_INTERVAL_US, pbl_mba_boot_timeout_ms * 1000);
+		status != 0, POLL_INTERVAL_US, (pbl_mba_boot_timeout_ms * 1000));
 	if (ret) {
 		dev_err(dev, "MBA boot timed out\n");
 		return ret;

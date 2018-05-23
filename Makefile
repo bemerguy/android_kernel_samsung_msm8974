@@ -368,7 +368,7 @@ OPTS           = -ffast-math -fsplit-loops \
 GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
 GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier -Wno-stringop-overflow \
 		-Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
-GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool
+GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool -Wno-int-in-bool-context -Wno-misleading-indentation -Wno-discarded-array-qualifiers
 
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
@@ -580,13 +580,13 @@ endif # $(dot-config)
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
 
-ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
-KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
-else
+#ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+#KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+#else
 KBUILD_CFLAGS	+= -O3 $(OPTS) -fno-unswitch-loops -fno-ipa-cp-clone -freorder-blocks-algorithm=simple -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
 # -freorder-blocks-algorithm=simple -fno-unswitch-loops -fno-ipa-cp-clone -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
 #$(OPTS) -fno-inline-functions $(GCC8WARNINGS)
-endif
+#endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
