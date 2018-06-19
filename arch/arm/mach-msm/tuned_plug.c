@@ -26,7 +26,8 @@ static struct workqueue_struct *tunedplug_wq;
 static unsigned int tuned_plug_active = 1;
 module_param(tuned_plug_active, uint, 0644);
 
-static unsigned int sampling_time = 7;
+static unsigned int sampling_time;
+static unsigned int max_sampling;
 
 bool displayon = true;
 static unsigned int down[NR_CPUS-1];
@@ -67,14 +68,11 @@ static void __cpuinit tuned_plug_work_fn(struct work_struct *work)
         if (!tuned_plug_active)
                 return;
 
-	if (!displayon && sampling_time < 50)
+	if (!displayon && sampling_time < max_sampling)
 		sampling_time++;
 
         nr_cpus = num_online_cpus();
 
-	/* if any cpu is on its limit, turn on the next one and quit.
-	   This is a shortcut. Returning here will prevent unecessary computing
-	*/
 	if (nr_cpus < NR_CPUS) {
 		for_each_online_cpu(i) {
 			if (cpufreq_get_policy(&policy, i) != 0)
@@ -105,7 +103,7 @@ static int lcd_notifier_callback(struct notifier_block *this,
 
                 case LCD_EVENT_ON_START:
 			displayon = true;
-	                sampling_time = 7;
+	                sampling_time = msecs_to_jiffies(25);
                         break;
 
                 default:
@@ -129,7 +127,8 @@ int __init tuned_plug_init(void)
 
 	INIT_DELAYED_WORK(&tuned_plug_work, tuned_plug_work_fn);
 
-	sampling_time = 7;
+	max_sampling = msecs_to_jiffies(2000);
+	sampling_time = msecs_to_jiffies(25);
 
 	queue_delayed_work_on(0, tunedplug_wq, &tuned_plug_work, msecs_to_jiffies(10000));
 

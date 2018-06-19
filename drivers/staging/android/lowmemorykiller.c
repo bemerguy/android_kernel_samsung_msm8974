@@ -45,7 +45,7 @@
 #include <linux/notifier.h>
 #include <linux/delay.h>
 
-static uint32_t lowmem_debug_level = 1;
+static uint32_t lowmem_debug_level = 3;
 static short lowmem_adj[6] = {
 	0,
 	1,
@@ -98,7 +98,7 @@ static int lowmem_shrink(void)
 		array_size = lowmem_minfree_size;
 	for (i = array_size-1; i >=0; i--) {
 		minfree = lowmem_minfree[i];
-		if (other_free < minfree && other_file < minfree) {
+		if (other_free+other_file < minfree) {
 			min_score_adj = lowmem_adj[i];
 			break;
 		}
@@ -134,24 +134,24 @@ static int lowmem_shrink(void)
 		if (same_thread_group(tsk, current))
 			continue;
 
-		p = find_lock_task_mm(tsk);
-		if (!p)
-			continue;
+                p = find_lock_task_mm(tsk);
+                if (!p)
+                        continue;
 
 		oom_score = p->signal->oom_score_adj;
-			task_unlock(p);
+		task_unlock(p);
 
                 if (oom_score < min_score_adj) {
                                 lowmem_print(5,"%s score: %d < min_score_adj: %d", p->comm, oom_score, min_score_adj);
-			continue;
-		}
+                                continue;
+                }
 
 
 		if (selected) {
 			if (oom_score < selected_oom_score) {
 				lowmem_print(5,"%s score (%d) is lower than %s's (%d)", p->comm, oom_score, selected->comm, selected_oom_score);
 				continue;
-		}
+			}
 			else if ((oom_score == selected_oom_score) && (tki < 16)) {
 					tki++;
 					lowmem_print(4,"### adding %s with score %d to pos %d of tokill", p->comm, oom_score, tki);
@@ -173,7 +173,7 @@ static int lowmem_shrink(void)
                 send_sig(SIGKILL, tokill[tki], 0);
 
                 lowmem_print(1, "Killing '%s' (%d) on behalf of '%s' (%d) because\n" \
-				"   cache %ldkB is below limit %ldkB for oom_score_adj %hd\n" \
+                                "   cache %ldkB is below limit %ldkB for oom_score_adj %hd\n" \
                                 "   Free memory is %ldkB above reserved\n",
                              tokill[tki]->comm, tokill[tki]->pid,
                              current->comm, current->pid, cache_size, cache_limit, min_score_adj, free);
@@ -212,9 +212,9 @@ static void timelylmk(struct work_struct *work)
 	lowmem_shrink();
 
 	if (displayon)
-		queue_delayed_work(system_nrt_wq, dwork, 400);
+		queue_delayed_work(system_nrt_wq, dwork, 300);
 	else
-		queue_delayed_work(system_nrt_wq, dwork, 1600);
+		queue_delayed_work(system_nrt_wq, dwork, 600);
 }
 
 static int __init lowmem_init(void)
@@ -314,7 +314,7 @@ static const struct kparam_array __param_arr_adj = {
  */
 #ifdef CONFIG_ANDROID_LOW_MEMORY_KILLER_AUTODETECT_OOM_ADJ_VALUES
 module_param_cb(adj, &lowmem_adj_array_ops,
-		    .arr = &__param_arr_adj,
+		.arr = &__param_arr_adj,
 		S_IRUGO | S_IWUSR);
 __MODULE_PARM_TYPE(adj, "array of short");
 #else
@@ -330,4 +330,3 @@ module_init(lowmem_init);
 module_exit(lowmem_exit);
 
 MODULE_LICENSE("GPL");
-

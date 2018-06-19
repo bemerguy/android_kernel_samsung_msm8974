@@ -10,7 +10,7 @@
 # Parameters to be configured manually
 #######################################
 
-BOEFFLA_VERSION="4.1-beta22-CM14.1-g900f"
+BOEFFLA_VERSION="4.2-190618-CM15.1-g900"
 
 #TOOLCHAIN="/root/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-"
 TOOLCHAIN="/root/matthewdalex-arm-eabi-8.x-2ff26b90c3c4/bin/arm-eabi-"
@@ -28,6 +28,7 @@ MODULES_IN_SYSTEM="y"
 OUTPUT_FOLDER="output"
 
 DEFCONFIG="boeffla_defconfig"
+DEFCONFIG="Boeffla_@klte@_defconfig"
 DEFCONFIG_VARIANT="msm8974pro_sec_klte_eur_defconfig"
 ##msm8974_sec_defconfig VARIANT_DEFCONFIG=msm8974pro_sec_klte_eur_defconfig
 

@@ -2,16 +2,15 @@
 #
 # Original and credits: osm0sis @ xda-developers
 #
-# Modified by Lord Boeffla, 05.12.2016
+# Modified by sunilpaulmathew @ xda-developers.com
 
 ############### AnyKernel setup start ############### 
 
 # EDIFY properties
 do.devicecheck=1
 do.initd=0
-do.modules=1
+do.modules=0
 do.cleanup=1
-#device.name1=kltekdi
 device.name1=kltexx
 device.name2=kltelra
 device.name3=kltetmo
@@ -23,10 +22,11 @@ device.name8=klte
 device.name9=kltekor
 device.name10=klteskt
 device.name11=kltektt
-device.name12=
-device.name13=
-device.name14=
+device.name12=kltekdi
+device.name13=kltedv
+device.name14=kltespr
 device.name15=
+# end properties
 
 # shell variables
 block=/dev/block/platform/msm_sdcc.1/by-name/boot;
@@ -52,8 +52,6 @@ chmod 755 $ramdisk/sbin/busybox
 chmod 775 $ramdisk/res
 chmod -R 755 $ramdisk/res/bc
 chmod -R 755 $ramdisk/res/misc
-
-replace_file /system/etc/thermal-engine-8974.conf 644 thermal-engine-8974.conf
 
 # ramdisk changes
 # ... none

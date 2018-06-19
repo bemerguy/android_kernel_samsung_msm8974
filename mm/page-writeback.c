@@ -42,7 +42,7 @@
 /*
  * Sleep at most 200ms at a time in balance_dirty_pages().
  */
-#define MAX_PAUSE		200
+#define MAX_PAUSE		100
 
 /*
  * Try to keep balance_dirty_pages() call intervals higher than this many pages
@@ -53,7 +53,7 @@
 /*
  * Estimate write bandwidth at 200ms intervals.
  */
-#define BANDWIDTH_INTERVAL	200
+#define BANDWIDTH_INTERVAL	1000
 
 #define RATELIMIT_CALC_SHIFT	10
 
@@ -61,20 +61,20 @@
  * After a CPU has dirtied this many pages, balance_dirty_pages_ratelimited
  * will look to see if it needs to force writeback or throttling.
  */
-static long ratelimit_pages = 32;
+static long ratelimit_pages = 64;
 
 /* The following parameters are exported via /proc/sys/vm */
 
 /*
  * Start background writeback (via writeback threads) at this percentage
  */
-int dirty_background_ratio = 5;
+int dirty_background_ratio;
 
 /*
  * dirty_background_bytes starts at 0 (disabled) so that it is a function of
  * dirty_background_ratio * the amount of dirtyable memory
  */
-unsigned long dirty_background_bytes;
+unsigned long dirty_background_bytes = 4194304;
 
 /*
  * free highmem will not be subtracted from the total free memory
@@ -85,13 +85,13 @@ int vm_highmem_is_dirtyable;
 /*
  * The generator of dirty data starts writeback at this percentage
  */
-int vm_dirty_ratio = 10;
+int vm_dirty_ratio;
 
 /*
  * vm_dirty_bytes starts at 0 (disabled) so that it is a function of
  * vm_dirty_ratio * the amount of dirtyable memory
  */
-unsigned long vm_dirty_bytes;
+unsigned long vm_dirty_bytes = 16777216;
 
 /*
  * The interval between `kupdate'-style writebacks
@@ -103,7 +103,7 @@ EXPORT_SYMBOL_GPL(dirty_writeback_interval);
 /*
  * The longest time for which data is allowed to remain dirty
  */
-unsigned int dirty_expire_interval = 40 * 100; /* centiseconds */
+unsigned int dirty_expire_interval = 2 * 100; /* centiseconds */
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.
@@ -185,14 +185,11 @@ static struct prop_descriptor vm_completions;
  */
 static unsigned long zone_dirtyable_memory(struct zone *zone)
 {
-	unsigned long nr_pages;
+	unsigned long nr_pages = zone_page_state(zone, NR_FREE_PAGES) +
+		zone_reclaimable_pages(zone);
 
-	nr_pages = zone_page_state(zone, NR_FREE_PAGES);
+	/* don't allow this to underflow */
 	nr_pages -= min(nr_pages, zone->dirty_balance_reserve);
-
-	nr_pages += zone_page_state(zone, NR_INACTIVE_FILE);
-	nr_pages += zone_page_state(zone, NR_ACTIVE_FILE);
-
 	return nr_pages;
 }
 
@@ -241,11 +238,8 @@ unsigned long global_dirtyable_memory(void)
 {
 	unsigned long x;
 
-	x = global_page_state(NR_FREE_PAGES);
+	x = global_page_state(NR_FREE_PAGES) + global_reclaimable_pages();
 	x -= min(x, dirty_balance_reserve);
-
-	x += global_page_state(NR_INACTIVE_FILE);
-	x += global_page_state(NR_ACTIVE_FILE);
 
 	if (!vm_highmem_is_dirtyable)
 		x -= highmem_dirtyable_memory(x);
@@ -1615,10 +1609,10 @@ ratelimit_handler(struct notifier_block *self, unsigned long action, void *hcpu)
 	switch (action & ~CPU_TASKS_FROZEN) {
 		case CPU_ONLINE:
 		case CPU_DEAD:
-	writeback_set_ratelimit();
+			writeback_set_ratelimit();
 			return NOTIFY_OK;
 		default:
-	return NOTIFY_DONE;
+			return NOTIFY_DONE;
 	}
 }
 

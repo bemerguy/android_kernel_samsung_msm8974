@@ -8,7 +8,6 @@
 #include "../../drivers/input/touchscreen/synaptics/synaptics_i2c_rmi.h"
 #include "../../drivers/sensorhub/stm/ssp.h"
 
-extern int SYN_I2C_RETRY_TIMES;
 extern int GPIO_CFG_KT;
 
 extern struct ssp_data *main_prox_data;

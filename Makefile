@@ -357,13 +357,16 @@ CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 
-OPTS           = -ffast-math -fsplit-loops \
-		-fmodulo-sched -fmodulo-sched-allow-regmoves \
-		-fsingle-precision-constant -ftree-partial-pre -fpredictive-commoning \
-		-ftree-vectorize -fvect-cost-model=cheap -ftree-loop-ivcanon \
-		-fgcse-sm -fgcse-las -fira-hoist-pressure -fivopts -fgcse-after-reload -ftree-loop-distribute-patterns \
-		-fsched-spec-load -fweb -frename-registers -fipa-pta -ftree-loop-im -fsection-anchors -funsafe-loop-optimizations \
-		-frerun-cse-after-loop -ftracer -floop-unroll-and-jam
+OPTS           = -ffast-math -fsplit-loops -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant \
+                -ftree-vectorize -fvect-cost-model=cheap -ftree-loop-ivcanon -fgcse-sm -fgcse-las -fira-hoist-pressure -fivopts \
+                -fsched-spec-load -fipa-pta -ftree-loop-im -fsection-anchors -fsched-pressure -fomit-frame-pointer -ftree-lrs -fgraphite-identity \
+                -floop-nest-optimize -floop-parallelize-all -ftree-coalesce-vars -ftree-loop-distribution -floop-interchange -fprefetch-loop-arrays -freorder-blocks-algorithm=simple \
+                -fvariable-expansion-in-unroller --param=l1-cache-line-size=64 --param=l2-cache-size=2048 --param=max-hoist-depth=0 \
+                --param=inline-min-speedup=9 --param max-modulo-backtrack-attempts=800 --param large-function-growth=2000 --param=large-function-insns=10000 --param=max-unroll-times=2000 \
+                --param=max-inline-insns-recursive=3000 --param=max-inline-insns-recursive-auto=3000 --param=max-inline-recursive-depth=64 --param=max-inline-recursive-depth-auto=96 \
+                --param=max-stores-to-sink=20 --param=max-tail-merge-comparisons=600 --param=max-stores-to-merge=640 --param=max-tail-merge-iterations=2000 \
+                --param=sched-pressure-algorithm=2 --param max-cse-path-length=40 --param max-cse-insns=2000 --param max-cselib-memory-locations=10000 --param max-reload-search-insns=2000 \
+                --param=max-tail-merge-iterations=20 --param=max-unrolled-insns=8000 --param=max-unswitch-insns=8000
 
 GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
 GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier -Wno-stringop-overflow \
@@ -583,7 +586,7 @@ all: vmlinux
 #ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 #KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 #else
-KBUILD_CFLAGS	+= -O3 $(OPTS) -fno-unswitch-loops -fno-ipa-cp-clone -freorder-blocks-algorithm=simple -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
+KBUILD_CFLAGS	+= -O3 $(OPTS) $(GCC8WARNINGS)
 # -freorder-blocks-algorithm=simple -fno-unswitch-loops -fno-ipa-cp-clone -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
 #$(OPTS) -fno-inline-functions $(GCC8WARNINGS)
 #endif
@@ -602,19 +605,6 @@ endif
 # This warning generated too much noise in a regular build.
 # Use make W=1 to enable this warning (see scripts/Makefile.build)
 KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
-
-ifdef CONFIG_FRAME_POINTER
-KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
-else
-# Some targets (ARM with Thumb2, for example), can't be built with frame
-# pointers.  For those, we don't have FUNCTION_TRACER automatically
-# select FRAME_POINTER.  However, FUNCTION_TRACER adds -pg, and this is
-# incompatible with -fomit-frame-pointer with current GCC, so we don't use
-# -fomit-frame-pointer with FUNCTION_TRACER.
-ifndef CONFIG_FUNCTION_TRACER
-KBUILD_CFLAGS	+= -fomit-frame-pointer
-endif
-endif
 
 # These flags need a special toolchain so split them off
 

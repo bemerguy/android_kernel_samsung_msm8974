@@ -4351,7 +4351,7 @@ int taiko_write_no_hook(struct snd_soc_codec *codec, unsigned int reg,
 		return 0;
 
 	BUG_ON(reg > TAIKO_MAX_REGISTER);
-
+	
 	if (!taiko_volatile(codec, reg)) {
 		ret = snd_soc_cache_write(codec, reg, value);
 		if (ret != 0)
