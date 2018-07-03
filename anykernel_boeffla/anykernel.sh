@@ -33,6 +33,7 @@ block=/dev/block/platform/msm_sdcc.1/by-name/boot;
 add_seandroidenforce=1
 supersu_exclusions=""
 is_slot_device=0;
+ramdisk_compression=auto;
 
 ############### AnyKernel setup end ############### 
 
@@ -40,21 +41,30 @@ is_slot_device=0;
 # import patching functions/variables - see for reference
 . /tmp/anykernel/tools/ak2-core.sh;
 
-# dump current kernel
-dump_boot;
-
-############### Ramdisk customization start ###############
-
-# AnyKernel permissions
-chmod 775 $ramdisk/sbin
-chmod 755 $ramdisk/sbin/busybox
+## AnyKernel file attributes
+# set permissions/ownership for included ramdisk files
+chmod -R 750 $ramdisk/*;
+chown -R root:root $ramdisk/*;
 
 chmod 775 $ramdisk/res
 chmod -R 755 $ramdisk/res/bc
 chmod -R 755 $ramdisk/res/misc
 
-# ramdisk changes
-# ... none
+# dump current kernel
+dump_boot;
+
+############### Ramdisk customization start ###############
+
+mount -o rw,remount /system;
+
+replace_file /system/vendor/etc/thermal-engine-8974.conf 644 thermal-engine-8974.conf;
+
+remove_line init.qcom.rc scaling_min_freq;
+remove_line init.qcom.rc scaling_min_freq;
+remove_line init.qcom.rc scaling_min_freq;
+remove_line init.qcom.rc scaling_min_freq;
+remove_line init.qcom.rc "start mpdecision";
+remove_line init.qcom.rc "start mpdecision";
 
 ############### Ramdisk customization end ###############
 

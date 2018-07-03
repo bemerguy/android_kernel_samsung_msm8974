@@ -23,11 +23,11 @@ DHDCFLAGS += -DWL_CFG80211
 DHDCFLAGS += -DSIMPLE_MAC_PRINT
 DHDCFLAGS += -DDEBUGFS_CFG80211
 # Enable wakelock debug function
-DHDCFLAGS += -DDHD_TRACE_WAKE_LOCK
+#DHDCFLAGS += -DDHD_TRACE_WAKE_LOCK
 # Print out kernel panic point of file and line info when assertion happened
-DHDCFLAGS += -DBCMASSERT_LOG
+#DHDCFLAGS += -DBCMASSERT_LOG
 # Collect Current Assoc/Reject Status for Big Data logging
-DHDCFLAGS += -DDHD_ENABLE_BIGDATA_LOGGING
+#DHDCFLAGS += -DDHD_ENABLE_BIGDATA_LOGGING
 
 # Print 8021X
 DHDCFLAGS += -DDHD_8021X_DUMP
@@ -610,7 +610,8 @@ DHDCFLAGS += -include "dhd_sec_feature.h"
 
 #EXTRA_LDFLAGS += --strip-debug
 
-EXTRA_CFLAGS += $(DHDCFLAGS) -DDHD_DEBUG
+EXTRA_CFLAGS += $(DHDCFLAGS) 
+#-DDHD_DEBUG
 EXTRA_CFLAGS += -DSRCBASE=\"$(src)\"
 EXTRA_CFLAGS += -I$(src)/include/ -I$(src)/
 KBUILD_CFLAGS += -I$(LINUXDIR)/include -I$(shell pwd)

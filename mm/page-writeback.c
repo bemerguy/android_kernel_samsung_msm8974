@@ -42,7 +42,7 @@
 /*
  * Sleep at most 200ms at a time in balance_dirty_pages().
  */
-#define MAX_PAUSE		100
+#define MAX_PAUSE		max(HZ/5, 1)
 
 /*
  * Try to keep balance_dirty_pages() call intervals higher than this many pages
@@ -53,7 +53,7 @@
 /*
  * Estimate write bandwidth at 200ms intervals.
  */
-#define BANDWIDTH_INTERVAL	1000
+#define BANDWIDTH_INTERVAL	max(HZ/5, 1)
 
 #define RATELIMIT_CALC_SHIFT	10
 
@@ -61,7 +61,7 @@
  * After a CPU has dirtied this many pages, balance_dirty_pages_ratelimited
  * will look to see if it needs to force writeback or throttling.
  */
-static long ratelimit_pages = 64;
+static long ratelimit_pages = 16;
 
 /* The following parameters are exported via /proc/sys/vm */
 
@@ -74,7 +74,7 @@ int dirty_background_ratio;
  * dirty_background_bytes starts at 0 (disabled) so that it is a function of
  * dirty_background_ratio * the amount of dirtyable memory
  */
-unsigned long dirty_background_bytes = 4194304;
+unsigned long dirty_background_bytes = 262144;
 
 /*
  * free highmem will not be subtracted from the total free memory
@@ -91,19 +91,19 @@ int vm_dirty_ratio;
  * vm_dirty_bytes starts at 0 (disabled) so that it is a function of
  * vm_dirty_ratio * the amount of dirtyable memory
  */
-unsigned long vm_dirty_bytes = 16777216;
+unsigned long vm_dirty_bytes = 1048576;
 
 /*
  * The interval between `kupdate'-style writebacks
  */
-unsigned int dirty_writeback_interval = 60 * 100; /* centiseconds */
+unsigned int dirty_writeback_interval = 5 * 100; /* centiseconds */
 
 EXPORT_SYMBOL_GPL(dirty_writeback_interval);
 
 /*
  * The longest time for which data is allowed to remain dirty
  */
-unsigned int dirty_expire_interval = 2 * 100; /* centiseconds */
+unsigned int dirty_expire_interval = 10 * 100; /* centiseconds */
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.

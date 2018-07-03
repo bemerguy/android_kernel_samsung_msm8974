@@ -358,10 +358,11 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 
 OPTS           = -ffast-math -fsplit-loops -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant \
-                -ftree-vectorize -fvect-cost-model=cheap -ftree-loop-ivcanon -fgcse-sm -fgcse-las -fira-hoist-pressure -fivopts \
+                -ftree-vectorize -fvect-cost-model=cheap -ftree-loop-ivcanon -fgcse-sm -fgcse-las -fgcse-after-reload -fira-hoist-pressure -fivopts \
                 -fsched-spec-load -fipa-pta -ftree-loop-im -fsection-anchors -fsched-pressure -fomit-frame-pointer -ftree-lrs -fgraphite-identity \
                 -floop-nest-optimize -floop-parallelize-all -ftree-coalesce-vars -ftree-loop-distribution -floop-interchange -fprefetch-loop-arrays -freorder-blocks-algorithm=simple \
-                -fvariable-expansion-in-unroller --param=l1-cache-line-size=64 --param=l2-cache-size=2048 --param=max-hoist-depth=0 \
+                -fvariable-expansion-in-unroller -funroll-loops -falign-functions=8 -falign-loops=8 -fgraphite \
+		--param=l1-cache-size=32 --param=l1-cache-line-size=64 --param=l2-cache-size=2048 --param=max-hoist-depth=0 \
                 --param=inline-min-speedup=9 --param max-modulo-backtrack-attempts=800 --param large-function-growth=2000 --param=large-function-insns=10000 --param=max-unroll-times=2000 \
                 --param=max-inline-insns-recursive=3000 --param=max-inline-insns-recursive-auto=3000 --param=max-inline-recursive-depth=64 --param=max-inline-recursive-depth-auto=96 \
                 --param=max-stores-to-sink=20 --param=max-tail-merge-comparisons=600 --param=max-stores-to-merge=640 --param=max-tail-merge-iterations=2000 \

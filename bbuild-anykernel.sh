@@ -9,12 +9,11 @@
 #######################################
 # Parameters to be configured manually
 #######################################
+VAR="klte"
 
-BOEFFLA_VERSION="4.2-190618-CM15.1-g900"
+BOEFFLA_VERSION="280618-CM15.1-$VAR"
 
-#TOOLCHAIN="/root/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-"
-TOOLCHAIN="/root/matthewdalex-arm-eabi-8.x-2ff26b90c3c4/bin/arm-eabi-"
-#TOOLCHAIN="/root/gcc-linaro-7.2.1-2017.11-x86_64_arm-eabi/bin/arm-eabi-"
+TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
 
 ARCHITECTURE=arm
 COMPILER_FLAGS_KERNEL="-Wno-maybe-uninitialized -Wno-array-bounds"
@@ -27,9 +26,9 @@ DTBTOOL_CMD="-2"
 MODULES_IN_SYSTEM="y"
 OUTPUT_FOLDER="output"
 
-DEFCONFIG="boeffla_defconfig"
-DEFCONFIG="Boeffla_@klte@_defconfig"
-DEFCONFIG_VARIANT="msm8974pro_sec_klte_eur_defconfig"
+DEFCONFIG="Boeffla_@$VAR@_defconfig"
+#Boeffla_@klte@_defconfig  Boeffla_@klteduos@_defconfig  Boeffla_@kltedv@_defconfig  Boeffla_@kltekdi@_defconfig  Boeffla_@kltekor@_defconfig
+#DEFCONFIG_VARIANT="msm8974pro_sec_klte_eur_defconfig"
 ##msm8974_sec_defconfig VARIANT_DEFCONFIG=msm8974pro_sec_klte_eur_defconfig
 
 KERNEL_NAME="Boeffla-Kernel"

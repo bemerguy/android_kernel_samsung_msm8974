@@ -105,7 +105,7 @@ static unsigned long timer_rate = DEFAULT_TIMER_RATE;
  * timer interval.
  */
 #define DEFAULT_ABOVE_HISPEED_DELAY DEFAULT_TIMER_RATE
-static unsigned int default_above_hispeed_delay[] = { 10000, 2265600, 80000 };
+static unsigned int default_above_hispeed_delay[] = { 20000, 2265600, 100000 };
 static spinlock_t above_hispeed_delay_lock;
 static unsigned int *above_hispeed_delay = default_above_hispeed_delay;
 static int nabove_hispeed_delay = ARRAY_SIZE(default_above_hispeed_delay);
@@ -206,7 +206,7 @@ extern bool displayon;
 static
 #endif
 struct cpufreq_governor cpufreq_gov_interactive = {
-	.name = "interactuned",
+	.name = "Tuned",
 	.governor = cpufreq_governor_interactive,
 	.max_transition_latency = 10000000,
 	.owner = THIS_MODULE,
@@ -215,9 +215,9 @@ struct cpufreq_governor cpufreq_gov_interactive = {
 static inline cputime64_t get_cpu_idle_time_jiffy(unsigned int cpu,
 						  cputime64_t *wall)
 {
-	static u64 idle_time;
-	static u64 cur_wall_time;
-	static u64 busy_time;
+	u64 idle_time;
+	u64 cur_wall_time;
+	u64 busy_time;
 
 	cur_wall_time = jiffies64_to_cputime64(get_jiffies_64());
 
@@ -277,10 +277,10 @@ static void cpufreq_interactive_timer_resched(
 	pcpu->cputime_speedadj = 0;
 	pcpu->cputime_speedadj_timestamp = pcpu->time_in_idle_timestamp;
 	if (displayon)
-	expires = jiffies + usecs_to_jiffies(timer_rate);
+		expires = jiffies + usecs_to_jiffies(timer_rate);
 	else
-		expires = jiffies + usecs_to_jiffies(timer_rate*2);
-	
+		expires = jiffies + usecs_to_jiffies(timer_rate*4);
+
 #ifdef DYN_DEFER
        if (pcpu->target_freq > pcpu->policy->min)
                timer_set_nondeferrable(&pcpu->cpu_timer);
@@ -1699,7 +1699,7 @@ static struct attribute *interactive_attributes[] = {
 
 static struct attribute_group interactive_attr_group = {
 	.attrs = interactive_attributes,
-	.name = "interactuned",
+	.name = "Tuned",
 };
 
 static int cpufreq_interactive_idle_notifier(struct notifier_block *nb,

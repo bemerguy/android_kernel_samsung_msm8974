@@ -38,7 +38,7 @@ RECOVERY_DEVICE="/dev/block/platform/msm_sdcc.1/by-name/recovery"
 # *******************
 
 if [ "lov_gov_profiles" == "$1" ]; then
-	echo "interactuned - battery;interactuned - battery extreme;interactuned - performance;zzmoove - optimal;zzmoove - battery;zzmoove - battery plus;zzmoove - battery yank;zzmoove - battery extreme yank;zzmoove - performance;zzmoove - insane;zzmoove - moderate;zzmoove - game;zzmoove - relax"
+	echo "Tuned - battery;Tuned - battery extreme;Tuned - performance;zzmoove - optimal;zzmoove - battery;zzmoove - battery plus;zzmoove - battery yank;zzmoove - battery extreme yank;zzmoove - performance;zzmoove - insane;zzmoove - moderate;zzmoove - game;zzmoove - relax"
 	exit 0
 fi
 
@@ -97,13 +97,13 @@ if [ "lov_presets" == "$1" ]; then
 	echo "^GPU: 320-578;"
 	
 	echo "Standard~"
-	echo "Gov: interactuned / standard"
+	echo "Gov: Tuned / standard"
 	echo "^Sched: row"
 	echo "^CPU: 2457 / no uv"
 	echo "^GPU: 200-578;"
 	
 	echo "Battery friendly~"
-	echo "Gov: interactuned / standard"
+	echo "Gov: Tuned / standard"
 	echo "^Sched: zen"
 	echo "^CPU: 1728 / -25mV"
 	echo "^GPU: 27-320;"
@@ -139,14 +139,14 @@ if [ "conf_presets" == "$1" ]; then
 	fi
 	if [ "Standard" ==  "$2" ]; then
 		# gov, gov prof, sched int, sched ext, cpu max, cpu uv, gpu freq, gpu uv
-		echo "interactuned;standard;"
+		echo "Tuned;standard;"
 		echo "row;row;"
 		echo "2457600;None;"
 		echo "5,0;None"
 	fi
 	if [ "Battery friendly" ==  "$2" ]; then
 		# gov, gov prof, sched int, sched ext, cpu max, cpu uv, gpu freq, gpu uv
-		echo "interactuned;standard;"
+		echo "Tuned;standard;"
 		echo "zen;zen;"
 		echo "1728000;undervolt -25mV;"
 		echo "6,3;None"
@@ -444,23 +444,12 @@ if [ "apply_cpu_hotplug_profile" == "$1" ]; then
 
         if [ "Tuned" == "$2" ]; then
 		echo "1" >/sys/module/tuned_plug/parameters/tuned_plug_active
-		if [ -f /system/bin/mpdecision ]; then
-			mount -o rw,remount /system
-			mv -f /system/bin/mpdecision /system/bin/mpdecision.bkp
-			killall mpdecision
-			mount -o ro,remount /system
-		fi
+		stop mpdecision
 		busybox find /sys/devices/system/cpu/cpu? -name online -exec sh -c "echo 1 > {}" \;
-		busybox find /sys/devices/system/cpu -name scaling_min_freq -exec sh -c "echo 300000 > {}" \;
                 exit 0
         else
 	        echo "0" >/sys/module/tuned_plug/parameters/tuned_plug_active
-	        if [ -f /system/bin/mpdecision.bkp ]; then
-	                mount -o rw,remount /system
-	                mv -f /system/bin/mpdecision.bkp /system/bin/mpdecision
-	                mount -o ro,remount /system
-	                start mpdecision
-	        fi
+                start mpdecision
 	fi
 
 	if [ "MPDecision" == "$2" ]; then
@@ -718,65 +707,65 @@ if [ "apply_governor_profile" == "$1" ]; then
 		busybox sync
 	fi
 
-	if [ "interactuned - standard" == "$2" ]; then
-		echo "10000 2265600:60000" > /sys/devices/system/cpu/cpufreq/interactuned/above_hispeed_delay
-		echo "90" > /sys/devices/system/cpu/cpufreq/interactuned/go_hispeed_load
-		echo "2265600" > /sys/devices/system/cpu/cpufreq/interactuned/hispeed_freq
-		echo "1" > /sys/devices/system/cpu/cpufreq/interactuned/io_is_busy
-		echo "60000" > /sys/devices/system/cpu/cpufreq/interactuned/min_sample_time
-		echo "0" > /sys/devices/system/cpu/cpufreq/interactuned/sampling_down_factor
-		echo "0" > /sys/devices/system/cpu/cpufreq/interactuned/sync_freq
-		echo "70" > /sys/devices/system/cpu/cpufreq/interactuned/target_loads
-		echo "20000" > /sys/devices/system/cpu/cpufreq/interactuned/timer_rate
-		echo "60000" > /sys/devices/system/cpu/cpufreq/interactuned/timer_slack
+	if [ "Tuned - standard" == "$2" ]; then
+		echo "20000 2265600:100000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+		echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
+		echo "2265600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+		echo "1" > /sys/devices/system/cpu/cpufreq/Tuned/io_is_busy
+		echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
+		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
+		echo "70" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
+		echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+		echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
 	fi
 
-	if [ "interactuned - battery" == "$2" ]; then
-                echo "20000 2265600:80000" > /sys/devices/system/cpu/cpufreq/interactuned/above_hispeed_delay
-                echo "95" > /sys/devices/system/cpu/cpufreq/interactuned/go_hispeed_load
-                echo "1958400" > /sys/devices/system/cpu/cpufreq/interactuned/hispeed_freq
-                echo "1" > /sys/devices/system/cpu/cpufreq/interactuned/io_is_busy
-                echo "60000" > /sys/devices/system/cpu/cpufreq/interactuned/min_sample_time
-                echo "0" > /sys/devices/system/cpu/cpufreq/interactuned/sampling_down_factor
-                echo "0" > /sys/devices/system/cpu/cpufreq/interactuned/sync_freq
-                echo "80" > /sys/devices/system/cpu/cpufreq/interactuned/target_loads
-                echo "20000" > /sys/devices/system/cpu/cpufreq/interactuned/timer_rate
-                echo "40000" > /sys/devices/system/cpu/cpufreq/interactuned/timer_slack
+	if [ "Tuned - battery" == "$2" ]; then
+                echo "30000 2265600:120000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "95" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
+                echo "1958400" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+                echo "1" > /sys/devices/system/cpu/cpufreq/Tuned/io_is_busy
+                echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
+                echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
+                echo "80" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
+                echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
 	fi
 
-	if [ "interactuned - battery extreme" == "$2" ]; then
-                echo "30000 2265600:100000" > /sys/devices/system/cpu/cpufreq/interactuned/above_hispeed_delay
-                echo "99" > /sys/devices/system/cpu/cpufreq/interactuned/go_hispeed_load
-                echo "1574400" > /sys/devices/system/cpu/cpufreq/interactuned/hispeed_freq
-                echo "1" > /sys/devices/system/cpu/cpufreq/interactuned/io_is_busy
-                echo "40000" > /sys/devices/system/cpu/cpufreq/interactuned/min_sample_time
-                echo "0" > /sys/devices/system/cpu/cpufreq/interactuned/sampling_down_factor
-                echo "0" > /sys/devices/system/cpu/cpufreq/interactuned/sync_freq
-                echo "95" > /sys/devices/system/cpu/cpufreq/interactuned/target_loads
-                echo "30000" > /sys/devices/system/cpu/cpufreq/interactuned/timer_rate
-                echo "20000" > /sys/devices/system/cpu/cpufreq/interactuned/timer_slack
+	if [ "Tuned - battery extreme" == "$2" ]; then
+                echo "40000 2265600:200000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "99" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
+                echo "1574400" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+                echo "1" > /sys/devices/system/cpu/cpufreq/Tuned/io_is_busy
+                echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
+                echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
+                echo "95" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
+                echo "30000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
 	fi
 
-	if [ "interactuned - performance" == "$2" ]; then
-                echo "10000 2265600:40000" > /sys/devices/system/cpu/cpufreq/interactuned/above_hispeed_delay
-                echo "80" > /sys/devices/system/cpu/cpufreq/interactuned/go_hispeed_load
-                echo "2265600" > /sys/devices/system/cpu/cpufreq/interactuned/hispeed_freq
-                echo "1" > /sys/devices/system/cpu/cpufreq/interactuned/io_is_busy
-                echo "60000" > /sys/devices/system/cpu/cpufreq/interactuned/min_sample_time
-                echo "0" > /sys/devices/system/cpu/cpufreq/interactuned/sampling_down_factor
-                echo "0" > /sys/devices/system/cpu/cpufreq/interactuned/sync_freq
-                echo "60" > /sys/devices/system/cpu/cpufreq/interactuned/target_loads
-                echo "10000" > /sys/devices/system/cpu/cpufreq/interactuned/timer_rate
-                echo "80000" > /sys/devices/system/cpu/cpufreq/interactuned/timer_slack
+	if [ "Tuned - performance" == "$2" ]; then
+                echo "10000 2265600:50000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "80" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
+                echo "2265600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+                echo "1" > /sys/devices/system/cpu/cpufreq/Tuned/io_is_busy
+                echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
+                echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
+                echo "60" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
+                echo "10000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync

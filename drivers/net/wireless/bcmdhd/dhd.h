@@ -863,7 +863,7 @@ extern uint dhd_force_tx_queueing;
 #endif
 
 /* hooks for custom Roaming Romaing  setting via Makefile */
-#define DEFAULT_ROAM_DELTA_VALUE  16 /* dBm default roam delta all band. was 10 */
+#define DEFAULT_ROAM_DELTA_VALUE  5 /* dBm default roam delta all band. was 10 */
 #define DEFAULT_ROAM_DELTA_SETTING 	-1
 #ifndef CUSTOM_ROAM_DELTA_SETTING
 #define CUSTOM_ROAM_DELTA_SETTING 	DEFAULT_ROAM_DELTA_VALUE
@@ -929,7 +929,7 @@ extern uint dhd_force_tx_queueing;
 
 #define MAX_DTIM_SKIP_BEACON_INTERVAL	100 /* max allowed associated AP beacon for DTIM skip */
 #ifndef MAX_DTIM_ALLOWED_INTERVAL
-#define MAX_DTIM_ALLOWED_INTERVAL 600 /* max allowed total beacon interval for DTIM skip */
+#define MAX_DTIM_ALLOWED_INTERVAL 300 /* max allowed total beacon interval for DTIM skip */
 #endif
 #define NO_DTIM_SKIP 1
 #ifdef SDTEST

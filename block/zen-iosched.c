@@ -16,9 +16,9 @@
 
 enum zen_data_dir { ASYNC, SYNC };
 
-static const int sync_expire  = HZ / 4;    /* max time before a sync is submitted. */
-static const int async_expire = 2 * HZ;    /* ditto for async, these limits are SOFT! */
-static const int fifo_batch = 1;
+static const int sync_expire  = 5;    /* max time before a sync is submitted. */
+static const int async_expire = 25;    /* ditto for async, these limits are SOFT! */
+static const int fifo_batch = 16;
 
 struct zen_data {
 	/* Runtime Data */
@@ -61,7 +61,7 @@ zen_merged_requests(struct request_queue *q, struct request *rq,
 static void zen_add_request(struct request_queue *q, struct request *rq)
 {
 	struct zen_data *zdata = zen_get_data(q);
-	const int dir = rq_data_dir(rq);
+	const int dir = rq_is_sync(rq);
 
 	if (zdata->fifo_expire[dir]) {
 		rq_set_fifo_time(rq, jiffies + zdata->fifo_expire[dir]);
@@ -91,7 +91,7 @@ zen_expired_request(struct zen_data *zdata, int ddir)
                 return NULL;
 
         rq = rq_entry_fifo(zdata->fifo_list[ddir].next);
-        if (time_after(jiffies, rq_fifo_time(rq)))
+        if (time_after_eq(jiffies, rq_fifo_time(rq)))
                 return rq;
 
         return NULL;
@@ -163,11 +163,14 @@ static void *zen_init_queue(struct request_queue *q)
 	zdata = kmalloc_node(sizeof(*zdata), GFP_KERNEL, q->node);
 	if (!zdata)
 		return NULL;
+
 	INIT_LIST_HEAD(&zdata->fifo_list[SYNC]);
 	INIT_LIST_HEAD(&zdata->fifo_list[ASYNC]);
 	zdata->fifo_expire[SYNC] = sync_expire;
 	zdata->fifo_expire[ASYNC] = async_expire;
 	zdata->fifo_batch = fifo_batch;
+
+
 	return zdata;
 }
 

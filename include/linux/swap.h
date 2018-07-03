@@ -354,7 +354,7 @@ extern struct page *swapin_readahead(swp_entry_t, gfp_t,
 			struct vm_area_struct *vma, unsigned long addr);
 
 /* linux/mm/swapfile.c */
-extern long nr_swap_pages;
+extern atomic_long_t nr_swap_pages;
 extern long total_swap_pages;
 extern bool is_swap_fast(swp_entry_t entry);
 
@@ -368,7 +368,12 @@ static inline bool vm_swap_full(struct swap_info_struct *si)
 	if (si->flags & SWP_FAST)
 		return true;
 
-	return nr_swap_pages * 2 < total_swap_pages;
+	return atomic_long_read(&nr_swap_pages) * 2 < total_swap_pages;
+}
+
+static inline long get_nr_swap_pages(void)
+{
+	return atomic_long_read(&nr_swap_pages);
 }
 
 extern void si_swapinfo(struct sysinfo *);

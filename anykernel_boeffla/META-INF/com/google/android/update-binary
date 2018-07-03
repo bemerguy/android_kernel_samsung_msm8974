@@ -68,9 +68,9 @@ if [ -f /tmp/anykernel/banner ]; then
   ui_print " ";
 fi;
 
-ui_print "Boeffla-Kernel (unofficial) for Samsung Galaxy S5";
+ui_print "Tuned-Kernel for Samsung Galaxy S5";
 ui_print " ";
-ui_print "...(c) sunilpaulmathew@xda-developers.com...";
+ui_print "...(c) fbs@xda-developers.com...";
 ui_print " ";
 
 umount /system 2>/dev/null;
@@ -158,16 +158,6 @@ if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.modules)" == 1 ]; then
   cd /tmp/anykernel;
   mount -o ro,remount -t auto /system;
   mount -o ro,remount -t auto /vendor 2>/dev/null;
-fi;
-
-if [ -f /system/bin/mpdecision ]; then
-       ui_print "***";
-       ui_print "*** /system/bin/mpdecision renamed to /system/bin/mpdecision.bkp";
-       ui_print "*** in order to use TUNED hotplugger";
-       ui_print "***";
-       mount -o rw,remount -t auto /system;
-       mv -f /system/bin/mpdecision /system/bin/mpdecision.bkp
-       mount -o ro,remount -t auto /system;
 fi;
 
 debugging;
