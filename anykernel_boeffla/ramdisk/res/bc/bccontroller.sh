@@ -938,62 +938,6 @@ if [ "apply_governor_profile" == "$1" ]; then
 	exit 0
 fi
 
-if [ "apply_system_tweaks" == "$1" ]; then
-
-	if [ "Off" == "$2" ]; then
-		echo "5" > /proc/sys/vm/dirty_background_ratio
-		echo "200" > /proc/sys/vm/dirty_expire_centisecs
-		echo "20" > /proc/sys/vm/dirty_ratio
-		echo "500" > /proc/sys/vm/dirty_writeback_centisecs
-		echo "3008" > /proc/sys/vm/min_free_kbytes
-		echo "130" > /proc/sys/vm/swappiness
-		echo "100" > /proc/sys/vm/vfs_cache_pressure
-		echo "0" > /proc/sys/vm/drop_caches
-		busybox sleep 0.5s
-		busybox sync
-	fi
-
-	if [ "Boeffla tweaks" == "$2" ]; then
-		echo "70" > /proc/sys/vm/dirty_background_ratio
-		echo "250" > /proc/sys/vm/dirty_expire_centisecs
-		echo "90" > /proc/sys/vm/dirty_ratio
-		echo "500" > /proc/sys/vm/dirty_writeback_centisecs
-		echo "4096" > /proc/sys/vm/min_free_kbytes
-		echo "130" > /proc/sys/vm/swappiness
-		echo "10" > /proc/sys/vm/vfs_cache_pressure
-		echo "3" > /proc/sys/vm/drop_caches
-		busybox sleep 0.5s
-		busybox sync
-	fi
-
-	if [ "Speedmod tweaks" == "$2" ]; then
-		echo "5" > /proc/sys/vm/dirty_background_ratio
-		echo "200" > /proc/sys/vm/dirty_expire_centisecs
-		echo "20" > /proc/sys/vm/dirty_ratio
-		echo "1500" > /proc/sys/vm/dirty_writeback_centisecs
-		echo "12288" > /proc/sys/vm/min_free_kbytes
-		echo "0" > /proc/sys/vm/swappiness
-		echo "100" > /proc/sys/vm/vfs_cache_pressure
-		echo "0" > /proc/sys/vm/drop_caches
-		busybox sleep 0.5s
-		busybox sync
-	fi
-
-	if [ "Mattiadj tweaks" == "$2" ]; then
-		echo "10" > /proc/sys/vm/dirty_background_ratio
-		echo "500" > /proc/sys/vm/dirty_expire_centisecs
-		echo "10" > /proc/sys/vm/dirty_ratio
-		echo "100" > /proc/sys/vm/dirty_writeback_centisecs
-		echo "8192" > /proc/sys/vm/min_free_kbytes
-		echo "150" > /proc/sys/vm/swappiness
-		echo "80" > /proc/sys/vm/vfs_cache_pressure
-		echo "0" > /proc/sys/vm/drop_caches
-		busybox sleep 0.5s
-		busybox sync
-	fi
-	exit 0
-fi
-
 if [ "apply_eq_bands" == "$1" ]; then
 #	echo "1 4027 1031 0 276" > /sys/class/misc/boeffla_sound/eq_bands
 #	echo "2 8076 61555 456 456" > /sys/class/misc/boeffla_sound/eq_bands

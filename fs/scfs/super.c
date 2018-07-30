@@ -521,7 +521,9 @@ static struct dentry *scfs_mount(struct file_system_type *fs_type, int flags,
 		SCFS_MEMPOOL_SIZE / 1024, SCFS_MEMPOOL_COUNT,
 		dev_name, tfm_names[sbi->options.comp_type]);
 
+#ifdef CONFIG_DEBUG_FS
 	scfs_mounted++;
+#endif
 	sb->s_flags |= MS_ACTIVE;
 	return dget(sb->s_root);
 

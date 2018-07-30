@@ -807,7 +807,9 @@ static int lpm_suspend_prepare(void)
 
 	suspend_in_progress = true;
 	msm_mpm_suspend_prepare();
+#ifdef CONFIG_DEBUG_FS
 	regulator_showall_enabled();
+#endif
 
 /* Temporary fix for RUBEN LTE for configuring GPIO 33 to NC configuration
 before entering sleep as some other process is changing it*/

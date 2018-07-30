@@ -11,7 +11,7 @@
 #######################################
 VAR="klte"
 
-BOEFFLA_VERSION="280618-CM15.1-$VAR"
+BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-CM15.1-$VAR"
 
 TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
 

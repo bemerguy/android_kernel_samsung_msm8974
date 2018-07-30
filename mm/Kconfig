@@ -404,7 +404,7 @@ config FRONTSWAP
 config ZSMALLOC_NEW
 	tristate "Memory allocator for compressed pages"
 	depends on !ZSMALLOC
-	default n
+	default y
 	help
 	  zsmalloc is a slab-based memory allocator designed to store
 	  compressed RAM pages.  zsmalloc uses virtual memory mapping
@@ -444,7 +444,7 @@ config ZSWAP
 config SWAP_ENABLE_READAHEAD
 	bool "Enable readahead on page swap in"
 	depends on SWAP
-	default y
+	default n
 	help
 	  When a page fault occurs, adjacent pages of SWAP_CLUSTER_MAX are
 	  also paged in expecting those pages will be used in near future.

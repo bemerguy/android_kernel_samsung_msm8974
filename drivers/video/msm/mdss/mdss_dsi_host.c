@@ -77,8 +77,9 @@ struct mdss_dsi_event {
 static struct mdss_dsi_event dsi_event;
 
 static int dsi_event_thread(void *data);
+#ifdef CONFIG_DEBUG_FS
 void mdss_dsi_debug_check_te(struct mdss_panel_data *pdata);
-
+#endif
 void mdss_dsi_ctrl_init(struct mdss_dsi_ctrl_pdata *ctrl)
 {
 	if (ctrl->panel_data.panel_info.pdest == DISPLAY_1) {
@@ -1519,7 +1520,7 @@ void mdss_dsi_cmd_mdp_start(struct mdss_dsi_ctrl_pdata *ctrl)
 #endif
 	spin_unlock_irqrestore(&ctrl->mdp_lock, flag);
 }
-
+#ifdef CONFIG_DEBUG_FS
 void mdss_dsi_debug_check_te(struct mdss_panel_data *pdata)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
@@ -1553,7 +1554,7 @@ void mdss_dsi_debug_check_te(struct mdss_panel_data *pdata)
 	}
 	pr_info(" ============ finish waiting for TE ============\n");
 }
-
+#endif
 void mdss_dsi_cmd_mdp_busy(struct mdss_dsi_ctrl_pdata *ctrl)
 {
 	unsigned long flags;
@@ -1596,8 +1597,10 @@ void mdss_dsi_cmd_mdp_busy(struct mdss_dsi_ctrl_pdata *ctrl)
 			mdp5_dump_regs();
 			mdss_dsi_dump_power_clk(&ctrl->panel_data, 0);
 			mdss_mdp_dump_power_clk();
+#if defined (CONFIG_FB_MSM_MDSS_DSI_DBG)
 			mdss_mdp_debug_bus();
 			xlog_dump();
+#endif
 			panic("mdss_dsi_cmd_mdp_busy timeout");
 #endif
                 }
@@ -1909,8 +1912,10 @@ void mdss_dsi_fifo_status(struct mdss_dsi_ctrl_pdata *ctrl)
 			mdp5_dump_regs();
 			mdss_dsi_dump_power_clk(&ctrl->panel_data, 0);
 			mdss_mdp_dump_power_clk();
+#if defined (CONFIG_FB_MSM_MDSS_DSI_DBG)
 			mdss_mdp_debug_bus();
 			xlog_dump();
+#endif
 				panic("mdss_dsi_fifo err");
 		}
 #endif

@@ -358,21 +358,24 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 
 OPTS           = -ffast-math -fsplit-loops -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant \
-                -ftree-vectorize -fvect-cost-model=cheap -ftree-loop-ivcanon -fgcse-sm -fgcse-las -fgcse-after-reload -fira-hoist-pressure -fivopts \
+                -fvect-cost-model=cheap -ftree-loop-ivcanon -fgcse-sm -fgcse-las -fgcse-after-reload -fira-hoist-pressure -fivopts \
                 -fsched-spec-load -fipa-pta -ftree-loop-im -fsection-anchors -fsched-pressure -fomit-frame-pointer -ftree-lrs -fgraphite-identity \
-                -floop-nest-optimize -floop-parallelize-all -ftree-coalesce-vars -ftree-loop-distribution -floop-interchange -fprefetch-loop-arrays -freorder-blocks-algorithm=simple \
-                -fvariable-expansion-in-unroller -funroll-loops -falign-functions=8 -falign-loops=8 -fgraphite \
-		--param=l1-cache-size=32 --param=l1-cache-line-size=64 --param=l2-cache-size=2048 --param=max-hoist-depth=0 \
-                --param=inline-min-speedup=9 --param max-modulo-backtrack-attempts=800 --param large-function-growth=2000 --param=large-function-insns=10000 --param=max-unroll-times=2000 \
-                --param=max-inline-insns-recursive=3000 --param=max-inline-insns-recursive-auto=3000 --param=max-inline-recursive-depth=64 --param=max-inline-recursive-depth-auto=96 \
-                --param=max-stores-to-sink=20 --param=max-tail-merge-comparisons=600 --param=max-stores-to-merge=640 --param=max-tail-merge-iterations=2000 \
-                --param=sched-pressure-algorithm=2 --param max-cse-path-length=40 --param max-cse-insns=2000 --param max-cselib-memory-locations=10000 --param max-reload-search-insns=2000 \
-                --param=max-tail-merge-iterations=20 --param=max-unrolled-insns=8000 --param=max-unswitch-insns=8000
+                -floop-nest-optimize -floop-interchange -fprefetch-loop-arrays -freorder-blocks-algorithm=simple \
+                -fvariable-expansion-in-unroller -funroll-loops -fgraphite \
+                --param=l1-cache-size=32 --param=l1-cache-line-size=64 --param=l2-cache-size=2048 --param=max-hoist-depth=0 --param=inline-min-speedup=9
+
+#                --param=max-stores-to-sink=20 --param=max-tail-merge-comparisons=600 --param=max-stores-to-merge=640 --param=max-tail-merge-iterations=2000 \
+#                --param=sched-pressure-algorithm=2 --param max-cse-path-length=40 --param max-cse-insns=2000 --param max-cselib-memory-locations=10000 --param max-reload-search-insns=2000 \
+#                --param=max-tail-merge-iterations=20 --param=max-unrolled-insns=8000 --param=max-unswitch-insns=8000 \
+#                --param=max-modulo-backtrack-attempts=800 --param=max-unroll-times=2000
+
+#--param large-function-growth=2000 --param=large-function-insns=10000 \
+#                --param=max-inline-insns-recursive=3000 --param=max-inline-insns-recursive-auto=3000 --param=max-inline-recursive-depth=640 --param=max-inline-recursive-depth-auto=960
 
 GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
 GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier -Wno-stringop-overflow \
 		-Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
-GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool -Wno-int-in-bool-context -Wno-misleading-indentation -Wno-discarded-array-qualifiers
+GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool -Wno-int-in-bool-context -Wno-misleading-indentation -Wno-discarded-array-qualifiers -Wno-unused-function
 
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
@@ -587,9 +590,9 @@ all: vmlinux
 #ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 #KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 #else
-KBUILD_CFLAGS	+= -O3 $(OPTS) $(GCC8WARNINGS)
-# -freorder-blocks-algorithm=simple -fno-unswitch-loops -fno-ipa-cp-clone -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
-#$(OPTS) -fno-inline-functions $(GCC8WARNINGS)
+KBUILD_CFLAGS	+= -O3 $(OPTS) -fno-ipa-cp-clone -fno-loop-unroll-and-jam -fno-tree-loop-vectorize -fno-inline-functions $(GCC8WARNINGS)
+#KBUILD_CFLAGS  += -O2 $(GCC8WARNINGS)
+# -fno-unswitch-loops -fno-ipa-cp-clone -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
 #endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile

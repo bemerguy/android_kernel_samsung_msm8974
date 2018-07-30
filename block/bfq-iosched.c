@@ -70,17 +70,11 @@
 #include "bfq.h"
 #include "blk.h"
 
-/* Expiration time of sync (0) and async (1) requests, in jiffies. */
-static const int bfq_fifo_expire[2] = { HZ / 4, HZ / 8 };
-
-/* Maximum backwards seek, in KiB. */
-static const int bfq_back_max = 16 * 1024;
-
-/* Penalty of a backwards seek, in number of sectors. */
-static const int bfq_back_penalty = 2;
+/* Expiration time of sync (1) and async (0) requests, in jiffies. */
+static const int bfq_fifo_expire[2] = { HZ / 4, HZ / 24 };
 
 /* Idling period duration, in jiffies. */
-static int bfq_slice_idle = HZ / 125;
+static int bfq_slice_idle = 2;
 
 /* Default maximum budget values, in sectors and number of requests. */
 static const int bfq_default_max_budget = 16 * 1024;
@@ -94,8 +88,8 @@ static const int bfq_max_budget_async_rq = 4;
 static const int bfq_async_charge_factor = 10;
 
 /* Default timeout values, in jiffies, approximating CFQ defaults. */
-static const int bfq_timeout_sync = HZ / 8;
-static int bfq_timeout_async = HZ / 25;
+static const int bfq_timeout_sync = HZ / 24;
+static int bfq_timeout_async = HZ / 4;
 
 struct kmem_cache *bfq_pool;
 
@@ -224,12 +218,13 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
 				      struct request *rq2,
 				      sector_t last)
 {
+#if 0
 	sector_t s1, s2, d1 = 0, d2 = 0;
 	unsigned long back_max;
 #define BFQ_RQ1_WRAP	0x01 /* request 1 wraps */
 #define BFQ_RQ2_WRAP	0x02 /* request 2 wraps */
 	unsigned wrap = 0; /* bit mask: requests behind the disk head? */
-
+#endif
 	if (rq1 == NULL || rq1 == rq2)
 		return rq2;
 	if (rq2 == NULL)
@@ -244,6 +239,8 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
 	else if ((rq2->cmd_flags & REQ_META) && !(rq1->cmd_flags & REQ_META))
 		return rq2;
 
+	return rq1;
+#if 0
 	s1 = blk_rq_pos(rq1);
 	s2 = blk_rq_pos(rq2);
 
@@ -307,6 +304,7 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
 		else
 			return rq2;
 	}
+#endif
 }
 
 static struct bfq_queue *
@@ -3842,8 +3840,6 @@ static void *bfq_init_queue(struct request_queue *q)
 
 	bfqd->bfq_fifo_expire[0] = bfq_fifo_expire[0];
 	bfqd->bfq_fifo_expire[1] = bfq_fifo_expire[1];
-	bfqd->bfq_back_max = bfq_back_max;
-	bfqd->bfq_back_penalty = bfq_back_penalty;
 	bfqd->bfq_slice_idle = bfq_slice_idle;
 	bfqd->bfq_class_idle_last_service = 0;
 	bfqd->bfq_max_budget_async_rq = bfq_max_budget_async_rq;
@@ -3975,8 +3971,6 @@ static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
 }
 SHOW_FUNCTION(bfq_fifo_expire_sync_show, bfqd->bfq_fifo_expire[1], 1);
 SHOW_FUNCTION(bfq_fifo_expire_async_show, bfqd->bfq_fifo_expire[0], 1);
-SHOW_FUNCTION(bfq_back_seek_max_show, bfqd->bfq_back_max, 0);
-SHOW_FUNCTION(bfq_back_seek_penalty_show, bfqd->bfq_back_penalty, 0);
 SHOW_FUNCTION(bfq_slice_idle_show, bfqd->bfq_slice_idle, 1);
 SHOW_FUNCTION(bfq_max_budget_show, bfqd->bfq_user_max_budget, 0);
 SHOW_FUNCTION(bfq_max_budget_async_rq_show,
@@ -4013,9 +4007,6 @@ STORE_FUNCTION(bfq_fifo_expire_sync_store, &bfqd->bfq_fifo_expire[1], 1,
 		INT_MAX, 1);
 STORE_FUNCTION(bfq_fifo_expire_async_store, &bfqd->bfq_fifo_expire[0], 1,
 		INT_MAX, 1);
-STORE_FUNCTION(bfq_back_seek_max_store, &bfqd->bfq_back_max, 0, INT_MAX, 0);
-STORE_FUNCTION(bfq_back_seek_penalty_store, &bfqd->bfq_back_penalty, 1,
-		INT_MAX, 0);
 STORE_FUNCTION(bfq_slice_idle_store, &bfqd->bfq_slice_idle, 0, INT_MAX, 1);
 STORE_FUNCTION(bfq_max_budget_async_rq_store, &bfqd->bfq_max_budget_async_rq,
 		1, INT_MAX, 0);
@@ -4111,8 +4102,6 @@ static ssize_t bfq_low_latency_store(struct elevator_queue *e,
 static struct elv_fs_entry bfq_attrs[] = {
 	BFQ_ATTR(fifo_expire_sync),
 	BFQ_ATTR(fifo_expire_async),
-	BFQ_ATTR(back_seek_max),
-	BFQ_ATTR(back_seek_penalty),
 	BFQ_ATTR(slice_idle),
 	BFQ_ATTR(max_budget),
 	BFQ_ATTR(max_budget_async_rq),

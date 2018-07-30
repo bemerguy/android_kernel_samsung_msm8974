@@ -42,7 +42,7 @@
 /*
  * Sleep at most 200ms at a time in balance_dirty_pages().
  */
-#define MAX_PAUSE		max(HZ/5, 1)
+#define MAX_PAUSE		max(HZ/5, 4)
 
 /*
  * Try to keep balance_dirty_pages() call intervals higher than this many pages
@@ -61,7 +61,7 @@
  * After a CPU has dirtied this many pages, balance_dirty_pages_ratelimited
  * will look to see if it needs to force writeback or throttling.
  */
-static long ratelimit_pages = 16;
+static long ratelimit_pages = 64;
 
 /* The following parameters are exported via /proc/sys/vm */
 
@@ -103,7 +103,7 @@ EXPORT_SYMBOL_GPL(dirty_writeback_interval);
 /*
  * The longest time for which data is allowed to remain dirty
  */
-unsigned int dirty_expire_interval = 10 * 100; /* centiseconds */
+unsigned int dirty_expire_interval = 2 * 100; /* centiseconds */
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.
@@ -236,15 +236,15 @@ static unsigned long highmem_dirtyable_memory(unsigned long total)
  */
 unsigned long global_dirtyable_memory(void)
 {
-	unsigned long x;
+        unsigned long x;
 
-	x = global_page_state(NR_FREE_PAGES) + global_reclaimable_pages();
-	x -= min(x, dirty_balance_reserve);
+        x = global_page_state(NR_FREE_PAGES) + global_reclaimable_pages();
+        x -= min(x, dirty_balance_reserve);
 
-	if (!vm_highmem_is_dirtyable)
-		x -= highmem_dirtyable_memory(x);
+        if (!vm_highmem_is_dirtyable)
+                x -= highmem_dirtyable_memory(x);
 
-	return x + 1;	/* Ensure that we never return 0 */
+        return x + 1;   /* Ensure that we never return 0 */
 }
 
 /*

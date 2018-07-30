@@ -1016,7 +1016,7 @@ static unsigned long compact_zone_order(struct zone *zone,
 	return ret;
 }
 
-int sysctl_extfrag_threshold = 500;
+int sysctl_extfrag_threshold = 750;
 
 /**
  * try_to_compact_pages - Direct compact to satisfy a high-order allocation
