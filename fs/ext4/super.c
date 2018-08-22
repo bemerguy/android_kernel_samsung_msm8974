@@ -1587,7 +1587,7 @@ static int handle_mount_opt(struct super_block *sb, char *opt, int token,
 		} else if (token == Opt_commit) {
 			if (arg == 0)
 				arg = JBD2_DEFAULT_MAX_COMMIT_AGE;
-//			sbi->s_commit_interval = HZ * arg;
+			sbi->s_commit_interval = HZ * arg;
 		} else if (token == Opt_max_batch_time) {
 			if (arg == 0)
 				arg = EXT4_DEF_MAX_BATCH_TIME;
@@ -3333,7 +3333,6 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	set_opt(sb, POSIX_ACL);
 #endif
 	set_opt(sb, MBLK_IO_SUBMIT);
-
 	if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_DATA)
 		set_opt(sb, JOURNAL_DATA);
 	else if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_ORDERED)
@@ -3365,8 +3364,8 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	 * enable delayed allocation by default
 	 * Use -o nodelalloc to turn it off
 	 */
-/*	if (!IS_EXT3_SB(sb) &&
-	    ((def_mount_opts & EXT4_DEFM_NODELALLOC) == 0)) */
+	if (!IS_EXT3_SB(sb) &&
+	    ((def_mount_opts & EXT4_DEFM_NODELALLOC) == 0))
 		set_opt(sb, DELALLOC);
 
 	/*

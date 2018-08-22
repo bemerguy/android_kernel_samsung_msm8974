@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3
-HOSTCXXFLAGS = -O3
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2
+HOSTCXXFLAGS = -O2
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -359,10 +359,16 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 
 OPTS           = -ffast-math -fsplit-loops -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant \
                 -fvect-cost-model=cheap -ftree-loop-ivcanon -fgcse-sm -fgcse-las -fgcse-after-reload -fira-hoist-pressure -fivopts \
-                -fsched-spec-load -fipa-pta -ftree-loop-im -fsection-anchors -fsched-pressure -fomit-frame-pointer -ftree-lrs -fgraphite-identity \
-                -floop-nest-optimize -floop-interchange -fprefetch-loop-arrays -freorder-blocks-algorithm=simple \
-                -fvariable-expansion-in-unroller -funroll-loops -fgraphite \
-                --param=l1-cache-size=32 --param=l1-cache-line-size=64 --param=l2-cache-size=2048 --param=max-hoist-depth=0 --param=inline-min-speedup=9
+                -fsched-spec-load -fipa-pta -ftree-loop-im -funswitch-loops -fsection-anchors -fsched-pressure -fomit-frame-pointer -ftree-lrs \
+                -fprefetch-loop-arrays -freorder-blocks-algorithm=simple -funroll-loops --param=inline-min-speedup=10 \
+                --param=max-stores-to-sink=20 --param=max-tail-merge-comparisons=600 --param=max-stores-to-merge=640 --param=max-tail-merge-iterations=2000 \
+		--param=sched-pressure-algorithm=2 --param max-cse-path-length=40 --param max-cse-insns=2000 --param max-cselib-memory-locations=10000 --param max-reload-search-insns=2000 \
+                --param=max-tail-merge-iterations=20 --param=max-unswitch-insns=8000 --param=max-modulo-backtrack-attempts=80000 \
+                --param=l1-cache-size=32 --param=l1-cache-line-size=64 --param=l2-cache-size=2048 --param=max-hoist-depth=0 --param=max-tail-merge-comparisons=600
+
+#-fsplit-loops
+###(-fgraphite, -fgraphite-identity, -floop-nest-optimize, -floop-parallelize-all)
+# --param=inline-min-speedup=9
 
 #                --param=max-stores-to-sink=20 --param=max-tail-merge-comparisons=600 --param=max-stores-to-merge=640 --param=max-tail-merge-iterations=2000 \
 #                --param=sched-pressure-algorithm=2 --param max-cse-path-length=40 --param max-cse-insns=2000 --param max-cselib-memory-locations=10000 --param max-reload-search-insns=2000 \
@@ -375,12 +381,12 @@ OPTS           = -ffast-math -fsplit-loops -fmodulo-sched -fmodulo-sched-allow-r
 GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
 GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier -Wno-stringop-overflow \
 		-Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
-GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool -Wno-int-in-bool-context -Wno-misleading-indentation -Wno-discarded-array-qualifiers -Wno-unused-function
+GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool -Wno-int-in-bool-context -Wno-misleading-indentation -Wno-discarded-array-qualifiers -Wno-unused-function -Wno-stringop-truncation
 
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL   = -mfpu=neon-vfpv4
+CFLAGS_KERNEL   =
 AFLAGS_KERNEL	=
 CFLAGS_GCOV    =
 
@@ -590,7 +596,7 @@ all: vmlinux
 #ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 #KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 #else
-KBUILD_CFLAGS	+= -O3 $(OPTS) -fno-ipa-cp-clone -fno-loop-unroll-and-jam -fno-tree-loop-vectorize -fno-inline-functions $(GCC8WARNINGS)
+KBUILD_CFLAGS	+= -O3 $(OPTS) -fno-ipa-cp-clone $(GCC8WARNINGS)
 #KBUILD_CFLAGS  += -O2 $(GCC8WARNINGS)
 # -fno-unswitch-loops -fno-ipa-cp-clone -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
 #endif

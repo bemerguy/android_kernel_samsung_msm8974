@@ -9,11 +9,15 @@
 #######################################
 # Parameters to be configured manually
 #######################################
-VAR="klte"
+VAR="kltekor"
 
 BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-CM15.1-$VAR"
 
 TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
+#TOOLCHAIN="/root/armv7-eabihf--uclibc--stable-2018.02-2/bin/arm-linux-"
+TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.02-1/bin/arm-linux-"
+#TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.06-1/bin/arm-linux-"
+#TOOLCHAIN="/root/arm-none-eabi-gcc-8.2.0-180809/bin/arm-none-eabi-"
 
 ARCHITECTURE=arm
 COMPILER_FLAGS_KERNEL="-Wno-maybe-uninitialized -Wno-array-bounds"

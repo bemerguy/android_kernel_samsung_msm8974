@@ -71,10 +71,10 @@
 #include "blk.h"
 
 /* Expiration time of sync (1) and async (0) requests, in jiffies. */
-static const int bfq_fifo_expire[2] = { HZ / 4, HZ / 24 };
+static const int bfq_fifo_expire[2] = { HZ / 4, HZ / 8 };
 
 /* Idling period duration, in jiffies. */
-static int bfq_slice_idle = 2;
+static int bfq_slice_idle = HZ / 125;
 
 /* Default maximum budget values, in sectors and number of requests. */
 static const int bfq_default_max_budget = 16 * 1024;
@@ -88,8 +88,8 @@ static const int bfq_max_budget_async_rq = 4;
 static const int bfq_async_charge_factor = 10;
 
 /* Default timeout values, in jiffies, approximating CFQ defaults. */
-static const int bfq_timeout_sync = HZ / 24;
-static int bfq_timeout_async = HZ / 4;
+static const int bfq_timeout_sync = HZ / 8;
+static int bfq_timeout_async = HZ / 25;
 
 struct kmem_cache *bfq_pool;
 
@@ -4142,7 +4142,7 @@ static struct elevator_type iosched_bfq = {
 	.icq_size =		sizeof(struct bfq_io_cq),
 	.icq_align =		__alignof__(struct bfq_io_cq),
 	.elevator_attrs =	bfq_attrs,
-	.elevator_name =	"bfq",
+	.elevator_name =	"bfqz",
 	.elevator_owner =	THIS_MODULE,
 };
 

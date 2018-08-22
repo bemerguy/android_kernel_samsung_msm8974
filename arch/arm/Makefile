@@ -33,13 +33,13 @@ ifeq ($(CONFIG_MMU),)
 MMUEXT		:= -nommu
 endif
 
-ifeq ($(CONFIG_FRAME_POINTER),y)
-KBUILD_CFLAGS	+=-fno-omit-frame-pointer -mapcs -mno-sched-prolog
-endif
+#ifeq ($(CONFIG_FRAME_POINTER),y)
+#KBUILD_CFLAGS	+=-fno-omit-frame-pointer -mapcs -mno-sched-prolog
+#endif
 
-ifeq ($(CONFIG_CC_STACKPROTECTOR),y)
-KBUILD_CFLAGS	+=-fstack-protector
-endif
+#ifeq ($(CONFIG_CC_STACKPROTECTOR),y)
+#KBUILD_CFLAGS	+=-fstack-protector
+#endif
 
 ifeq ($(CONFIG_CPU_BIG_ENDIAN),y)
 KBUILD_CPPFLAGS	+= -mbig-endian
@@ -59,7 +59,7 @@ comma = ,
 # char struct members incorrectly. So disable it.
 # (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65932)
 #
-KBUILD_CFLAGS	+= $(call cc-option,-fno-ipa-sra)
+###KBUILD_CFLAGS	+= $(call cc-option,-fno-ipa-sra)
 
 # This selects which instruction set is used.
 # Note that GCC does not numerically define an architecture version
@@ -136,6 +136,7 @@ endif
 # Need -Uarm for gcc < 3.x
 KBUILD_CFLAGS	+=$(CFLAGS_ABI) $(CFLAGS_THUMB2) $(arch-y) $(tune-y) $(call cc-option,-mshort-load-bytes,$(call cc-option,-malignment-traps,)) -msoft-float -Uarm
 KBUILD_AFLAGS	+=$(CFLAGS_ABI) $(AFLAGS_THUMB2) $(arch-y) $(tune-y) -include asm/unified.h -msoft-float
+#-msoft-float
 
 CHECKFLAGS	+= -D__arm__
 
