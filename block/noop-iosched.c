@@ -88,7 +88,7 @@ static struct elevator_type elevator_noop = {
 		.elevator_init_fn		= noop_init_queue,
 		.elevator_exit_fn		= noop_exit_queue,
 	},
-	.elevator_name = "noop",
+	.elevator_name = "noopz",
 	.elevator_owner = THIS_MODULE,
 };
 

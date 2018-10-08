@@ -15,10 +15,9 @@
 #include <linux/init.h>
 
 enum zen_data_dir { ASYNC, SYNC };
-
-static const int sync_expire  = 5;    /* max time before a sync is submitted. */
-static const int async_expire = 25;    /* ditto for async, these limits are SOFT! */
-static const int fifo_batch = 16;
+static const int sync_expire  = HZ / 2;    /* max time before a sync is submitted. */
+static const int async_expire = 5 * HZ;    /* ditto for async, these limits are SOFT! */
+static const int fifo_batch = 8;
 
 struct zen_data {
 	/* Runtime Data */

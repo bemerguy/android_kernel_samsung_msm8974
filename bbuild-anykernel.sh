@@ -9,15 +9,12 @@
 #######################################
 # Parameters to be configured manually
 #######################################
-VAR="kltekor"
+VAR="klte"
 
-BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-CM15.1-$VAR"
+BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-LOS15.1-$VAR"
 
 TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
-#TOOLCHAIN="/root/armv7-eabihf--uclibc--stable-2018.02-2/bin/arm-linux-"
-TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.02-1/bin/arm-linux-"
-#TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.06-1/bin/arm-linux-"
-#TOOLCHAIN="/root/arm-none-eabi-gcc-8.2.0-180809/bin/arm-none-eabi-"
+TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.07-3/bin/arm-linux-"
 
 ARCHITECTURE=arm
 COMPILER_FLAGS_KERNEL="-Wno-maybe-uninitialized -Wno-array-bounds"
@@ -47,7 +44,7 @@ SMB_SHARE_BACKUP=""
 SMB_FOLDER_BACKUP=""
 SMB_AUTH_BACKUP=""
 
-NUM_CPUS=""   # number of cpu cores used for build (leave empty for auto detection)
+NUM_CPUS="1"   # number of cpu cores used for build (leave empty for auto detection)
 
 #######################################
 # automatic parameters, do not touch !
@@ -151,6 +148,9 @@ step3_compile()
 
 	TIMESTAMP1=$(date +%s)
 
+        # remove a previous kernel image
+        rm $BUILD_PATH/$OUTPUT_FOLDER/arch/$ARCHITECTURE/boot/$KERNEL_IMAGE &>/dev/null
+
 	# jump to build path
 	cd $BUILD_PATH
 
@@ -179,6 +179,18 @@ step3_compile()
 
 	# Log compile time (screen output)
 	echo "compile time:" $(($TIMESTAMP2 - $TIMESTAMP1)) "seconds"
+
+       # if kernel image does not exist, exit processing
+       if [ ! -e $BUILD_PATH/$OUTPUT_FOLDER/arch/$ARCHITECTURE/boot/$KERNEL_IMAGE ]; then
+               echo -e $COLOR_RED
+               echo ""
+               echo "Compile was NOT successful !! Aborting."
+               echo ""
+               echo -e $COLOR_NEUTRAL
+               exit
+       fi
+
+       # Log kernel image size (screen output)
 	echo "Kernel image size (bytes):"
 	stat -c%s $BUILD_PATH/$OUTPUT_FOLDER/arch/$ARCHITECTURE/boot/$KERNEL_IMAGE
 

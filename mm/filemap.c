@@ -1581,7 +1581,7 @@ static int page_cache_read(struct file *file, pgoff_t offset)
 	return ret;
 }
 
-#define MMAP_LOTSAMISS  (100)
+#define MMAP_LOTSAMISS  (10)
 
 /*
  * Synchronous readahead happens when we don't even find
@@ -1687,10 +1687,10 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		 * We found the page, so try async readahead before
 		 * waiting for the lock.
 		 */
-		//do_async_mmap_readahead(vma, ra, file, page, offset);
+		do_async_mmap_readahead(vma, ra, file, page, offset);
 	} else {
 		/* No page in the page cache at all */
-		//do_sync_mmap_readahead(vma, ra, file, offset);
+		do_sync_mmap_readahead(vma, ra, file, offset);
 		count_vm_event(PGMAJFAULT);
 		mem_cgroup_count_vm_event(vma->vm_mm, PGMAJFAULT);
 		ret = VM_FAULT_MAJOR;

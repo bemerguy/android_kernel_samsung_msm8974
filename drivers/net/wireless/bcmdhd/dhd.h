@@ -863,7 +863,7 @@ extern uint dhd_force_tx_queueing;
 #endif
 
 /* hooks for custom Roaming Romaing  setting via Makefile */
-#define DEFAULT_ROAM_DELTA_VALUE  5 /* dBm default roam delta all band. was 10 */
+#define DEFAULT_ROAM_DELTA_VALUE  15 /* dBm default roam delta all band. was 10 */
 #define DEFAULT_ROAM_DELTA_SETTING 	-1
 #ifndef CUSTOM_ROAM_DELTA_SETTING
 #define CUSTOM_ROAM_DELTA_SETTING 	DEFAULT_ROAM_DELTA_VALUE
