@@ -15,6 +15,7 @@ BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-LOS15.1-$VAR"
 
 TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
 TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.07-3/bin/arm-linux-"
+TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.02-1/bin/arm-linux-"
 
 ARCHITECTURE=arm
 COMPILER_FLAGS_KERNEL="-Wno-maybe-uninitialized -Wno-array-bounds"
@@ -44,7 +45,7 @@ SMB_SHARE_BACKUP=""
 SMB_FOLDER_BACKUP=""
 SMB_AUTH_BACKUP=""
 
-NUM_CPUS="1"   # number of cpu cores used for build (leave empty for auto detection)
+NUM_CPUS=""   # number of cpu cores used for build (leave empty for auto detection)
 
 #######################################
 # automatic parameters, do not touch !
