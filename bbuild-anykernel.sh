@@ -13,8 +13,9 @@ VAR="klte"
 
 BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-LOS15.1-$VAR"
 
-TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
-TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.07-3/bin/arm-linux-"
+#TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
+#TOOLCHAIN="/root/arm-none-eabi-gcc-8.2.0-180809/bin/arm-none-eabi-"
+#TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.07-3/bin/arm-linux-"
 TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.02-1/bin/arm-linux-"
 
 ARCHITECTURE=arm
@@ -45,7 +46,7 @@ SMB_SHARE_BACKUP=""
 SMB_FOLDER_BACKUP=""
 SMB_AUTH_BACKUP=""
 
-NUM_CPUS=""   # number of cpu cores used for build (leave empty for auto detection)
+NUM_CPUS="32"   # number of cpu cores used for build (leave empty for auto detection)
 
 #######################################
 # automatic parameters, do not touch !

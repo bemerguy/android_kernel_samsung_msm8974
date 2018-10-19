@@ -938,35 +938,6 @@ if [ "apply_governor_profile" == "$1" ]; then
 	exit 0
 fi
 
-if [ "apply_eq_bands" == "$1" ]; then
-#	echo "1 4027 1031 0 276" > /sys/class/misc/boeffla_sound/eq_bands
-#	echo "2 8076 61555 456 456" > /sys/class/misc/boeffla_sound/eq_bands
-#	echo "3 7256 62323 2644 1368" > /sys/class/misc/boeffla_sound/eq_bands
-#	echo "4 5774 63529 1965 4355" > /sys/class/misc/boeffla_sound/eq_bands
-#	echo "5 1380 1369 0 16384" > /sys/class/misc/boeffla_sound/eq_bands
-	exit 0
-fi
-
-#if [ "apply_ext4_tweaks" == "$1" ]; then
-#	if [ "1" == "$2" ]; then
-#		busybox sync
-#		busybox mount -o remount,commit=20,noatime $CACHE_DEVICE /cache
-#		busybox sync
-#		busybox mount -o remount,commit=20,noatime $DATA_DEVICE /data
-#		busybox sync
-#	fi
-#
-#	if [ "0" == "$2" ]; then
-#		busybox sync
-#		busybox mount -o remount,commit=0,noatime $CACHE_DEVICE /cache
-#		busybox sync
-#		busybox mount -o remount,commit=0,noatime $DATA_DEVICE /data
-#		busybox sync
-#	fi
-#	exit 0
-#fi
-
-
 #if [ "apply_zram" == "$1" ]; then
 #
 #	busybox swapoff /dev/block/vnswap0

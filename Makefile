@@ -360,9 +360,12 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 OPTS           = -ffast-math -fsplit-loops -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant \
                 -fvect-cost-model=cheap -ftree-loop-ivcanon -fgcse-sm -fgcse-las -fgcse-after-reload -fira-hoist-pressure -fivopts \
                 -fsched-spec-load -fipa-pta -ftree-loop-im -funswitch-loops -fsection-anchors -fsched-pressure -fomit-frame-pointer -ftree-lrs \
-                -freorder-blocks-and-partition -fsched-spec-load -fschedule-fusion \
+                -fschedule-fusion \
                 -fprefetch-loop-arrays -freorder-blocks-algorithm=simple --param=inline-min-speedup=10
 
+#                -fgraphite -fgraphite-identity -floop-nest-optimize -floop-parallelize-all
+
+#-freorder-blocks-and-partition
 #                --param=max-stores-to-sink=20 --param=max-tail-merge-comparisons=600 --param=max-stores-to-merge=640 --param=max-tail-merge-iterations=2000 \
 #		--param=sched-pressure-algorithm=2 --param max-cse-path-length=40 --param max-cse-insns=2000 --param max-cselib-memory-locations=10000 --param max-reload-search-insns=2000 \
 #                --param=max-tail-merge-iterations=20 --param=max-unswitch-insns=8000 --param=max-modulo-backtrack-attempts=80000 \
@@ -383,14 +386,14 @@ OPTS           = -ffast-math -fsplit-loops -fmodulo-sched -fmodulo-sched-allow-r
 GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
 GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier -Wno-stringop-overflow \
 		-Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
-GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool -Wno-int-in-bool-context -Wno-misleading-indentation -Wno-discarded-array-qualifiers -Wno-unused-function -Wno-stringop-truncation
+GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool -Wno-int-in-bool-context -Wno-misleading-indentation -Wno-discarded-array-qualifiers -Wno-unused-function -Wno-stringop-truncation -Wno-restrict -Wno-sizeof-pointer-memaccess
 
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
 CFLAGS_KERNEL   =
 AFLAGS_KERNEL	=
-CFLAGS_GCOV    =
+CFLAGS_GCOV    = -fprofile-arcs -ftest-coverage
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
 # Needed to be compatible with the O= option
@@ -401,10 +404,10 @@ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
-KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+KBUILD_CFLAGS   := -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
-		   -Wno-format-security \
+		   -Wno-format-security -Wno-attributes \
 		   -fno-delete-null-pointer-checks
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=

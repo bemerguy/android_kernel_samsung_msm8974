@@ -6000,10 +6000,8 @@ int mdss_dsi_panel_init(struct device_node *node, struct mdss_dsi_ctrl_pdata *ct
 	static const char *panel_name;
 	bool cont_splash_enabled;
 	struct mdss_panel_info *pinfo;
-#ifdef CONFIG_DEBUG_FS
 	struct mdss_debug_data *mdd =
 				(struct mdss_debug_data *)((mdss_mdp_get_mdata())->debug_inf.debug_data);
-#endif
 
 	pr_debug("%s: ++ \n", __func__);
 
@@ -6112,9 +6110,7 @@ int mdss_dsi_panel_init(struct device_node *node, struct mdss_dsi_ctrl_pdata *ct
 		pinfo->esd_check_enabled = false;
 		ctrl_pdata->on_cmds.link_state = DSI_LP_MODE;
 		ctrl_pdata->off_cmds.link_state = DSI_LP_MODE;
-#ifdef CONFIG_DEBUG_FS
 		mdd->logd.xlog_enable = 0;
-#endif
 
 		set_samsung_lcd_attached(1);
 	}

@@ -998,7 +998,7 @@ out:
 	return err < 0 ? err : count;
 }
 #endif
-#if 0
+
 static int oom_adjust_permission(struct inode *inode, int mask)
 {
 	uid_t uid;
@@ -1023,7 +1023,6 @@ static int oom_adjust_permission(struct inode *inode, int mask)
 	/* Fall back to default. */
 	return generic_permission(inode, mask);
 }
-#endif
 /*
 static const struct inode_operations proc_oom_adjust_inode_operations = {
 	.permission	= oom_adjust_permission,

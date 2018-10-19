@@ -434,12 +434,13 @@ static int adreno_perfcounter_start(struct adreno_device *adreno_dev)
 					KGSL_PERFCOUNTER_BROKEN)
 				continue;
 
-			if (adreno_dev->gpudev->perfcounter_enable)
+			if (adreno_dev->gpudev->perfcounter_enable) {
 				ret = adreno_dev->gpudev->perfcounter_enable(
 					adreno_dev, i, j,
 					group->regs[j].countable);
 				if (ret)
 					goto done;
+			}
 		}
 	}
 done:
@@ -1867,9 +1868,7 @@ adreno_probe(struct platform_device *pdev)
 	if (status)
 		goto error_close_device;
 
-#ifdef CONFIG_DEBUG_FS
 	adreno_debugfs_init(device);
-#endif
 	adreno_profile_init(device);
 
 	adreno_ft_init_sysfs(device);

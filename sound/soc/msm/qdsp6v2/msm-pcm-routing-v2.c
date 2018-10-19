@@ -1445,10 +1445,8 @@ static int msm_sec_sa_ep_get(struct snd_kcontrol *kcontrol,
 	struct audio_client *ac;
 	mutex_lock(&routing_lock);
 	ac = q6asm_get_audio_client(fe_dai_map[3][SESSION_TYPE_RX].strm_id);
-#ifdef CONFIG_DEBUG_FS
 	pr_info("%s: sa_ep  ret=%d score=%d", __func__, q6asm_get_sa_ep(ac), score);
 	ucontrol->value.integer.value[0] = score;
-#endif
 	mutex_unlock(&routing_lock);
 	return 0;
 }

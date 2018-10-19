@@ -327,6 +327,7 @@ struct root_domain {
 	struct rcu_head rcu;
 	cpumask_var_t span;
 	cpumask_var_t online;
+	bool overload;
 
 	/*
 	 * The "RT overload" flag: it gets set if a CPU has more than
@@ -477,6 +478,7 @@ static inline int cpu_of(struct rq *rq)
 }
 
 DECLARE_PER_CPU(struct rq, runqueues);
+DECLARE_PER_CPU(int, sd_llc_id);
 
 #define cpu_rq(cpu)		(&per_cpu(runqueues, (cpu)))
 #define this_rq()		(&__get_cpu_var(runqueues))
@@ -526,8 +528,6 @@ static inline struct sched_domain *highest_flag_domain(int cpu, int flag)
 }
 
 DECLARE_PER_CPU(struct sched_domain *, sd_llc);
-DECLARE_PER_CPU(int, sd_llc_size);
-DECLARE_PER_CPU(int, sd_llc_id);
 
 #endif /* CONFIG_SMP */
 
