@@ -90,7 +90,7 @@ static inline struct inode *wb_inode(struct list_head *head)
  * wb_writeback_work structure and inline functions so that the definition
  * remains local to this file.
  */
-#define CREATE_TRACE_POINTS
+//#define CREATE_TRACE_POINTS
 #include <trace/events/writeback.h>
 
 /* Wakeup flusher thread or forker thread to fork it. Requires bdi->wb_lock. */

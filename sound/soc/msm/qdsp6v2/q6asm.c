@@ -90,6 +90,8 @@ static struct audio_client common_client;
 static int set_custom_topology;
 static int topology_map_handle;
 
+u32 score;
+
 #ifdef CONFIG_DEBUG_FS
 #define OUT_BUFFER_SIZE 56
 #define IN_BUFFER_SIZE 24
@@ -107,7 +109,6 @@ static int in_cont_index;
 static int out_cold_index;
 static char *out_buffer;
 static char *in_buffer;
-u32 score;
 
 static int q6asm_mmap_apr_dereg(void)
 {

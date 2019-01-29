@@ -43,15 +43,19 @@
 #include <linux/slab.h>
 #include <linux/earlysuspend.h>
 
-#define DEF_FREQUENCY_UP_THRESHOLD		(70)
-#define DEF_FREQUENCY_DOWN_THRESHOLD		(20)
+#define DEF_FREQUENCY_UP_THRESHOLD		(65)
+#define DEF_FREQUENCY_DOWN_THRESHOLD		(30)
+#define MIN_SAMPLING_RATE_RATIO			(2)
 
 static unsigned int min_sampling_rate;
 
+#define LATENCY_MULTIPLIER			(1000)
+#define MIN_LATENCY_MULTIPLIER			(100)
+#define DEF_SAMPLING_DOWN_FACTOR		(1)
+#define MAX_SAMPLING_DOWN_FACTOR		(10)
 #define TRANSITION_LATENCY_LIMIT		(10 * 1000 * 1000)
 
 static void do_dbs_timer(struct work_struct *work);
-static int delay;
 
 struct cpu_dbs_info_s {
 	cputime64_t prev_cpu_idle;
@@ -74,6 +78,7 @@ static DEFINE_MUTEX(dbs_mutex);
 
 static struct dbs_tuners {
 	unsigned int sampling_rate;
+	unsigned int sampling_down_factor;
 	unsigned int up_threshold;
 	unsigned int down_threshold;
 	unsigned int ignore_nice;
@@ -81,11 +86,12 @@ static struct dbs_tuners {
 } dbs_tuners_ins = {
 	.up_threshold = DEF_FREQUENCY_UP_THRESHOLD,
 	.down_threshold = DEF_FREQUENCY_DOWN_THRESHOLD,
+	.sampling_down_factor = DEF_SAMPLING_DOWN_FACTOR,
 	.ignore_nice = 0,
 	.freq_step = 5,
 };
 
-static cputime64_t get_cpu_idle_time_jiffy(unsigned int cpu,
+static inline cputime64_t get_cpu_idle_time_jiffy(unsigned int cpu,
 							cputime64_t *wall)
 {
 	cputime64_t idle_time;
@@ -96,9 +102,9 @@ static cputime64_t get_cpu_idle_time_jiffy(unsigned int cpu,
 
 	busy_time  = kcpustat_cpu(cpu).cpustat[CPUTIME_USER];
 	busy_time += kcpustat_cpu(cpu).cpustat[CPUTIME_SYSTEM];
-//	busy_time += kcpustat_cpu(cpu).cpustat[CPUTIME_IRQ];
-//	busy_time += kcpustat_cpu(cpu).cpustat[CPUTIME_SOFTIRQ];
-//	busy_time += kcpustat_cpu(cpu).cpustat[CPUTIME_STEAL];
+	busy_time += kcpustat_cpu(cpu).cpustat[CPUTIME_IRQ];
+	busy_time += kcpustat_cpu(cpu).cpustat[CPUTIME_SOFTIRQ];
+	busy_time += kcpustat_cpu(cpu).cpustat[CPUTIME_STEAL];
 	busy_time += kcpustat_cpu(cpu).cpustat[CPUTIME_NICE];
 
 	idle_time = (cur_wall_time - busy_time);
@@ -108,7 +114,7 @@ static cputime64_t get_cpu_idle_time_jiffy(unsigned int cpu,
 	return (cputime64_t)jiffies_to_usecs(idle_time);
 }
 
-static cputime64_t get_cpu_idle_time(unsigned int cpu, cputime64_t *wall)
+static inline cputime64_t get_cpu_idle_time(unsigned int cpu, cputime64_t *wall)
 {
 	u64 idle_time = get_cpu_idle_time_us(cpu, wall);
 
@@ -144,6 +150,14 @@ static struct notifier_block dbs_cpufreq_notifier_block = {
 	.notifier_call = dbs_cpufreq_notifier
 };
 
+static ssize_t show_sampling_rate_min(struct kobject *kobj,
+				      struct attribute *attr, char *buf)
+{
+	return sprintf(buf, "%u\n", min_sampling_rate);
+}
+
+define_one_global_ro(sampling_rate_min);
+
 #define show_one(file_name, object)					\
 static ssize_t show_##file_name						\
 (struct kobject *kobj, struct attribute *attr, char *buf)		\
@@ -152,11 +166,26 @@ static ssize_t show_##file_name						\
 }
 
 show_one(sampling_rate, sampling_rate);
+show_one(sampling_down_factor, sampling_down_factor);
 show_one(up_threshold, up_threshold);
 show_one(down_threshold, down_threshold);
 show_one(ignore_nice_load, ignore_nice);
 show_one(freq_step, freq_step);
 
+static ssize_t store_sampling_down_factor(struct kobject *a,
+					  struct attribute *b,
+					  const char *buf, size_t count)
+{
+	unsigned int input;
+	int ret;
+	ret = sscanf(buf, "%u", &input);
+
+	if (ret != 1 || input > MAX_SAMPLING_DOWN_FACTOR || input < 1)
+		return -EINVAL;
+
+	dbs_tuners_ins.sampling_down_factor = input;
+	return count;
+}
 
 static ssize_t store_sampling_rate(struct kobject *a, struct attribute *b,
 				   const char *buf, size_t count)
@@ -251,13 +280,16 @@ static ssize_t store_freq_step(struct kobject *a, struct attribute *b,
 }
 
 define_one_global_rw(sampling_rate);
+define_one_global_rw(sampling_down_factor);
 define_one_global_rw(up_threshold);
 define_one_global_rw(down_threshold);
 define_one_global_rw(ignore_nice_load);
 define_one_global_rw(freq_step);
 
 static struct attribute *dbs_attributes[] = {
+	&sampling_rate_min.attr,
 	&sampling_rate.attr,
+	&sampling_down_factor.attr,
 	&up_threshold.attr,
 	&down_threshold.attr,
 	&ignore_nice_load.attr,
@@ -318,7 +350,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 			max_load = load;
 	}
 
-	if (unlikely(dbs_tuners_ins.freq_step == 0))
+	if (dbs_tuners_ins.freq_step == 0)
 		return;
 
 	if (max_load > dbs_tuners_ins.up_threshold) {
@@ -341,7 +373,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		return;
 	}
 
-	if (max_load < (dbs_tuners_ins.down_threshold)) {
+	if (max_load < (dbs_tuners_ins.down_threshold - 10)) {
 		freq_target = (dbs_tuners_ins.freq_step * policy->max) / 100;
 
 		this_dbs_info->requested_freq -= freq_target;
@@ -363,6 +395,10 @@ static void do_dbs_timer(struct work_struct *work)
 		container_of(work, struct cpu_dbs_info_s, work.work);
 	unsigned int cpu = dbs_info->cpu;
 
+	int delay = usecs_to_jiffies(dbs_tuners_ins.sampling_rate);
+
+	// delay -= jiffies % delay;
+
 	mutex_lock(&dbs_info->timer_mutex);
 
 	dbs_check_cpu(dbs_info);
@@ -371,9 +407,9 @@ static void do_dbs_timer(struct work_struct *work)
 	mutex_unlock(&dbs_info->timer_mutex);
 }
 
-static void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
+static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
 {
-	delay = usecs_to_jiffies(dbs_tuners_ins.sampling_rate);
+	int delay = usecs_to_jiffies(dbs_tuners_ins.sampling_rate);
 
 	// delay -= jiffies % delay;
 
@@ -382,7 +418,7 @@ static void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
 	schedule_delayed_work_on(dbs_info->cpu, &dbs_info->work, delay);
 }
 
-static void dbs_timer_exit(struct cpu_dbs_info_s *dbs_info)
+static inline void dbs_timer_exit(struct cpu_dbs_info_s *dbs_info)
 {
 	dbs_info->enable = 0;
 	cancel_delayed_work_sync(&dbs_info->work);
@@ -438,7 +474,7 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 			}
 
 			min_sampling_rate = 10000;
-			dbs_tuners_ins.sampling_rate = 30000;
+			dbs_tuners_ins.sampling_rate = 10000;
 
 			cpufreq_register_notifier(
 					&dbs_cpufreq_notifier_block,

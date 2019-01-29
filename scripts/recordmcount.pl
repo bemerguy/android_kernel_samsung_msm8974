@@ -345,7 +345,7 @@ if ($arch eq "x86_64") {
 	    $endian = " -EB ";
 	    $ld .= " -melf".$bits."btsmip";
     } else {
-//	    $endian = " -EL ";
+	    $endian = " -EL ";
 	    $ld .= " -melf".$bits."ltsmip";
     }
 

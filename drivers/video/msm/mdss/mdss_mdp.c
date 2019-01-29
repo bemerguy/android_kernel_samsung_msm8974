@@ -945,7 +945,9 @@ void mdss_mdp_dump_power_clk(void)
 	for(clk_idx = MDSS_CLK_AHB ; clk_idx < MDSS_MAX_CLK ;clk_idx++)
 	{
 		clk = mdss_mdp_get_clk(clk_idx);
+#ifdef CONFIG_DEBUG_FS
 		clock_debug_print_clock2(clk);
+#endif
 	}
 
 	pr_info("%s: mdp_clk_cnt =%d \n", __func__, mdp_clk_cnt);

@@ -25,8 +25,8 @@ extern int poweroff_charging;
 #define DVFS_STAGE_DUAL		2
 #define DVFS_STAGE_SINGLE		1
 #define DVFS_STAGE_NONE		0
-#define TOUCH_BOOSTER_OFF_TIME	500
-#define TOUCH_BOOSTER_CHG_TIME	500
+#define TOUCH_BOOSTER_OFF_TIME	200
+#define TOUCH_BOOSTER_CHG_TIME	200
 #endif
 
 #include <linux/input.h>

@@ -102,7 +102,6 @@ static inline int create_xlog_debug(struct mdss_data_type *mdata) { return 0; }
 static inline void mdss_xlog(const char *name, ...) { }
 static inline void mdss_xlog_dump(void) { }
 static inline void mdss_dump_reg(char __iomem *base, int len) { }
-static inline void mdss_dsi_debug_check_te(struct mdss_panel_data *pdata) { }
 static inline void mdss_xlog_tout_handler(const char *name, ...) { }
 #endif
 #endif /* MDSS_DEBUG_H */

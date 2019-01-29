@@ -147,7 +147,7 @@ static const struct neigh_ops arp_direct_ops = {
 	.output =		neigh_direct_output,
 	.connected_output =	neigh_direct_output,
 };
-/*
+
 static const struct neigh_ops arp_broken_ops = {
 	.family =		AF_INET,
 	.solicit =		arp_solicit,
@@ -155,7 +155,7 @@ static const struct neigh_ops arp_broken_ops = {
 	.output =		neigh_compat_output,
 	.connected_output =	neigh_compat_output,
 };
-*/
+
 struct neigh_table arp_tbl = {
 	.family		= AF_INET,
 	.key_len	= 4,
@@ -1171,7 +1171,7 @@ int arp_ioctl(struct net *net, unsigned int cmd, void __user *arg)
 	switch (cmd) {
 	case SIOCDARP:
 	case SIOCSARP:
-		if (!capable(CAP_NET_ADMIN))
+		if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
 			return -EPERM;
 	case SIOCGARP:
 		err = copy_from_user(&r, arg, sizeof(struct arpreq));

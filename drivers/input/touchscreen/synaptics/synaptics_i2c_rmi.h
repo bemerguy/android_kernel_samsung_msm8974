@@ -45,7 +45,7 @@
 #define DEFAULT_DISABLE	0
 
 /* feature define */
-#define TSP_BOOSTER	/* DVFS feature : TOUCH BOOSTER */
+//#define TSP_BOOSTER	/* DVFS feature : TOUCH BOOSTER */
 #define USE_OPEN_CLOSE	/* Use when CONFIG_HAS_EARLYSUSPEND is disabled */
 #define REPORT_2D_W
 #define REDUCE_I2C_DATA_LENGTH
@@ -59,7 +59,7 @@
 #define USE_RECENT_TOUCHKEY
 #define PROXIMITY
 #define EDGE_SWIPE
-#define TKEY_BOOSTER
+//#define TKEY_BOOSTER
 #define SYNAPTICS_DEVICE_NAME	"T320"
 #define USE_PALM_REJECTION_KERNEL
 
@@ -214,10 +214,10 @@
 #define DVFS_STAGE_NONE		0
 #include <linux/cpufreq.h>
 
-#define TOUCH_BOOSTER_OFF_TIME		500
-#define TOUCH_BOOSTER_CHG_TIME		130
-#define TOUCH_BOOSTER_HIGH_OFF_TIME	1000
-#define TOUCH_BOOSTER_HIGH_CHG_TIME	500
+#define TOUCH_BOOSTER_OFF_TIME		 50
+#define TOUCH_BOOSTER_CHG_TIME		 50
+#define TOUCH_BOOSTER_HIGH_OFF_TIME	100
+#define TOUCH_BOOSTER_HIGH_CHG_TIME	100
 #endif
 
 /* TA_CON mode @ H mode */

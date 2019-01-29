@@ -443,12 +443,12 @@ if [ "apply_cpu_hotplug_profile" == "$1" ]; then
 	fi
 
         if [ "Tuned" == "$2" ]; then
-		echo "1" >/sys/module/tuned_plug/parameters/tuned_plug_active
+		echo "1" >/sys/module/tuned_plug/parameters/tunedplug_active
 		stop mpdecision
 		busybox find /sys/devices/system/cpu/cpu? -name online -exec sh -c "echo 1 > {}" \;
                 exit 0
         else
-	        echo "0" >/sys/module/tuned_plug/parameters/tuned_plug_active
+	        echo "0" >/sys/module/tuned_plug/parameters/tunedplug_active
                 start mpdecision
 	fi
 

@@ -11,12 +11,14 @@
 #######################################
 VAR="klte"
 
-BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-LOS15.1-$VAR"
+BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-LOS16-$VAR"
 
 #TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
-#TOOLCHAIN="/root/arm-none-eabi-gcc-8.2.0-180809/bin/arm-none-eabi-"
-#TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.07-3/bin/arm-linux-"
+#8.2
 TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.11-1/bin/arm-linux-"
+#8.2
+#TOOLCHAIN="/root/armv7-eabihf--glibc--bleeding-edge-2018.11-1/bin/arm-linux-"
+#7.3
 #TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.02-1/bin/arm-linux-"
 
 ARCHITECTURE=arm
@@ -31,9 +33,9 @@ MODULES_IN_SYSTEM="y"
 OUTPUT_FOLDER="output"
 
 DEFCONFIG="Boeffla_@$VAR@_defconfig"
+#DEFCONFIG="lineage_klte_pn547_defconfig"
 #Boeffla_@klte@_defconfig  Boeffla_@klteduos@_defconfig  Boeffla_@kltedv@_defconfig  Boeffla_@kltekdi@_defconfig  Boeffla_@kltekor@_defconfig
-#DEFCONFIG_VARIANT="msm8974pro_sec_klte_eur_defconfig"
-##msm8974_sec_defconfig VARIANT_DEFCONFIG=msm8974pro_sec_klte_eur_defconfig
+#msm8974_sec_defconfig VARIANT_DEFCONFIG=msm8974pro_sec_klte_eur_defconfig SELINUX_DEFCONFIG=selinux_defconfig
 
 KERNEL_NAME="Boeffla-Kernel"
 
@@ -47,7 +49,7 @@ SMB_SHARE_BACKUP=""
 SMB_FOLDER_BACKUP=""
 SMB_AUTH_BACKUP=""
 
-NUM_CPUS="32"   # number of cpu cores used for build (leave empty for auto detection)
+NUM_CPUS=""   # number of cpu cores used for build (leave empty for auto detection)
 
 #######################################
 # automatic parameters, do not touch !
@@ -136,7 +138,7 @@ step2_make_config()
 	fi
 
 	if [ ! -z "$DEFCONFIG_VARIANT" ]; then
-		MAKESTRING="$MAKESTRING VARIANT_DEFCONFIG=$DEFCONFIG_VARIANT"
+		MAKESTRING="$MAKESTRING VARIANT_DEFCONFIG=$DEFCONFIG_VARIANT SELINUX_DEFCONFIG=selinux_defconfig"
 	fi
 
 	# jump to build path and make config
@@ -159,9 +161,9 @@ step3_compile()
 
 	# compile source
 	if [ -z "$OUTPUT_FOLDER" ]; then
-		make -j$NUM_CPUS CFLAGS_KERNEL="$COMPILER_FLAGS_KERNEL" CFLAGS_MODULE="$COMPILER_FLAGS_MODULE" 2>&1 |tee ../compile.log
+		make -j$NUM_CPUS CFLAGS_KERNEL="$COMPILER_FLAGS_KERNEL" CFLAGS_MODULE="$COMPILER_FLAGS_MODULE" 2>&1 CONFIG_NO_ERROR_ON_MISMATCH=y |tee ../compile.log
 	else
-		make -j$NUM_CPUS O=$OUTPUT_FOLDER CFLAGS_KERNEL="$COMPILER_FLAGS_KERNEL" CFLAGS_MODULE="$COMPILER_FLAGS_MODULE" VARIANT_DEFCONFIG=$DEFCONFIG_VARIANT 2>&1 |tee ../compile.log
+		make -j$NUM_CPUS O=$OUTPUT_FOLDER CFLAGS_KERNEL="$COMPILER_FLAGS_KERNEL" CFLAGS_MODULE="$COMPILER_FLAGS_MODULE" CONFIG_NO_ERROR_ON_MISMATCH=y 2>&1 |tee ../compile.log
 	fi
 
 	# compile dtb if required

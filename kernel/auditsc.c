@@ -1192,7 +1192,7 @@ static void audit_log_task_info(struct audit_buffer *ab, struct task_struct *tsk
 
 	/* tsk == current */
 
-	get_task_comm(name, sizeof(name), tsk);
+	get_task_comm(name, tsk);
 	audit_log_format(ab, " comm=");
 	audit_log_untrustedstring(ab, name);
 

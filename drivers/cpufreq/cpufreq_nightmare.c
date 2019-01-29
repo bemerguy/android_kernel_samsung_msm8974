@@ -101,8 +101,8 @@ static struct nightmare_tuners {
 	.freq_for_responsiveness = ATOMIC_INIT(200000),
 	.freq_for_responsiveness_max = ATOMIC_INIT(1200000),
 #else
-	.freq_for_responsiveness = ATOMIC_INIT(540000),
-	.freq_for_responsiveness_max = ATOMIC_INIT(1890000),
+	.freq_for_responsiveness = ATOMIC_INIT(1190400),
+	.freq_for_responsiveness_max = ATOMIC_INIT(2457600),
 #endif
 	.freq_step_at_min_freq = ATOMIC_INIT(20),
 	.freq_step = ATOMIC_INIT(20),
@@ -148,7 +148,6 @@ static ssize_t show_##file_name##_##cpu		\
 {									\
 	return sprintf(buf, "%d\n", atomic_read(&file_name[cpu]));	\
 }
-
 #define store_freqlimit_param(file_name, cpu)		\
 static ssize_t store_##file_name##_##cpu		\
 (struct kobject *kobj, struct attribute *attr,				\
@@ -795,7 +794,6 @@ static int cpufreq_governor_nightmare(struct cpufreq_policy *policy,
 
 		/*if (atomic_read(&min_freq_limit[cpu]) == 0)
 			atomic_set(&min_freq_limit[cpu], policy->min);
-
 		if (atomic_read(&max_freq_limit[cpu]) == 0)
 			atomic_set(&max_freq_limit[cpu], policy->max);*/
 

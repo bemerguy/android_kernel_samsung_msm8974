@@ -15,9 +15,9 @@
 #include <linux/init.h>
 
 enum zen_data_dir { ASYNC, SYNC };
-static const int sync_expire  = HZ / 2;    /* max time before a sync is submitted. */
-static const int async_expire = 5 * HZ;    /* ditto for async, these limits are SOFT! */
-static const int fifo_batch = 8;
+static const int sync_expire  = HZ / 6;    /* max time before a sync is submitted. */
+static const int async_expire = HZ;        /* ditto for async, these limits are SOFT! */
+static const int fifo_batch = 4;
 
 struct zen_data {
 	/* Runtime Data */
@@ -30,11 +30,6 @@ struct zen_data {
 	int fifo_expire[2];
 	int fifo_batch;
 };
-
-static inline struct zen_data *
-zen_get_data(struct request_queue *q) {
-	return q->elevator->elevator_data;
-}
 
 static void zen_dispatch(struct zen_data *, struct request *);
 
@@ -59,12 +54,12 @@ zen_merged_requests(struct request_queue *q, struct request *rq,
 
 static void zen_add_request(struct request_queue *q, struct request *rq)
 {
-	struct zen_data *zdata = zen_get_data(q);
-	const int dir = rq_is_sync(rq);
+	struct zen_data *zdata = q->elevator->elevator_data;
+	const int sync = rq_is_sync(rq);
 
-	if (zdata->fifo_expire[dir]) {
-		rq_set_fifo_time(rq, jiffies + zdata->fifo_expire[dir]);
-		list_add_tail(&rq->queuelist, &zdata->fifo_list[dir]);
+	if (zdata->fifo_expire[sync]) {
+		rq_set_fifo_time(rq, jiffies + zdata->fifo_expire[sync]);
+		list_add_tail(&rq->queuelist, &zdata->fifo_list[sync]);
 	}
 }
 
@@ -135,7 +130,7 @@ zen_choose_request(struct zen_data *zdata)
 
 static int zen_dispatch_requests(struct request_queue *q, int force)
 {
-	struct zen_data *zdata = zen_get_data(q);
+	struct zen_data *zdata = q->elevator->elevator_data;
 	struct request *rq = NULL;
 
 	/* Check for and issue expired requests */

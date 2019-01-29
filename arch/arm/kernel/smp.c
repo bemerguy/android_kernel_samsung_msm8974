@@ -74,7 +74,7 @@ void __init smp_set_ops(struct smp_operations *ops)
 		smp_ops = *ops;
 };
 
-int __cpuinit __cpu_up(unsigned int cpu)
+int __cpu_up(unsigned int cpu)
 {
 	struct cpuinfo_arm *ci = &per_cpu(cpu_data, cpu);
 	struct task_struct *idle = ci->idle;
@@ -154,7 +154,7 @@ void __attribute__((weak)) __cpuinit platform_secondary_init(unsigned int cpu)
 		smp_ops.smp_secondary_init(cpu);
 }
 
-int __attribute__((weak)) __cpuinit boot_secondary(unsigned int cpu, struct task_struct *idle)
+int __attribute__((weak)) boot_secondary(unsigned int cpu, struct task_struct *idle)
 {
 	if (smp_ops.smp_boot_secondary)
 		return smp_ops.smp_boot_secondary(cpu, idle);

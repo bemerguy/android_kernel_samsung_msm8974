@@ -6110,7 +6110,9 @@ int mdss_dsi_panel_init(struct device_node *node, struct mdss_dsi_ctrl_pdata *ct
 		pinfo->esd_check_enabled = false;
 		ctrl_pdata->on_cmds.link_state = DSI_LP_MODE;
 		ctrl_pdata->off_cmds.link_state = DSI_LP_MODE;
+#ifdef CONFIG_DEBUG_FS
 		mdd->logd.xlog_enable = 0;
+#endif
 
 		set_samsung_lcd_attached(1);
 	}

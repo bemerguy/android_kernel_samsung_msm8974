@@ -827,8 +827,7 @@ static void synaptics_change_dvfs_lock(struct work_struct *work)
 					"%s: do fw update, do not change cpu frequency.\n",
 					__func__);
 		} else {
-			retval = set_freq_limit(DVFS_TOUCH_ID,
-					MIN_TOUCH_LIMIT_SECOND);
+			retval = set_freq_limit(DVFS_TOUCH_ID,	MIN_TOUCH_LIMIT_SECOND);
 			rmi4_data->dvfs_freq = MIN_TOUCH_LIMIT_SECOND;
 		}
 	} else if (rmi4_data->dvfs_boost_mode == DVFS_STAGE_NINTH) {
@@ -837,8 +836,7 @@ static void synaptics_change_dvfs_lock(struct work_struct *work)
 					"%s: do fw update, do not change cpu frequency.\n",
 					__func__);
 		} else {
-			retval = set_freq_limit(DVFS_TOUCH_ID,
-					MIN_TOUCH_LIMIT);
+			retval = set_freq_limit(DVFS_TOUCH_ID,	MIN_TOUCH_LIMIT);
 			rmi4_data->dvfs_freq = MIN_TOUCH_LIMIT;
 		}
 	} else if ((rmi4_data->dvfs_boost_mode == DVFS_STAGE_SINGLE) ||

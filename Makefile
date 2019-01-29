@@ -357,17 +357,17 @@ CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 
-OPTS           = -ffast-math -fsplit-loops -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant \
-                -fvect-cost-model=cheap -ftree-loop-ivcanon -fgcse-sm -fgcse-las -fgcse-after-reload -fira-hoist-pressure -fivopts \
-                -fsched-spec-load -fipa-pta -ftree-loop-im -funswitch-loops -fsection-anchors -fsched-pressure -fomit-frame-pointer -ftree-lrs \
-                -fschedule-fusion \
-                -fprefetch-loop-arrays -freorder-blocks-algorithm=simple -freorder-blocks-and-partition \
-                --param=max-stores-to-sink=20 --param=max-tail-merge-comparisons=600 --param=max-stores-to-merge=640 \
-                --param=max-tail-merge-iterations=20000 --param=sched-pressure-algorithm=2 --param max-cse-path-length=40 \
-                --param max-cse-insns=2000 --param max-cselib-memory-locations=10000 --param max-reload-search-insns=2000 \
-                --param=max-tail-merge-iterations=20 --param=max-unswitch-insns=8000 --param=max-modulo-backtrack-attempts=80000 \
-                --param=max-hoist-depth=0 --param=max-tail-merge-comparisons=600
+OPTS           = -fsplit-loops -ffast-math -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap -ftree-loop-ivcanon \
+                -fgcse-sm -fgcse-las -fgcse-after-reload -fira-hoist-pressure -fivopts -fsched-spec-load -fipa-pta -ftree-loop-im -fsection-anchors -fsched-pressure -ftree-lrs \
+                -fschedule-fusion -freorder-blocks-algorithm=simple -fira-loop-pressure \
+                -ftracer -fira-loop-pressure -funroll-loops -fipa-icf -fipa-vrp -fno-ipa-cp-clone \
+                --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
+                --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
+                --param max-cse-insns=2000 --param=max-cselib-memory-locations=100000 --param=max-reload-search-insns=100000 \
+                --param=max-unswitch-insns=80000 --param=max-modulo-backtrack-attempts=100000 \
+                --param=max-hoist-depth=0 --param=l2-cache-size=2048 --param=max-inline-recursive-depth=640 --param=max-inline-recursive-depth-auto=460 --param=inline-min-speedup=50
 
+#-fsplit-loops -funswitch-loops -fira-loop-pressure -funroll-loops \
 # --param=inline-min-speedup=10
 
 #                -fgraphite -fgraphite-identity -floop-nest-optimize -floop-parallelize-all
@@ -604,7 +604,7 @@ all: vmlinux
 #ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 #KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 #else
-KBUILD_CFLAGS	+= -O3 $(OPTS) -fno-ipa-cp-clone -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
+KBUILD_CFLAGS	+= -O3 -fno-prefetch-loop-arrays -fno-ipa-cp-clone $(OPTS) $(GCC8WARNINGS)
 #KBUILD_CFLAGS  += -O3 $(GCC8WARNINGS)
 #KBUILD_CFLAGS  += -O2 $(GCC8WARNINGS)
 # -fno-unswitch-loops -fno-ipa-cp-clone -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
@@ -633,10 +633,6 @@ KBUILD_CFLAGS  += $(call cc-option,-mlow-precision-recip-sqrt,) \
 
 # Disable format-truncation warnings
 KBUILD_CFLAGS   += $(call cc-disable-warning,format-truncation,)
-
-
-# Needed to unbreak GCC 7.x and above
-###KBUILD_CFLAGS   += $(call cc-option,-fno-store-merging,)
 
 
 # Tell gcc to never replace conditional load with a non-conditional one

@@ -147,11 +147,12 @@ extern unsigned long nr_uninterruptible(void);
 extern unsigned long nr_iowait(void);
 extern unsigned long nr_iowait_cpu(int cpu);
 extern unsigned long this_cpu_load(void);
-
 #ifdef CONFIG_RUNTIME_COMPCACHE
 extern unsigned long this_cpu_loadx(int i);
 #endif /* CONFIG_RUNTIME_COMPCACHE */
 
+extern void sched_update_nr_prod(int cpu, unsigned long nr, bool inc);
+extern void sched_get_nr_running_avg(int *avg, int *iowait_avg);
 
 extern void calc_global_load(unsigned long ticks);
 extern void update_cpu_load_nohz(void);
@@ -1289,13 +1290,10 @@ struct task_struct {
 	atomic_t usage;
 	unsigned int flags;	/* per process flags, defined below */
 	unsigned int ptrace;
-        unsigned int yield_count;
+
 #ifdef CONFIG_SMP
 	struct llist_node wake_entry;
 	int on_cpu;
-	struct task_struct *last_wakee;
-	unsigned long wakee_flips;
-	unsigned long wakee_flip_decay_ts;
 #endif
 	int on_rq;
 

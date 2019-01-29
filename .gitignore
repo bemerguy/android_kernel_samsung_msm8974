@@ -24,13 +24,12 @@
 *.order
 modules.builtin
 *.elf
-*.gz
 *.bz2
 *.lzma
 *.xz
 *.lzo
-*.patch
 *.gcno
+*.save
 
 #
 # Top-level generic files

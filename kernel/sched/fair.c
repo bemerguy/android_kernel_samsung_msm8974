@@ -43,8 +43,11 @@
  * (to see the precise effective timeslice length of your workload,
  *  run vmstat and monitor the context-switches (cs) field)
  */
-unsigned int sysctl_sched_latency = 6000000ULL;
-unsigned int normalized_sysctl_sched_latency = 6000000ULL;
+//unsigned int sysctl_sched_latency = 6000000ULL;
+//unsigned int normalized_sysctl_sched_latency = 6000000ULL;
+
+unsigned int sysctl_sched_latency = 2000000ULL;
+unsigned int normalized_sysctl_sched_latency = 2000000ULL;
 
 /*
  * The initial- and re-scaling of tunables is configurable
@@ -62,19 +65,22 @@ enum sched_tunable_scaling sysctl_sched_tunable_scaling
  * Minimal preemption granularity for CPU-bound tasks:
  * (default: 0.75 msec * (1 + ilog(ncpus)), units: nanoseconds)
  */
-unsigned int sysctl_sched_min_granularity = 750000ULL;
-unsigned int normalized_sysctl_sched_min_granularity = 750000ULL;
+//unsigned int sysctl_sched_min_granularity = 750000ULL;
+//unsigned int normalized_sysctl_sched_min_granularity = 750000ULL;
+
+unsigned int sysctl_sched_min_granularity = 300000ULL;
+unsigned int normalized_sysctl_sched_min_granularity = 300000ULL;
 
 /*
  * is kept at sysctl_sched_latency / sysctl_sched_min_granularity
  */
-static unsigned int sched_nr_latency = 8;
+static unsigned int sched_nr_latency = 10;
 
 /*
  * After fork, child runs first. If set to 0 (default) then
  * parent will (try to) run first.
  */
-unsigned int sysctl_sched_child_runs_first __read_mostly;
+unsigned int sysctl_sched_child_runs_first __read_mostly = 1;
 
 /*
  * Controls whether, when SD_SHARE_PKG_RESOURCES is on, if all
@@ -82,7 +88,7 @@ unsigned int sysctl_sched_child_runs_first __read_mostly;
  * per-task flag PF_WAKE_ON_IDLE can still cause a task to go to an
  * idle CPU upon being woken.
  */
-unsigned int __read_mostly sysctl_sched_wake_to_idle;
+unsigned int __read_mostly sysctl_sched_wake_to_idle = 0;
 
 /*
  * SCHED_OTHER wake-up granularity.
@@ -92,10 +98,14 @@ unsigned int __read_mostly sysctl_sched_wake_to_idle;
  * and reduces their over-scheduling. Synchronous workloads will still
  * have immediate wakeup/sleep latencies.
  */
-unsigned int sysctl_sched_wakeup_granularity = 1000000UL;
-unsigned int normalized_sysctl_sched_wakeup_granularity = 1000000UL;
 
-const_debug unsigned int sysctl_sched_migration_cost = 500000UL;
+//unsigned int sysctl_sched_wakeup_granularity = 1000000UL;
+//unsigned int normalized_sysctl_sched_wakeup_granularity = 1000000UL;
+
+unsigned int sysctl_sched_wakeup_granularity = 400000UL;
+unsigned int normalized_sysctl_sched_wakeup_granularity = 400000UL;
+
+const_debug unsigned int sysctl_sched_migration_cost = 400000UL;
 
 /*
  * The exponential sliding  window over which load is averaged for shares

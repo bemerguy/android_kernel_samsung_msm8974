@@ -139,7 +139,7 @@ static int lp8556_backlight_parse_dt(struct device *dev,
 	return 0;
 }
 
-extern int system_rev;
+extern unsigned int system_rev;
 /*
 	0xA5, 0x24 //4 channel
 	0xA5, 0x14 //5 channel

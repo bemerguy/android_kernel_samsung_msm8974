@@ -19,8 +19,8 @@ extern int ISSP_main(void);
 #ifdef TSP_BOOSTER
 #include <linux/cpufreq.h>
 
-#define TOUCH_BOOSTER_OFF_TIME	300
-#define TOUCH_BOOSTER_CHG_TIME	200
+#define TOUCH_BOOSTER_OFF_TIME	50
+#define TOUCH_BOOSTER_CHG_TIME	50
 #endif
 #ifdef CONFIG_LEDS_CLASS
 #include <linux/leds.h>
