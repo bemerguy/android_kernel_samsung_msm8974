@@ -1376,7 +1376,7 @@ static void __ref check_temp(struct work_struct *work)
 	do_vdd_restriction();
 //	do_psm();
 //	do_ocr();
-//	do_freq_control(temp);
+	do_freq_control(temp);
 
 reschedule:
 	if (polling_enabled)

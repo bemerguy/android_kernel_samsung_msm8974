@@ -23,8 +23,8 @@
 #include <linux/cpufreq.h>
 
 
-#define TOUCHBOOST_DURATION_MIN		0
-#define TOUCHBOOST_DURATION_MAX		10000
+#define TOUCHBOOST_DURATION_MIN		10
+#define TOUCHBOOST_DURATION_MAX		2000
 
 
 /*****************************************/

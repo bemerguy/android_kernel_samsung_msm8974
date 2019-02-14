@@ -38,8 +38,8 @@ static void inline down_one(void){
 		if (cpu_online(i)) {
 			if (down[i] > 200) {
 				cpu_down(i);
+				pr_info("tunedplug: DOWN cpu %d (%d). sampling: %lu", i, down[i], sampling_time);
 				down[i]=0;
-				pr_info("tunedplug: DOWN cpu %d. sampling: %lu", i, sampling_time);
 			}
 			else down[i]++;
 			return;
@@ -50,11 +50,14 @@ static void inline up_one(void){
         unsigned int i;
         for (i = 1; i < NR_CPUS; i++) {
                 if (!cpu_online(i)) {
-			cpu_up(i);
-			down[i]=-800;
-			pr_info("tunedplug: UP cpu %d. sampling: %lu", i, sampling_time);
-			msleep(200);
-                        return;
+			if (down[i] < 20) {
+				cpu_up(i);
+				pr_info("tunedplug: UP cpu %d (%d). sampling: %lu", i, down[i], sampling_time);
+				down[i]=0;
+				msleep(500);
+			}
+			else down[i]--;
+			return;
                 }
         }
 }

@@ -19,7 +19,7 @@ comment "Multimedia core support"
 
 config MEDIA_CONTROLLER
 	bool "Media Controller API (EXPERIMENTAL)"
-	depends on EXPERIMENTAL
+#	depends on EXPERIMENTAL
 	---help---
 	  Enable the media controller API used to query media devices internal
 	  topology and configure it dynamically.
