@@ -3270,7 +3270,8 @@ static int sdfat_da_prep_block(struct inode *inode, sector_t iblock,
 
 	} else if (create == 1) {
 		/* Not exist: new cluster needed */
-				if (!BLOCK_ADDED(bmap_create)) {
+
+		if (!BLOCK_ADDED(bmap_create)) {
 			sector_t last_block;
 			last_block = (i_size_read(inode) + (sb->s_blocksize - 1))
 						>> sb->s_blocksize_bits;

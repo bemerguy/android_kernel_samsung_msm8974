@@ -1335,7 +1335,7 @@ static sector_t __calc_hidden_sect(struct super_block *sb)
 	}
 
 out:
-		sdfat_log_msg(sb, KERN_INFO, "start_sect of part(%d)    : %lld",
+	sdfat_log_msg(sb, KERN_INFO, "start_sect of part(%d)    : %lld",
 		bdev ? bdev->bd_part->partno : -1, (s64)hidden);
 	return hidden;
 

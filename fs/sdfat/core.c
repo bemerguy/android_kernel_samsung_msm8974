@@ -1709,7 +1709,7 @@ s32 fscore_mount(struct super_block *sb)
 	pbr_t *p_pbr;
 	struct buffer_head *tmp_bh = NULL;
 	struct gendisk *disk = sb->s_bdev->bd_disk;
-    struct hd_struct *part = sb->s_bdev->bd_part;
+	struct hd_struct *part = sb->s_bdev->bd_part;
 	struct sdfat_mount_options *opts = &(SDFAT_SB(sb)->options);
 	FS_INFO_T *fsi = &(SDFAT_SB(sb)->fsi);
 

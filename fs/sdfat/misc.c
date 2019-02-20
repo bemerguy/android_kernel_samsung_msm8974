@@ -96,7 +96,7 @@ void __sdfat_fs_error(struct super_block *sb, int report, const char *fmt, ...)
 			sb->s_id, MAJOR(bd_dev), MINOR(bd_dev));
 	} else if (opts->errors == SDFAT_ERRORS_RO && !(sb->s_flags & MS_RDONLY)) {
 		sb->s_flags |= MS_RDONLY;
-        sdfat_statistics_set_mnt_ro();
+		sdfat_statistics_set_mnt_ro();
 		pr_err("[SDFAT](%s[%d:%d]): Filesystem has been set "
 			"read-only\n", sb->s_id, MAJOR(bd_dev), MINOR(bd_dev));
 #ifdef CONFIG_SDFAT_SUPPORT_STLOG
