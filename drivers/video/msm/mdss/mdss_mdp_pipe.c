@@ -24,7 +24,7 @@
 #define SMP_MB_CNT		(mdss_res->smp_mb_cnt)
 #define SMP_ENTRIES_PER_MB	(SMP_MB_SIZE / 16)
 #define SMP_MB_ENTRY_SIZE	16
-#define MAX_BPP 4
+#define MAX_BPP 2
 
 #define PIPE_HALT_TIMEOUT_US	0x4000
 

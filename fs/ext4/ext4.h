@@ -1539,7 +1539,7 @@ static inline void ext4_clear_state_flags(struct ext4_inode_info *ei)
 #define	EXT4_DEF_RESUID		0
 #define	EXT4_DEF_RESGID		0
 
-#define EXT4_DEF_INODE_READAHEAD_BLKS	0
+#define EXT4_DEF_INODE_READAHEAD_BLKS	16
 
 /*
  * Default mount options

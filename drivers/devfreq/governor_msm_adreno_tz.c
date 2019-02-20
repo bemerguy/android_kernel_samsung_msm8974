@@ -32,17 +32,17 @@ static DEFINE_SPINLOCK(tz_lock);
 /*
  * MIN_BUSY is 1 msec for the sample to be sent
  */
-#define MIN_BUSY		1000
+#define MIN_BUSY		1500
 #define LONG_FLOOR		50000
-#define HIST			5
-#define TARGET			80
-#define CAP			75
+#define HIST			4
+#define TARGET			90
+#define CAP			85
 
 /*
  * CEILING is 50msec, larger than any standard
  * frame length, but less than the idle timer.
  */
-#define CEILING			50000
+#define CEILING			70000
 #define TZ_RESET_ID		0x3
 #define TZ_UPDATE_ID		0x4
 #define TZ_INIT_ID		0x6

@@ -490,4 +490,14 @@ static inline int add_to_page_cache(struct page *page,
 	return error;
 }
 
+#define FGP_ACCESSED            0x00000001
+#define FGP_LOCK                0x00000002
+#define FGP_CREAT               0x00000004
+#define FGP_WRITE               0x00000008
+#define FGP_NOFS                0x00000010
+#define FGP_NOWAIT              0x00000020
+
+struct page *pagecache_get_page(struct address_space *mapping, pgoff_t offset,
+                int fgp_flags, gfp_t cache_gfp_mask);
+
 #endif /* _LINUX_PAGEMAP_H */

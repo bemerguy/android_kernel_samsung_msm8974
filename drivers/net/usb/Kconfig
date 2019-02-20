@@ -134,7 +134,7 @@ config USB_NET_AX8817X
 	tristate "ASIX AX88xxx Based USB 2.0 Ethernet Adapters"
 	depends on USB_USBNET
 	select CRC32
-	default n
+	default y
 	help
 	  This option adds support for ASIX AX88xxx based USB 2.0
 	  10/100 Ethernet adapters.
@@ -202,7 +202,7 @@ config USB_NET_CDC_EEM
 config USB_NET_CDC_NCM
 	tristate "CDC NCM support"
 	depends on USB_USBNET
-	default n
+	default y
 	help
 	  This driver provides support for CDC NCM (Network Control Model
 	  Device USB Class Specification). The CDC NCM specification is
@@ -253,7 +253,7 @@ config USB_NET_GL620A
 
 config USB_NET_NET1080
 	tristate "NetChip 1080 based cables (Laplink, ...)"
-	default n
+	default y
 	depends on USB_USBNET
 	help
 	  Choose this option if you're using a host-to-host cable based
@@ -334,7 +334,7 @@ config USB_BELKIN
 config USB_ARMLINUX
 	boolean "Embedded ARM Linux links (iPaq, ...)"
 	depends on USB_NET_CDC_SUBSET
-	default n
+	default y
 	help
 	  Choose this option to support the "usb-eth" networking driver
 	  used by most of the ARM Linux community with device controllers
@@ -367,7 +367,7 @@ config USB_NET_ZAURUS
 	depends on USB_USBNET
 	select USB_NET_CDCETHER
 	select CRC32
-	default n
+	default y
 	help
 	  Choose this option to support the usb networking links used by
 	  Zaurus models like the SL-5000D, SL-5500, SL-5600, A-300, B-500.

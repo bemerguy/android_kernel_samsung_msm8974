@@ -10,6 +10,8 @@
  *
  */
 
+/* tuned hotplugger by fbs (heiler.bemerguy@gmail.com) */
+
 #include <linux/workqueue.h>
 #include <linux/cpu.h>
 #include <linux/sched.h>
@@ -27,18 +29,23 @@ static unsigned int tunedplug_active = 1;
 module_param(tunedplug_active, uint, 0644);
 
 static unsigned long sampling_time;
-static unsigned long max_sampling;
+
+#define DEF_SAMPLING msecs_to_jiffies(20)
+#define MAX_SAMPLING msecs_to_jiffies(2000)
+
 
 bool displayon = true;
+
 static int down[NR_CPUS-1];
+/* 123 are cpu cores. 0 will be used for flags */
 
 static void inline down_one(void){
 	unsigned int i;
-	for (i = NR_CPUS; i > 0; --i) {
+	for (i = NR_CPUS-1; i > 0; i--) {
 		if (cpu_online(i)) {
-			if (down[i] > 200) {
+			if (down[i] > 300) {
 				cpu_down(i);
-				pr_info("tunedplug: DOWN cpu %d (%d). sampling: %lu", i, down[i], sampling_time);
+				pr_info("tunedplug: DOWN cpu %d. sampling: %lu", i, sampling_time);
 				down[i]=0;
 			}
 			else down[i]++;
@@ -46,21 +53,29 @@ static void inline down_one(void){
 		}
 	}
 }
+
 static void inline up_one(void){
         unsigned int i;
         for (i = 1; i < NR_CPUS; i++) {
                 if (!cpu_online(i)) {
-			if (down[i] < 20) {
+			if (down[i] < -5) {
+				struct cpufreq_policy policy;
+
+				pr_info("tunedplug: UP cpu %d. sampling: %lu", i, sampling_time);
+
+	                        if (cpufreq_get_policy(&policy, i) != 0)
+        	                        pr_info("tunedplug: no policy for cpu %d ?", i);
+				else
+					policy.cur = policy.max;
 				cpu_up(i);
-				pr_info("tunedplug: UP cpu %d (%d). sampling: %lu", i, down[i], sampling_time);
-				down[i]=0;
-				msleep(500);
+				down[i]=-100;
 			}
 			else down[i]--;
 			return;
                 }
         }
 }
+
 static void tunedplug_work_fn(struct work_struct *work)
 {
 	unsigned int nr_cpus, i;
@@ -71,33 +86,36 @@ static void tunedplug_work_fn(struct work_struct *work)
         if (!tunedplug_active)
                 return;
 
-	if (!displayon && (sampling_time < max_sampling))
+	if (!displayon && (sampling_time < MAX_SAMPLING))
 		sampling_time++;
 
 	nr_cpus = num_online_cpus();
+	down[0]=0;
 
+	//up
 	if (nr_cpus < NR_CPUS) {
 		for_each_online_cpu(i) {
 			if (cpufreq_get_policy(&policy, i) != 0)
 				continue;
 			if (i < NR_CPUS-1 && (policy.cur >= policy.max)) {
 				up_one();
+				down[0]=3;
 				break;
 			}
 		}
 	}
 
-	if (nr_cpus > 1) {
-		bool todown = false;
+	//down
+	if (down[0]!=3 && nr_cpus > 1) {
                 for_each_online_cpu(i) {
-                        if (!i || (cpufreq_get_policy(&policy, i) != 0))
+                        if (!i || cpufreq_get_policy(&policy, i) != 0)
                                 continue;
                         if (policy.cur <= policy.min)
-				todown = true;
+				down[0] = 1;
 			else if (policy.cur >= policy.max)
-				todown = false;
+				down[0] = 2;
                 }
-		if (todown == true) down_one();
+		if (down[0]==1) down_one();
 	}
 
 }
@@ -112,7 +130,7 @@ static int lcd_notifier_callback(struct notifier_block *this,
 
                 case LCD_EVENT_ON_START:
 			displayon = true;
-	                sampling_time = msecs_to_jiffies(20);
+	                sampling_time = DEF_SAMPLING;
                         break;
 
                 default:
@@ -138,8 +156,7 @@ static int __init tuned_plug_init(void)
 
         INIT_DELAYED_WORK(&tunedplug_work, tunedplug_work_fn);
 
-	max_sampling = msecs_to_jiffies(2000);
-	sampling_time = msecs_to_jiffies(20);
+	sampling_time = DEF_SAMPLING;
 
         queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, 1);
 

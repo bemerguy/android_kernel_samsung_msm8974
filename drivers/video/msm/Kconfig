@@ -20,7 +20,7 @@ if FB_MSM
 
 config FB_MSM_BACKLIGHT
 	bool "Support for backlight control"
-	default y
+	default n
 	---help---
 	  Say Y here if you want to control the backlight of your display.
 
@@ -36,7 +36,7 @@ config FB_MSM_LCDC_HW
 
 config FB_MSM_TRIPLE_BUFFER
 	bool "Support for triple frame buffer"
-	default n
+	default y
 
 config FB_MSM_MDP_HW
 	bool

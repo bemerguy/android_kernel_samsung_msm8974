@@ -881,7 +881,7 @@
 		interrupts = <0 95 0>;
 		interrupt-names = "qup_err_intr";
 		qcom,i2c-bus-freq = <400000>;
-		qcom,i2c-src-freq = <50000000>;
+		qcom,i2c-src-freq = <19200000>;
 		qcom,scl-gpio = <&msmgpio 3 0>;
 		qcom,sda-gpio = <&msmgpio 2 0>;
 		qcom,master-id = <86>;
@@ -897,7 +897,7 @@
 		interrupts = <0 96 0>;
 		interrupt-names = "qup_err_intr";
 		qcom,i2c-bus-freq = <400000>;
-		qcom,i2c-src-freq = <50000000>;
+		qcom,i2c-src-freq = <19200000>;
 		qcom,master-id = <86>;
 	};
 
@@ -911,7 +911,7 @@
 		interrupts = <0 97 0>;
 		interrupt-names = "qup_err_intr";
 		qcom,i2c-bus-freq = <100000>;
-		qcom,i2c-src-freq = <50000000>;
+		qcom,i2c-src-freq = <19200000>;
 		qcom,scl-gpio = <&msmgpio 11 0>;
 		qcom,sda-gpio = <&msmgpio 10 0>;
 		qcom,master-id = <86>;
@@ -927,7 +927,7 @@
 		interrupts = <0 100 0>;
 		interrupt-names = "qup_err_intr";
 		qcom,i2c-bus-freq = <100000>;
-		qcom,i2c-src-freq = <50000000>;
+		qcom,i2c-src-freq = <19200000>;
 		qcom,scl-gpio = <&msmgpio 30 0>;
 		qcom,sda-gpio = <&msmgpio 29 0>;
 		qcom,master-id = <86>;
@@ -944,7 +944,7 @@
 		interrupts = <0 103 0>;
 		interrupt-names = "qup_err_intr";
 		qcom,i2c-bus-freq = <100000>;
-		qcom,i2c-src-freq = <50000000>;
+		qcom,i2c-src-freq = <19200000>;
 		qcom,scl-gpio = <&msmgpio 52 0>;
 		qcom,sda-gpio = <&msmgpio 51 0>;
 		qcom,master-id = <84>;
@@ -1634,7 +1634,8 @@
 			< 4684 /* 614 MHz */ >,
 			< 6103 /* 800 MHz */ >,
 			< 7102 /* 931 MHz */ >,
-			< 7674 /* 1006 MHz */ >;
+			< 7674 /* 1006 MHz */ >,
+            < 8246 /* 1081 MHz */ >;
 	};
 
 	qcom,kraitbw-l2pm {
@@ -1647,7 +1648,7 @@
 		reg = <0 4>;
 		compatible = "qcom,msm-cpufreq";
 		qcom,cpufreq-table =
-		    	<  268800  268800  381 >,
+			<  268800  268800  381 >,
 			<  300000  300000  572 >,
 			<  422400  422400 1144 >,
 			<  652800  499200 1525 >,
@@ -1666,7 +1667,9 @@
 			< 2534400 2457600 7674 >,
 			< 2611200 2534400 7674 >,
 			< 2764800 2688000 7674 >,
-			< 2841600 2764800 7674 >;
+			< 2841600 2764800 8246 >,
+			< 2918400 2841600 8246 >,
+			< 2995200 2918400 8246 >;
 	};
 
 	usb3: qcom,ssusb@f9200000 {

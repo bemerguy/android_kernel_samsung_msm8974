@@ -153,7 +153,7 @@ struct mem_cgroup_zone {
 /*
  * From 0 .. 100.  Higher means more swappy.
  */
-int vm_swappiness __read_mostly = 0;
+int vm_swappiness = 60;
 long vm_total_pages;	/* The total number of pages which the VM controls */
 
 #ifdef CONFIG_RUNTIME_COMPCACHE
@@ -190,6 +190,21 @@ static struct zone_reclaim_stat *get_reclaim_stat(struct mem_cgroup_zone *mz)
 	return &mz->zone->reclaim_stat;
 }
 
+unsigned long zone_reclaimable_pages(struct zone *zone)
+{
+	int nr;
+
+	nr = zone_page_state(zone, NR_ACTIVE_FILE) +
+	     zone_page_state(zone, NR_INACTIVE_FILE);
+
+#ifndef CONFIG_RUNTIME_COMPCACHE
+	if (get_nr_swap_pages() > 0)
+		nr += zone_page_state(zone, NR_ACTIVE_ANON) +
+		      zone_page_state(zone, NR_INACTIVE_ANON);
+#endif /* CONFIG_RUNTIME_COMPCACHE */
+
+	return nr;
+}
 
 bool zone_reclaimable(struct zone *zone)
 {
@@ -1346,11 +1361,9 @@ putback_inactive_pages(struct mem_cgroup_zone *mz,
 		add_page_to_lru_list(zone, page, lru);
 
 		file = is_file_lru(lru);
-#ifdef CONFIG_ZCACHE
 		if (IS_ENABLED(CONFIG_ZCACHE))
 			if (file)
 				SetPageWasActive(page);
-#endif
 		if (is_active_lru(lru)) {
 			int numpages = hpage_nr_pages(page);
 			reclaim_stat->recent_rotated[file] += numpages;
@@ -1647,14 +1660,12 @@ static void shrink_active_list(unsigned long nr_to_scan,
 		}
 
 		ClearPageActive(page);	/* we are de-activating */
-#ifdef CONFIG_ZCACHE
 		if (IS_ENABLED(CONFIG_ZCACHE))
 			/*
 			 * For zcache to know whether the page is from active
 			 * file list
 			 */
 			SetPageWasActive(page);
-#endif
 		list_add(&page->lru, &l_inactive);
 	}
 
@@ -1825,7 +1836,7 @@ static void get_scan_count(struct mem_cgroup_zone *mz, struct scan_control *sc,
 		force_scan = true;
 
 	/* If we have no swap space, do not bother scanning anon pages. */
-        if (!sc->may_swap || (get_nr_swap_pages() <= 0)) {
+	if (!sc->may_swap || (get_nr_swap_pages() <= 0)) {
 		noswap = 1;
 		fraction[0] = 0;
 		fraction[1] = 1;
@@ -3261,34 +3272,6 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
 
 	trace_mm_vmscan_wakeup_kswapd(pgdat->node_id, zone_idx(zone), order);
 	wake_up_interruptible(&pgdat->kswapd_wait);
-}
-
-unsigned long global_reclaimable_pages(void)
-{
-	int nr;
-
-	nr = global_page_state(NR_ACTIVE_FILE) +
-	     global_page_state(NR_INACTIVE_FILE);
-
-	if (get_nr_swap_pages() > 0)
-		nr += global_page_state(NR_ACTIVE_ANON) +
-		      global_page_state(NR_INACTIVE_ANON);
-
-	return nr;
-}
-
-unsigned long zone_reclaimable_pages(struct zone *zone)
-{
-	int nr;
-
-	nr = zone_page_state(zone, NR_ACTIVE_FILE) +
-	     zone_page_state(zone, NR_INACTIVE_FILE);
-
-	if (get_nr_swap_pages() > 0)
-		nr += zone_page_state(zone, NR_ACTIVE_ANON) +
-		      zone_page_state(zone, NR_INACTIVE_ANON);
-
-	return nr;
 }
 
 #ifdef CONFIG_HIBERNATION

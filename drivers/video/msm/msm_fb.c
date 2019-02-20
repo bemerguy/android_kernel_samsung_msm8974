@@ -68,6 +68,7 @@ static boolean bf_supported;
  * transients during resume.
  */
 unsigned long backlight_duration = (HZ/20);
+unsigned long backlight_duration = 0;
 
 static struct platform_device *pdev_list[MSM_FB_MAX_DEV_LIST];
 static int pdev_list_cnt;
