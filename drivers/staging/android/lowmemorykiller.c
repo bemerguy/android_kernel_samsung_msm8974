@@ -83,9 +83,7 @@ static int lowmem_shrink(void)
 	int minfree = 0, oom_score, tki = 0;
 	int array_size = ARRAY_SIZE(lowmem_adj);
 	int other_free = global_page_state(NR_FREE_PAGES) - totalreserve_pages;
-	int other_file = global_page_state(NR_FILE_PAGES) -
-						global_page_state(NR_SHMEM) -
-						total_swapcache_pages();
+	int other_file = global_page_state(NR_FILE_PAGES);
 
         long cache_size, cache_limit, free;
 	static unsigned int expire=0, count=0;
@@ -172,10 +170,10 @@ static int lowmem_shrink(void)
 	lowmem_print(5,"NOW start killing... %d processes", tki);
 
 	while (tki >=0) {
+		task_lock(tokill[tki]);
 		set_tsk_thread_flag(tokill[tki], TIF_MEMDIE);
-//		task_lock(tokill[tki]);
                 send_sig(SIGKILL, tokill[tki], 0);
-//		task_unlock(tokill[tki]);
+		task_unlock(tokill[tki]);
 
                 lowmem_print(1, "Killing '%s' (%d) on behalf of '%s' (%d) because\n" \
                                 "   cache %ldkB is below limit %ldkB for oom_score_adj %hd\n" \

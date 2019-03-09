@@ -365,7 +365,7 @@ OPTS           = -fsplit-loops -ffast-math -fmodulo-sched -fmodulo-sched-allow-r
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
                 --param max-cse-insns=2000 --param=max-cselib-memory-locations=100000 --param=max-reload-search-insns=100000 \
                 --param=max-unswitch-insns=80000 --param=max-modulo-backtrack-attempts=100000 \
-                --param=max-hoist-depth=0 --param=l2-cache-size=2048 --param=max-inline-recursive-depth=640 --param=max-inline-recursive-depth-auto=460 --param=inline-min-speedup=25
+                --param=max-hoist-depth=0 --param=l2-cache-size=2048 --param=max-inline-recursive-depth=640 --param=max-inline-recursive-depth-auto=460 --param=inline-min-speedup=12
 
 #-fsplit-loops -funswitch-loops -fira-loop-pressure -funroll-loops \
 # --param=inline-min-speedup=10
@@ -593,14 +593,11 @@ endif # $(dot-config)
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
 
-#ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
-#KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
-#else
+ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+else
 KBUILD_CFLAGS	+= -O3 -fno-prefetch-loop-arrays $(OPTS) $(GCC8WARNINGS)
-#KBUILD_CFLAGS  += -O3 $(GCC8WARNINGS)
-#KBUILD_CFLAGS  += -O2 $(GCC8WARNINGS)
-# -fno-unswitch-loops -fno-ipa-cp-clone -fno-prefetch-loop-arrays -fno-inline-functions $(GCC8WARNINGS)
-#endif
+endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
 

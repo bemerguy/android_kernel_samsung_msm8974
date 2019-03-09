@@ -63,11 +63,13 @@ static void inline up_one(void){
 
 				pr_info("tunedplug: UP cpu %d. sampling: %lu", i, sampling_time);
 
+				cpu_up(i);
+
 	                        if (cpufreq_get_policy(&policy, i) != 0)
         	                        pr_info("tunedplug: no policy for cpu %d ?", i);
 				else
 					policy.cur = policy.max;
-				cpu_up(i);
+
 				down[i]=-100;
 			}
 			else down[i]--;
