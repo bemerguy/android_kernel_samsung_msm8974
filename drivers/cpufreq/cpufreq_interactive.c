@@ -285,7 +285,7 @@ static void cpufreq_interactive_timer_resched(
 	if (displayon)
 		expires = jiffies + usecs_to_jiffies(timer_rate);
 	else
-		expires = jiffies + usecs_to_jiffies(timer_rate*4);
+		expires = jiffies + usecs_to_jiffies(timer_rate*3);
 #else
 	expires = jiffies + usecs_to_jiffies(timer_rate);
 #endif
@@ -390,7 +390,10 @@ static unsigned int choose_freq(
 	do {
 		prevfreq = freq;
 		tl = freq_to_targetload(freq);
-
+#ifdef CONFIG_TUNED_PLUG
+	        if (!displayon)
+			tl += tl;
+#endif
 		/*
 		 * Find the lowest frequency where the computed load is less
 		 * than or equal to the target load.

@@ -2457,6 +2457,7 @@ config VFPv3
 
 config NEON
 	bool "Advanced SIMD (NEON) Extension support"
+	default y
 	depends on VFPv3 && CPU_V7
 	help
 	  Say Y to include support code for NEON, the ARMv7 Advanced SIMD
@@ -2464,7 +2465,7 @@ config NEON
 
 config KERNEL_MODE_NEON
 	bool "Support for NEON in kernel mode"
-	default n
+	default y
 	depends on NEON
 	help
 	  Say Y to include support for NEON in kernel mode.

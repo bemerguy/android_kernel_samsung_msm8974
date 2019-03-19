@@ -323,7 +323,7 @@ static int __init msm_pm_mode_sysfs_add_cpu(
 			     !msm_pm_modes[idx].suspend_supported)
 				continue;
 			mode->kas[j].cpu = cpu;
-			mode->kas[j].ka.attr.mode = 0644;
+			mode->kas[j].ka.attr.mode = 0444;
 			mode->kas[j].ka.show = msm_pm_mode_attr_show;
 			mode->kas[j].ka.store = msm_pm_mode_attr_store;
 			mode->kas[j].ka.attr.name = msm_pm_mode_attr_labels[k];
@@ -1564,6 +1564,7 @@ static int msm_pm_enter(suspend_state_t state)
 			sleep_limit = SLEEP_LIMIT_NO_TCXO_SHUTDOWN;
 
 #if defined(CONFIG_MSM_MEMORY_LOW_POWER_MODE_SUSPEND_ACTIVE)
+lala
 		sleep_limit |= SLEEP_RESOURCE_MEMORY_BIT1;
 #elif defined(CONFIG_MSM_MEMORY_LOW_POWER_MODE_SUSPEND_RETENTION)
 		sleep_limit |= SLEEP_RESOURCE_MEMORY_BIT0;

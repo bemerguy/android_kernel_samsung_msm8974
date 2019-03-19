@@ -34,8 +34,7 @@ OUTPUT_FOLDER="output"
 
 DEFCONFIG="Boeffla_@$VAR@_defconfig"
 #DEFCONFIG="lineage_klte_pn547_defconfig"
-#Boeffla_@klte@_defconfig  Boeffla_@klteduos@_defconfig  Boeffla_@kltedv@_defconfig  Boeffla_@kltekdi@_defconfig  Boeffla_@kltekor@_defconfig
-#msm8974_sec_defconfig VARIANT_DEFCONFIG=msm8974pro_sec_klte_eur_defconfig SELINUX_DEFCONFIG=selinux_defconfig
+#Boeffla_@klte@_defconfig  Boeffla_@klteduos@_defconfig  Boeffla_@kltedv@_defconfig  Boeffla_@kltekdi@_defconfig  Boeffla_@kltekor@_defconfig Boeffla_@kltechn@_defconfig
 
 KERNEL_NAME="Boeffla-Kernel"
 
@@ -85,7 +84,8 @@ if [ -f ~/x-settings.sh ]; then
 	. ~/x-settings.sh
 fi
 
-BOEFFLA_FILENAME="${KERNEL_NAME,,}-$BOEFFLA_VERSION"
+#BOEFFLA_FILENAME="${KERNEL_NAME,,}-$BOEFFLA_VERSION"
+BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-LOS16-$VAR"
 
 # set environment
 export ARCH=$ARCHITECTURE

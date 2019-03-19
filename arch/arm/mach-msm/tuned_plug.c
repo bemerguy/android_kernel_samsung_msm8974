@@ -31,7 +31,7 @@ module_param(tunedplug_active, uint, 0644);
 static unsigned long sampling_time;
 
 #define DEF_SAMPLING msecs_to_jiffies(20)
-#define MAX_SAMPLING msecs_to_jiffies(2000)
+#define MAX_SAMPLING msecs_to_jiffies(200)
 
 
 bool displayon = true;

@@ -67,7 +67,7 @@ static struct hfpll_data hdata = {
 	.user_val = 0x8,
 	.low_vco_max_rate = 1248000000,
 	.min_rate = 537600000UL,
-	.max_rate = 2900000000UL,
+	.max_rate = 3100000000UL,
 };
 
 static struct hfpll_clk hfpll0_clk = {

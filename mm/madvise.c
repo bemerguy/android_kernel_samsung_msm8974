@@ -47,16 +47,15 @@ static long madvise_behavior(struct vm_area_struct * vma,
 	unsigned long new_flags = vma->vm_flags;
 
 	switch (behavior) {
-	case MADV_RANDOM:
 	case MADV_NORMAL:
 		new_flags = new_flags & ~VM_RAND_READ & ~VM_SEQ_READ;
 		break;
 	case MADV_SEQUENTIAL:
 		new_flags = (new_flags & ~VM_RAND_READ) | VM_SEQ_READ;
 		break;
-/*	case MADV_RANDOM:
+	case MADV_RANDOM:
 		new_flags = (new_flags & ~VM_SEQ_READ) | VM_RAND_READ;
-		break;*/
+		break;
 	case MADV_DONTFORK:
 		new_flags |= VM_DONTCOPY;
 		break;
