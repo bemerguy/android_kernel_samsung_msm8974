@@ -30,6 +30,11 @@
  *
  */
 
+/* rework by fbs (heiler.bemerguy@gmail.com) 2018/2019
+ * let's do it in a timely fashion with freezable timer instead of using kernel
+ * shrink functions, and killing up to 16 process at a time
+*/
+
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 #include <linux/module.h>
@@ -68,11 +73,10 @@ static uint32_t lowmem_lmkcount = 0;
 			pr_info(x);			\
 	} while (0)
 
-#if defined(CONFIG_ZSWAP)
-extern u64 zswap_pool_pages;
-extern atomic_t zswap_stored_pages;
-#endif
+#ifdef CONFIG_TUNED_PLUG
 extern bool displayon;
+#endif
+
 static int lowmem_shrink(void)
 {
 	struct task_struct *tsk, *tokill[16], *p;
@@ -85,10 +89,8 @@ static int lowmem_shrink(void)
 	int other_free = global_page_state(NR_FREE_PAGES) - totalreserve_pages;
 	int other_file = global_page_state(NR_FILE_PAGES);
 
-        long cache_size, cache_limit, free;
+        long cache_size, free;
 	static unsigned int expire=0, count=0;
-
-	if (other_free < 0) other_free = 0;
 
 	if (lowmem_adj_size < array_size)
 		array_size = lowmem_adj_size;
@@ -105,14 +107,15 @@ static int lowmem_shrink(void)
 	if (++expire > 10) { expire=0; count=0; }
 
 	if (min_score_adj == OOM_SCORE_ADJ_MAX + 1) {
-		lowmem_print(3, "min_score_adj = %d. We still have %u pages in cache", min_score_adj, other_file);
+		lowmem_print(3, "min_score_adj = %d. We still have %u pages in cache",
+			min_score_adj, other_file);
 		return 0;
 	}
 	else {
-           free = other_free * (long)(PAGE_SIZE / 1024);
-           cache_size = other_file * (long)(PAGE_SIZE / 1024);
-	   lowmem_print(2, "############### LOW MEMORY KILLER: %ldKb less than hiddenapps minimum: %ldKb. And free: %ldKb",
-			cache_size, minfree*(long)(PAGE_SIZE / 1024), free);
+		free = other_free * (long)(PAGE_SIZE / 1024);
+		cache_size = other_file * (long)(PAGE_SIZE / 1024);
+		lowmem_print(1, "############### LOW MEMORY KILLER: %ldKb less than adj %d's minimum: %ldKb.",
+			cache_size+free, min_score_adj, minfree*(long)(PAGE_SIZE / 1024));
 	}
 	rcu_read_lock();
 
@@ -121,10 +124,7 @@ static int lowmem_shrink(void)
 	selected = NULL;
 	selected_oom_score = min_score_adj;
 
-	cache_limit = minfree * (long)(PAGE_SIZE / 1024);
-
 	for_each_process(tsk) {
-		oom_score = 0;
 
 		if (tsk->flags & PF_KTHREAD)
 			continue;
@@ -139,58 +139,48 @@ static int lowmem_shrink(void)
                 oom_score = p->signal->oom_score_adj;
 
 		task_unlock(p);
-                if (oom_score < min_score_adj) {
-                                lowmem_print(5,"%s score: %d < min_score_adj: %d", p->comm, oom_score, min_score_adj);
-                                continue;
-                }
+                if (oom_score < min_score_adj)
+			continue;
 
 
 		if (selected) {
-			if (oom_score < selected_oom_score) {
-				lowmem_print(5,"%s score (%d) is lower than %s's (%d)", p->comm, oom_score, selected->comm, selected_oom_score);
+			if (oom_score < selected_oom_score)
 				continue;
-			}
 			else if ((oom_score == selected_oom_score) && (tki < 16)) {
 					tki++;
 					tokill[tki] = p;
-					lowmem_print(5,"adding %s with score %d to pos %d of tokill", p->comm, oom_score, tki);
 			}
 			else if (oom_score > selected_oom_score) {
 					tki=0;
 					tokill[0] = p;
-					lowmem_print(5,"oops, adding %s with score %d to pos %d of tokill", p->comm, oom_score, tki);
 			}
 		}
-
 		selected = p;
 		selected_oom_score = oom_score;
-
 	}
 
-	lowmem_print(5,"NOW start killing... %d processes", tki);
+	lowmem_print(3,"NOW start killing %d process(es)", tki+1);
 
 	while (tki >=0) {
 		task_lock(tokill[tki]);
 		set_tsk_thread_flag(tokill[tki], TIF_MEMDIE);
                 send_sig(SIGKILL, tokill[tki], 0);
+
+                lowmem_print(1, "Killing '%s' (%d) on behalf of '%s' (%d)", tokill[tki]->comm, tokill[tki]->pid, current->comm, current->pid);
+
 		task_unlock(tokill[tki]);
 
-                lowmem_print(1, "Killing '%s' (%d) on behalf of '%s' (%d) because\n" \
-                                "   cache %ldkB is below limit %ldkB for oom_score_adj %hd\n" \
-                                "   Free memory is %ldkB above reserved\n",
-                             tokill[tki]->comm, tokill[tki]->pid,
-                             current->comm, current->pid, cache_size, cache_limit, min_score_adj, free);
                 rem++;
                 lowmem_lmkcount++;
 		tki--;
 	}
 
         if (!rem && i>0) {
-           min_score_adj = lowmem_adj[--i];
-	   minfree = lowmem_minfree[i];
-	   cache_limit = minfree * (long)(PAGE_SIZE / 1024);
-           lowmem_print(2, "Nothing to kill? min_score_adj decreased to: %d", min_score_adj);
-	   goto restart;
+		i--;
+		min_score_adj = lowmem_adj[i];
+		minfree = lowmem_minfree[i];
+		lowmem_print(2, "Nothing to kill? min_score_adj decreased to: %d", min_score_adj);
+		goto restart;
         }
 
 	if (rem) {
@@ -201,7 +191,6 @@ static int lowmem_shrink(void)
 		count=0;
 		goto restart;
 	   }
-	   lowmem_print(1, "Killed %d processes", rem);
 	}
 
 	rcu_read_unlock();
@@ -236,96 +225,8 @@ static void __exit lowmem_exit(void)
 {
 }
 
-#ifdef CONFIG_ANDROID_LOW_MEMORY_KILLER_AUTODETECT_OOM_ADJ_VALUES
-static short lowmem_oom_adj_to_oom_score_adj(short oom_adj)
-{
-	if (oom_adj == OOM_ADJUST_MAX)
-		return OOM_SCORE_ADJ_MAX;
-	else
-		return (oom_adj * OOM_SCORE_ADJ_MAX) / -OOM_DISABLE;
-}
-
-static void lowmem_autodetect_oom_adj_values(void)
-{
-	int i;
-	short oom_adj;
-	short oom_score_adj;
-	int array_size = ARRAY_SIZE(lowmem_adj);
-
-	if (lowmem_adj_size < array_size)
-		array_size = lowmem_adj_size;
-
-	if (array_size <= 0)
-		return;
-
-	oom_adj = lowmem_adj[array_size - 1];
-	if (oom_adj > OOM_ADJUST_MAX)
-		return;
-
-	oom_score_adj = lowmem_oom_adj_to_oom_score_adj(oom_adj);
-	if (oom_score_adj <= OOM_ADJUST_MAX)
-		return;
-
-	lowmem_print(1, "lowmem_shrink: convert oom_adj to oom_score_adj:\n");
-	for (i = 0; i < array_size; i++) {
-		oom_adj = lowmem_adj[i];
-		oom_score_adj = lowmem_oom_adj_to_oom_score_adj(oom_adj);
-		lowmem_adj[i] = oom_score_adj;
-		lowmem_print(1, "oom_adj %d => oom_score_adj %d\n",
-			     oom_adj, oom_score_adj);
-	}
-}
-
-static int lowmem_adj_array_set(const char *val, const struct kernel_param *kp)
-{
-	int ret;
-
-	ret = param_array_ops.set(val, kp);
-
-	/* HACK: Autodetect oom_adj values in lowmem_adj array */
-	lowmem_autodetect_oom_adj_values();
-
-	return ret;
-}
-
-static int lowmem_adj_array_get(char *buffer, const struct kernel_param *kp)
-{
-	return param_array_ops.get(buffer, kp);
-}
-
-static void lowmem_adj_array_free(void *arg)
-{
-	param_array_ops.free(arg);
-}
-
-static struct kernel_param_ops lowmem_adj_array_ops = {
-	.set = lowmem_adj_array_set,
-	.get = lowmem_adj_array_get,
-	.free = lowmem_adj_array_free,
-};
-
-static const struct kparam_array __param_arr_adj = {
-	.max = ARRAY_SIZE(lowmem_adj),
-	.num = &lowmem_adj_size,
-	.ops = &param_ops_short,
-	.elemsize = sizeof(lowmem_adj[0]),
-	.elem = lowmem_adj,
-};
-#endif
-
-/*
- * not really modular, but the easiest way to keep compat with existing
- * bootargs behaviour is to continue using module_param here.
- */
-#ifdef CONFIG_ANDROID_LOW_MEMORY_KILLER_AUTODETECT_OOM_ADJ_VALUES
-module_param_cb(adj, &lowmem_adj_array_ops,
-		.arr = &__param_arr_adj,
-		S_IRUGO | S_IWUSR);
-__MODULE_PARM_TYPE(adj, "array of short");
-#else
 module_param_array_named(adj, lowmem_adj, short, &lowmem_adj_size,
 			 S_IRUGO | S_IWUSR);
-#endif
 module_param_array_named(minfree, lowmem_minfree, uint, &lowmem_minfree_size,
 			 S_IRUGO | S_IWUSR);
 module_param_named(debug_level, lowmem_debug_level, uint, S_IRUGO | S_IWUSR);

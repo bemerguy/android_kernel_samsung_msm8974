@@ -173,7 +173,7 @@ static void ladder_reflect(struct cpuidle_device *dev, int index)
 
 static struct cpuidle_governor ladder_governor = {
 	.name =		"ladder",
-	.rating =	10,
+	.rating =	30,
 	.enable =	ladder_enable_device,
 	.select =	ladder_select_state,
 	.reflect =	ladder_reflect,

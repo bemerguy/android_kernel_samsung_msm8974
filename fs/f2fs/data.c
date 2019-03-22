@@ -239,7 +239,7 @@ int reserve_new_block(struct dnode_of_data *dn)
 	if (unlikely(!inc_valid_block_count(sbi, dn->inode, 1)))
 		return -ENOSPC;
 
-	trace_f2fs_reserve_new_block(dn->inode, dn->nid, dn->ofs_in_node);
+//	trace_f2fs_reserve_new_blocks(dn->inode, dn->nid, dn->ofs_in_node);
 
 	dn->data_blkaddr = NEW_ADDR;
 	set_data_blkaddr(dn);

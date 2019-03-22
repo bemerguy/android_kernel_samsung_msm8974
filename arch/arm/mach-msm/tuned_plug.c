@@ -59,7 +59,7 @@ static void inline up_one(void){
         for (i = 1; i < NR_CPUS; i++) {
                 if (!cpu_online(i)) {
 			if (down[i] < -5) {
-				struct cpufreq_policy policy;
+				struct cpufreq_policy policy, *p = &policy;
 
 				pr_info("tunedplug: UP cpu %d. sampling: %lu", i, sampling_time);
 
@@ -68,7 +68,7 @@ static void inline up_one(void){
 	                        if (cpufreq_get_policy(&policy, i) != 0)
         	                        pr_info("tunedplug: no policy for cpu %d ?", i);
 				else
-					policy.cur = policy.max;
+					__cpufreq_driver_target(p, p->max, CPUFREQ_RELATION_H);
 
 				down[i]=-100;
 			}

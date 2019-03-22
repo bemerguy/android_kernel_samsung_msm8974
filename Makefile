@@ -360,12 +360,12 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 OPTS           = -fsplit-loops -ffast-math -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap -ftree-loop-ivcanon \
                 -fgcse-sm -fgcse-las -fgcse-after-reload -fira-hoist-pressure -fivopts -fsched-spec-load -fipa-pta -ftree-loop-im -fsection-anchors -fsched-pressure -ftree-lrs \
                 -fschedule-fusion -freorder-blocks-algorithm=simple -fira-loop-pressure \
-                -ftracer -fira-loop-pressure -fipa-icf -fipa-vrp -fno-ipa-cp-clone \
+                -ftracer -fira-loop-pressure -fipa-icf -fipa-vrp -fno-ipa-cp-clone -fmerge-all-constants -funroll-loops -funswitch-loops \
                 --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
-                --param max-cse-insns=2000 --param=max-cselib-memory-locations=100000 --param=max-reload-search-insns=100000 \
-                --param=max-unswitch-insns=80000 --param=max-modulo-backtrack-attempts=100000 \
-                --param=max-hoist-depth=0 --param=l2-cache-size=2048 --param=max-inline-recursive-depth=640 --param=max-inline-recursive-depth-auto=460 --param=inline-min-speedup=20
+                --param max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
+                --param=max-modulo-backtrack-attempts=500000 \
+                --param=max-hoist-depth=0 --param=l2-cache-size=2048 --param=max-inline-recursive-depth=640 --param=max-inline-recursive-depth-auto=460 --param=inline-min-speedup=50
 
 #-fsplit-loops -funswitch-loops -fira-loop-pressure -funroll-loops \
 # --param=inline-min-speedup=10
@@ -380,8 +380,9 @@ OPTS           = -fsplit-loops -ffast-math -fmodulo-sched -fmodulo-sched-allow-r
 
 GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
 GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier -Wno-stringop-overflow \
-		-Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
-GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool -Wno-int-in-bool-context -Wno-misleading-indentation -Wno-discarded-array-qualifiers -Wno-unused-function -Wno-stringop-truncation -Wno-restrict -Wno-sizeof-pointer-memaccess
+                 -Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
+GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool \
+                 -Wno-int-in-bool-context -Wno-unused-function -Wno-stringop-truncation -Wno-restrict -Wno-sizeof-pointer-memaccess
 
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
