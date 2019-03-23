@@ -360,12 +360,12 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 OPTS           = -fsplit-loops -ffast-math -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap -ftree-loop-ivcanon \
                 -fgcse-sm -fgcse-las -fgcse-after-reload -fira-hoist-pressure -fivopts -fsched-spec-load -fipa-pta -ftree-loop-im -fsection-anchors -fsched-pressure -ftree-lrs \
                 -fschedule-fusion -freorder-blocks-algorithm=simple -fira-loop-pressure \
-                -ftracer -fira-loop-pressure -fipa-icf -fipa-vrp -fno-ipa-cp-clone -fmerge-all-constants -funroll-loops -funswitch-loops \
+                -ftracer -fira-loop-pressure -fipa-icf -fipa-vrp -fno-ipa-cp-clone \
                 --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
                 --param max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
                 --param=max-modulo-backtrack-attempts=500000 \
-                --param=max-hoist-depth=0 --param=l2-cache-size=2048 --param=max-inline-recursive-depth=640 --param=max-inline-recursive-depth-auto=460 --param=inline-min-speedup=50
+                --param=max-hoist-depth=0 --param=l2-cache-size=2048 --param=inline-min-speedup=50
 
 #-fsplit-loops -funswitch-loops -fira-loop-pressure -funroll-loops \
 # --param=inline-min-speedup=10

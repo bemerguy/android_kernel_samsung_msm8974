@@ -908,7 +908,6 @@ static void lpm_cpuidle_init(void)
 	if (cpuidle_register(&msm_cpuidle_driver, NULL))
 		pr_err("%s(): Failed to register CPUIDLE device\n", __func__);
 
-        pr_err("lpm_cpuidle_init");
 }
 
 static int lpm_parse_power_params(struct device_node *node,
@@ -1146,7 +1145,6 @@ static int lpm_probe(struct platform_device *pdev)
 	platform_device_register(&lpm_dev);
 	suspend_set_ops(&lpm_suspend_ops);
 	hrtimer_init(&lpm_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-	pr_err("lpm_probe");
 	lpm_cpuidle_init();
 	return 0;
 fail:

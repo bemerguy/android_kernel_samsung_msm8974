@@ -125,6 +125,7 @@ static int lowmem_shrink(void)
 	selected_oom_score = min_score_adj;
 
 	for_each_process(tsk) {
+		oom_score = 0;
 
 		if (tsk->flags & PF_KTHREAD)
 			continue;
