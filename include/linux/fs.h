@@ -1900,8 +1900,9 @@ enum file_time_flags {
 extern void touch_atime(struct path *);
 static inline void file_accessed(struct file *file)
 {
+/*
 	if (!(file->f_flags & O_NOATIME))
-		touch_atime(&file->f_path);
+		touch_atime(&file->f_path);*/
 }
 
 int sync_inode(struct inode *inode, struct writeback_control *wbc);

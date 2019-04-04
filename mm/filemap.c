@@ -1113,11 +1113,11 @@ static void do_generic_file_read(struct file *filp, loff_t *ppos,
 find_page:
 		page = find_get_page(mapping, index);
 		if (!page) {
-			/*page_cache_sync_readahead(mapping,
+			page_cache_sync_readahead(mapping,
 					ra, filp,
 					index, last_index - index);
 			page = find_get_page(mapping, index);
-			if (unlikely(page == NULL))*/
+			if (unlikely(page == NULL))
 				goto no_cached_page;
 		}
 /*		if (PageReadahead(page)) {
@@ -1691,7 +1691,7 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		goto b;
 	} else {
 		/* No page in the page cache at all */
-		//do_sync_mmap_readahead(vma, ra, file, offset);
+		do_sync_mmap_readahead(vma, ra, file, offset);
 		count_vm_event(PGMAJFAULT);
 		mem_cgroup_count_vm_event(vma->vm_mm, PGMAJFAULT);
 		ret = VM_FAULT_MAJOR;

@@ -1,3 +1,4 @@
+nao compila
 /* Copyright (c) 2008-2010, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify

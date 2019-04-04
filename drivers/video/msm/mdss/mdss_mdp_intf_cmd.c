@@ -26,7 +26,7 @@
 #define MAX_SESSIONS 2
 
 /* wait for at most 2 vsync for lowest refresh rate (24hz) */
-#define KOFF_TIMEOUT msecs_to_jiffies(84)
+#define KOFF_TIMEOUT2 msecs_to_jiffies(84)
 
 #define STOP_TIMEOUT(hz) msecs_to_jiffies((1000 / hz) * (VSYNC_EXPIRE_TICK + 2))
 #define ULPS_ENTER_TIME msecs_to_jiffies(100)
@@ -739,7 +739,7 @@ static int mdss_mdp_cmd_wait4pingpong(struct mdss_mdp_ctl *ctl, void *arg)
 
 	rc = wait_event_timeout(ctx->pp_waitq,
 			atomic_read(&ctx->koff_cnt) == 0,
-			KOFF_TIMEOUT);
+			KOFF_TIMEOUT2);
 
 	if (rc <= 0) {
 		u32 status, mask;

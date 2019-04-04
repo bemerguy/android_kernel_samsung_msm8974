@@ -97,6 +97,7 @@ static int sdcardfs_d_revalidate(struct dentry *dentry, struct nameidata *nd)
 	}
 
 	if (!qstr_case_eq(&dentry->d_name, &lower_dentry->d_name)) {
+		__d_drop(dentry);
 		err = 0;
 	}
 

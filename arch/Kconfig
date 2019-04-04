@@ -77,7 +77,6 @@ config OPTPROBES
 	depends on !PREEMPT
 
 config HAVE_EFFICIENT_UNALIGNED_ACCESS
-	bool
 	def_bool y
 	help
 	  Some architectures are unable to perform unaligned accesses
