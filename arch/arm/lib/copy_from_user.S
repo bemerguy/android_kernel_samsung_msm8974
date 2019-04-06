@@ -111,4 +111,3 @@ ENDPROC(__copy_from_user)
 	ldr	r0, [sp], #4
 	copy_abort_end
 	.popsection
-

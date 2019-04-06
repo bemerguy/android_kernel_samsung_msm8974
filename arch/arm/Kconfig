@@ -2014,12 +2014,14 @@ config UACCESS_WITH_MEMCPY
 config ARM_PLD_64BYTE
 	bool "Use 64-bit preload size for kernel memory copy"
 	depends on CPU_V7
+	default y
 	help
 	  Config preload size for memcpy, selecting this for Cortex-A15
 
 config USE_LDRDSTRD_OVER_LDMSTM
 	bool "Use 64-bit access instructions to optimize memory copy"
 	depends on CPU_V7
+	default y
 	help
 	  Cortex-A15 perform better when use LDRD/STRD to access memory.
 	  Selecting this to optimize memory copy routines.

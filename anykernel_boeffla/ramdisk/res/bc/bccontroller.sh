@@ -98,8 +98,8 @@ if [ "lov_presets" == "$1" ]; then
 	
 	echo "Standard~"
 	echo "Gov: Tuned / standard"
-	echo "^Sched: row"
-	echo "^CPU: 2457 / no uv"
+	echo "^Sched: maple"
+	echo "^CPU: 2611 / no uv"
 	echo "^GPU: 200-578;"
 	
 	echo "Battery friendly~"
@@ -140,8 +140,8 @@ if [ "conf_presets" == "$1" ]; then
 	if [ "Standard" ==  "$2" ]; then
 		# gov, gov prof, sched int, sched ext, cpu max, cpu uv, gpu freq, gpu uv
 		echo "Tuned;standard;"
-		echo "row;row;"
-		echo "2457600;None;"
+		echo "maple;noopz;"
+		echo "2611200;None;"
 		echo "5,0;None"
 	fi
 	if [ "Battery friendly" ==  "$2" ]; then
@@ -708,16 +708,15 @@ if [ "apply_governor_profile" == "$1" ]; then
 	fi
 
 	if [ "Tuned - standard" == "$2" ]; then
-		echo "20000 2265600:100000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+		echo "10000 2265600:100000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
 		echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
 		echo "2265600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-		echo "1" > /sys/devices/system/cpu/cpufreq/Tuned/io_is_busy
-		echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+		echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
 		echo "70" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
 		echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
-		echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
+		echo "-1" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
@@ -727,13 +726,12 @@ if [ "apply_governor_profile" == "$1" ]; then
                 echo "30000 2265600:120000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "95" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "1958400" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "1" > /sys/devices/system/cpu/cpufreq/Tuned/io_is_busy
-                echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "80" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
                 echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
-                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
+                echo "-1" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
@@ -743,29 +741,27 @@ if [ "apply_governor_profile" == "$1" ]; then
                 echo "40000 2265600:200000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "99" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "1574400" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "1" > /sys/devices/system/cpu/cpufreq/Tuned/io_is_busy
-                echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "95" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
                 echo "30000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
-                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
+                echo "-1" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
 	fi
 
 	if [ "Tuned - performance" == "$2" ]; then
-                echo "10000 2265600:50000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "10000 2265600:80000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "80" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "2265600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "1" > /sys/devices/system/cpu/cpufreq/Tuned/io_is_busy
-                echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "60" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
                 echo "10000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
-                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
+                echo "-1" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
