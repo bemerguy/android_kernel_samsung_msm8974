@@ -104,7 +104,7 @@ static int lowmem_shrink(void)
 		}
 	}
 
-	if (++expire > 10) { expire=0; count=0; }
+	if (++expire > 20) { expire=0; count=0; }
 
 	if (min_score_adj == OOM_SCORE_ADJ_MAX + 1) {
 		lowmem_print(3, "min_score_adj = %d. We still have %u pages in cache",
@@ -187,8 +187,8 @@ static int lowmem_shrink(void)
 	if (rem) {
 	   if (++count > 4) {
 		lowmem_print(1, "I think you have too many apps running in background. Please try to disable their auto-start on boot!");
-		min_score_adj = lowmem_adj[3];
-		minfree = lowmem_minfree[3];
+		min_score_adj = lowmem_adj[2];
+		minfree = lowmem_minfree[2];
 		count=0;
 		goto restart;
 	   }
