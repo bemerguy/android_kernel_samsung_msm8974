@@ -292,6 +292,7 @@ static inline void *get_freepointer_safe(struct kmem_cache *s, void *object)
 
 static inline void set_freepointer(struct kmem_cache *s, void *object, void *fp)
 {
+//	BUG_ON(object == fp); /* naive detection of double free or corruption */
 	*(void **)(object + s->offset) = fp;
 }
 
@@ -1515,6 +1516,7 @@ static inline void *acquire_slab(struct kmem_cache *s,
 	void *freelist;
 	unsigned long counters;
 	struct page new;
+	unsigned long objects;
 
 	/*
 	 * Zap the freelist and set the frozen bit.
@@ -1525,6 +1527,7 @@ static inline void *acquire_slab(struct kmem_cache *s,
 		freelist = page->freelist;
 		counters = page->counters;
 		new.counters = counters;
+		objects = page->objects;
 		if (mode) {
 			new.inuse = page->objects;
 			new.freelist = NULL;
@@ -1541,6 +1544,7 @@ static inline void *acquire_slab(struct kmem_cache *s,
 			"lock and freeze"));
 
 	remove_partial(n, page);
+	page->lru.next = (void *)objects;
 	return freelist;
 }
 
@@ -1577,7 +1581,7 @@ static void *get_partial_node(struct kmem_cache *s,
 			c->node = page_to_nid(page);
 			stat(s, ALLOC_FROM_PARTIAL);
 			object = t;
-			available =  page->objects - page->inuse;
+			available =  page->objects - (unsigned long)page->lru.next;
 		} else {
 			available = put_cpu_partial(s, page, 0);
 			stat(s, CPU_PARTIAL_NODE);
@@ -1891,10 +1895,9 @@ redo:
 }
 
 /* Unfreeze all the cpu partial slabs */
-static void unfreeze_partials(struct kmem_cache *s)
+static void unfreeze_partials(struct kmem_cache *s, struct kmem_cache_cpu *c)
 {
 	struct kmem_cache_node *n = NULL, *n2 = NULL;
-	struct kmem_cache_cpu *c = this_cpu_ptr(s->cpu_slab);
 	struct page *page, *discard_page = NULL;
 
 	while ((page = c->partial)) {
@@ -1980,7 +1983,7 @@ int put_cpu_partial(struct kmem_cache *s, struct page *page, int drain)
 				 * set to the per node partial list.
 				 */
 				local_irq_save(flags);
-				unfreeze_partials(s);
+				unfreeze_partials(s, this_cpu_ptr(s->cpu_slab));
 				local_irq_restore(flags);
 				pobjects = 0;
 				pages = 0;
@@ -2018,7 +2021,7 @@ static inline void __flush_cpu_slab(struct kmem_cache *s, int cpu)
 		if (c->page)
 			flush_slab(s, c);
 
-		unfreeze_partials(s);
+		unfreeze_partials(s, c);
 	}
 }
 
