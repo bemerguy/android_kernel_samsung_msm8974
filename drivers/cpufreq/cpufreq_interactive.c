@@ -126,7 +126,7 @@ static u64 boostpulse_endtime;
 //#define DEFAULT_TIMER_SLACK (10 * DEFAULT_TIMER_RATE)
 static int timer_slack_val = DEFAULT_TIMER_SLACK;
 
-static bool io_is_busy = true;
+static bool io_is_busy = false;
 
 #ifdef CONFIG_MODE_AUTO_CHANGE
 struct cpufreq_loadinfo {
@@ -285,7 +285,7 @@ static void cpufreq_interactive_timer_resched(
 	if (displayon)
 		expires = jiffies + usecs_to_jiffies(timer_rate);
 	else
-		expires = jiffies + usecs_to_jiffies(timer_rate*3);
+		expires = jiffies + usecs_to_jiffies(timer_rate*5);
 #else
 	expires = jiffies + usecs_to_jiffies(timer_rate);
 #endif

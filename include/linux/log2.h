@@ -37,6 +37,15 @@ int __ilog2_u64(u64 n)
 }
 #endif
 
+#define __IS_POWER_OF_2(__n) ((__n) != 0 && (((__n) & ((__n) - 1)) == 0))
+
+static inline __attribute__((const))
+bool __is_power_of_2(unsigned long n)
+{
+	return __IS_POWER_OF_2(n);
+}
+
+
 /**
  * is_power_of_2() - check if a value is a power of two
  * @n: the value to check
@@ -45,11 +54,8 @@ int __ilog2_u64(u64 n)
  * *not* considered a power of two.
  * Return: true if @n is a power of 2, otherwise false.
  */
-static inline __attribute__((const))
-bool is_power_of_2(unsigned long n)
-{
-	return (n != 0 && ((n & (n - 1)) == 0));
-}
+#define is_power_of_2(n) \
+	__builtin_choose_expr(__builtin_constant_p(n), __IS_POWER_OF_2(n), __is_power_of_2(n))
 
 /**
  * __roundup_pow_of_two() - round up to nearest power of two

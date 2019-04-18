@@ -1431,6 +1431,7 @@ generic_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
 		return retval;
 
 	/* coalesce the iovecs and go direct-to-BIO for O_DIRECT */
+#if 0
 	if (filp->f_flags & O_DIRECT) {
 		loff_t size;
 		struct address_space *mapping;
@@ -1471,7 +1472,7 @@ generic_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
 			}
 		}
 	}
-
+#endif
 	count = retval;
 	for (seg = 0; seg < nr_segs; seg++) {
 		read_descriptor_t desc;
@@ -1581,7 +1582,7 @@ static int page_cache_read(struct file *file, pgoff_t offset)
 	return ret;
 }
 
-#define MMAP_LOTSAMISS  (200)
+#define MMAP_LOTSAMISS  (100)
 
 /*
  * Synchronous readahead happens when we don't even find
@@ -2580,6 +2581,8 @@ ssize_t __generic_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 	if (unlikely(file->f_flags & O_DIRECT)) {
 		loff_t endbyte;
 		ssize_t written_buffered;
+
+		pr_info("direct write for %s",file->f_path.dentry->d_name.name);
 
 		written = generic_file_direct_write(iocb, iov, &nr_segs, pos,
 							ppos, count, ocount);

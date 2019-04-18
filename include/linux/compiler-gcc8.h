@@ -57,7 +57,7 @@
  *
  * (asm goto is automatically volatile - the naming reflects this.)
  */
-#define asm_volatile_goto(x...)	do { asm goto(x); asm (""); } while (0)
+//#define asm_volatile_goto(x...)	do { asm goto(x); asm (""); } while (0)
 
 #ifdef CONFIG_ARCH_USE_BUILTIN_BSWAP
 #define __HAVE_BUILTIN_BSWAP32__

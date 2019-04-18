@@ -109,14 +109,14 @@ do {								\
 				 * the buf length can be BRCMF_DCMD_MAXLEN
 				 * to reduce iteration
 				 */
-#define WL_ISCAN_TIMER_INTERVAL_MS	3000
+#define WL_ISCAN_TIMER_INTERVAL_MS	9000
 #define WL_SCAN_ERSULTS_LAST	(BRCMF_SCAN_RESULTS_NO_MEM+1)
-#define WL_AP_MAX	256	/* virtually unlimitted as long
+#define WL_AP_MAX	16	/* virtually unlimitted as long
 				 * as kernel memory allows
 				 */
 
-#define WL_ROAM_TRIGGER_LEVEL		-75
-#define WL_ROAM_DELTA			20
+#define WL_ROAM_TRIGGER_LEVEL		-70
+#define WL_ROAM_DELTA			10
 #define WL_BEACON_TIMEOUT		3
 
 #define WL_SCAN_CHANNEL_TIME		40

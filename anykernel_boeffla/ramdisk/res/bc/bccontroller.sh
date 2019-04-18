@@ -311,9 +311,9 @@ fi
 
 if [ "param_readahead" == "$1" ]; then
 	# Internal sd (min/max/steps)
-	echo "128;3072;128;"
+	echo "32;3072;32;"
 	# External sd (min/max/steps)
-	echo "128;3072;128"
+	echo "32;3072;32"
 	exit 0
 fi
 
@@ -450,6 +450,7 @@ if [ "apply_cpu_hotplug_profile" == "$1" ]; then
         else
 	        echo "0" >/sys/module/tuned_plug/parameters/tunedplug_active
                 start mpdecision
+		exit 0
 	fi
 
 	if [ "MPDecision" == "$2" ]; then
@@ -679,7 +680,6 @@ if [ "apply_governor_profile" == "$1" ]; then
 		echo "3" >/sys/devices/system/cpu/cpufreq/ondemand/down_differential_multi_core
 		echo "0" >/sys/devices/system/cpu/cpufreq/ondemand/ignore_nice_load
 		echo "0" >/sys/devices/system/cpu/cpufreq/ondemand/input_boost
-		echo "0" >/sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
 		echo "300000" >/sys/devices/system/cpu/cpufreq/ondemand/optimal_freq
 		echo "0" >/sys/devices/system/cpu/cpufreq/ondemand/powersave_bias
 		echo "1" >/sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
@@ -770,7 +770,6 @@ if [ "apply_governor_profile" == "$1" ]; then
 	if [ "wheatley - standard" == "$2" ]; then
 		echo "5" > /sys/devices/system/cpu/cpufreq/wheatley/allowed_misses
 		echo "0" > /sys/devices/system/cpu/cpufreq/wheatley/ignore_nice_load
-		echo "0" > /sys/devices/system/cpu/cpufreq/wheatley/io_is_busy
 		echo "0" > /sys/devices/system/cpu/cpufreq/wheatley/powersave_bias
 		echo "1" > /sys/devices/system/cpu/cpufreq/wheatley/sampling_down_factor
 		echo "10000" > /sys/devices/system/cpu/cpufreq/wheatley/sampling_rate
@@ -790,7 +789,6 @@ if [ "apply_governor_profile" == "$1" ]; then
 		echo "60000" > /sys/devices/system/cpu/cpufreq/smartmax/down_rate
 		echo "1" > /sys/devices/system/cpu/cpufreq/smartmax/ignore_nice
 		echo "150000" > /sys/devices/system/cpu/cpufreq/smartmax/input_boost_duration
-		echo "0" > /sys/devices/system/cpu/cpufreq/smartmax/io_is_busy
 		echo "55" > /sys/devices/system/cpu/cpufreq/smartmax/max_cpu_load
 		echo "5" > /sys/devices/system/cpu/cpufreq/smartmax/min_cpu_load
 		echo "10000" > /sys/devices/system/cpu/cpufreq/smartmax/min_sampling_rate
@@ -814,7 +812,6 @@ if [ "apply_governor_profile" == "$1" ]; then
 		echo "60000" > /sys/devices/system/cpu/cpufreq/smartmax/down_rate
 		echo "1" > /sys/devices/system/cpu/cpufreq/smartmax/ignore_nice
 		echo "90000" > /sys/devices/system/cpu/cpufreq/smartmax/input_boost_duration
-		echo "0" > /sys/devices/system/cpu/cpufreq/smartmax/io_is_busy
 		echo "70" > /sys/devices/system/cpu/cpufreq/smartmax/max_cpu_load
 		echo "40" > /sys/devices/system/cpu/cpufreq/smartmax/min_cpu_load
 		echo "10000" > /sys/devices/system/cpu/cpufreq/smartmax/min_sampling_rate

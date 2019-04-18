@@ -57,17 +57,17 @@ extern u8 mb_enable_debug;
 /*
  * How long mballoc can look for a best extent (in found extents)
  */
-#define MB_DEFAULT_MAX_TO_SCAN		200
+#define MB_DEFAULT_MAX_TO_SCAN		50
 
 /*
  * How long mballoc must look for a best extent
  */
-#define MB_DEFAULT_MIN_TO_SCAN		10
+#define MB_DEFAULT_MIN_TO_SCAN		4
 
 /*
  * How many groups mballoc will scan looking for the best chunk
  */
-#define MB_DEFAULT_MAX_GROUPS_TO_SCAN	5
+#define MB_DEFAULT_MAX_GROUPS_TO_SCAN	2
 
 /*
  * with 'ext4_mb_stats' allocator will collect stats that will be
@@ -92,7 +92,7 @@ extern u8 mb_enable_debug;
 /*
  * default group prealloc size 512 blocks
  */
-#define MB_DEFAULT_GROUP_PREALLOC	512
+#define MB_DEFAULT_GROUP_PREALLOC	1024
 
 
 struct ext4_free_data {

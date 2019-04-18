@@ -33,7 +33,7 @@
 #define MAJOR_VERSION	1
 #define MINOR_VERSION	5
 
-#define POWER_SUSPEND_DEBUG // Add debugging prints in dmesg
+//#define POWER_SUSPEND_DEBUG // Add debugging prints in dmesg
 
 struct workqueue_struct *suspend_work_queue;
 
@@ -136,8 +136,6 @@ abort_resume:
 	mutex_unlock(&power_suspend_lock);
 }
 
-bool power_suspended = false;
-
 void set_power_suspend_state(int new_state)
 {
 	unsigned long irqflags;
@@ -148,14 +146,12 @@ void set_power_suspend_state(int new_state)
 		pr_info("[POWERSUSPEND] state activated.\n");
 		#endif
 		state = new_state;
-		power_suspended = true;
 		queue_work(suspend_work_queue, &power_suspend_work);
 	} else if (state == POWER_SUSPEND_ACTIVE && new_state == POWER_SUSPEND_INACTIVE) {
 		#ifdef POWER_SUSPEND_DEBUG
 		pr_info("[POWERSUSPEND] state deactivated.\n");
 		#endif
 		state = new_state;
-		power_suspended = false;
 		queue_work(suspend_work_queue, &power_resume_work);
 	}
 	spin_unlock_irqrestore(&state_lock, irqflags);
@@ -240,7 +236,7 @@ static ssize_t power_suspend_mode_store(struct kobject *kobj,
 		default:
 			return -EINVAL;
 	}
-	
+
 }
 
 static struct kobj_attribute power_suspend_mode_attribute =
@@ -325,4 +321,3 @@ MODULE_AUTHOR("Paul Reioux <reioux@gmail.com> / Jean-Pierre Rasquin <yank555.lu@
 MODULE_DESCRIPTION("power_suspend - A replacement kernel PM driver for"
         "Android's deprecated early_suspend/late_resume PM driver!");
 MODULE_LICENSE("GPL v2");
-

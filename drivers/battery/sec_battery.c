@@ -9,6 +9,10 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
+
+#define DEBUG 1
+#define VERBOSE_DEBUG 1
+
 #include <linux/battery/sec_battery.h>
 #if defined(CONFIG_SENSORS_QPNP_ADC_VOLTAGE)
 #include <linux/qpnp/qpnp-adc.h>
@@ -2484,12 +2488,9 @@ static void sec_bat_swelling_fullcharged_check(struct sec_battery_info *battery)
 
 	switch (battery->pdata->full_check_type) {
 	case SEC_BATTERY_FULLCHARGED_FG_CURRENT:
-		if ((battery->current_now > 0 && battery->current_now <
-				battery->pdata->charging_current[
-				battery->cable_type].full_check_current_1st) &&
-				(battery->current_avg > 0 && battery->current_avg <
-				battery->pdata->charging_current[
-				battery->cable_type].full_check_current_1st)) {
+		if ((battery->current_now > 0 &&
+				battery->current_now < battery->pdata->charging_current[battery->cable_type].full_check_current_1st) &&
+				(battery->current_avg > 0 && battery->current_avg < battery->pdata->charging_current[battery->cable_type].full_check_current_1st)) {
 				value.intval = POWER_SUPPLY_STATUS_FULL;
 		}
 		break;

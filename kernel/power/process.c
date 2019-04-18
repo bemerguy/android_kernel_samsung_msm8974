@@ -23,7 +23,7 @@
 /* 
  * Timeout for stopping processes
  */
-#define TIMEOUT	(40 * HZ)
+#define TIMEOUT	msecs_to_jiffies(20000)
 
 static int try_to_freeze_tasks(bool user_only)
 {
