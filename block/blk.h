@@ -7,7 +7,7 @@
 #define BLK_BATCH_TIME	(HZ/50UL)
 
 /* Number of requests a "batching" process may submit */
-#define BLK_BATCH_REQ	16
+#define BLK_BATCH_REQ	64
 
 extern struct kmem_cache *blk_requestq_cachep;
 extern struct kobj_type blk_queue_ktype;

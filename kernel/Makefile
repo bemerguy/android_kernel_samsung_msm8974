@@ -2,7 +2,7 @@
 # Makefile for the linux kernel.
 #
 
-obj-y     = fork.o exec_domain.o panic.o printk.o printk_interface.o \
+obj-y     = fork.o exec_domain.o panic.o printk.o \
 	    cpu.o exit.o itimer.o time.o softirq.o resource.o \
 	    sysctl.o sysctl_binary.o capability.o ptrace.o timer.o user.o \
 	    signal.o sys.o kmod.o workqueue.o pid.o \
@@ -122,16 +122,8 @@ $(obj)/config_data.h: $(obj)/config_data.gz FORCE
 
 $(obj)/time.o: $(obj)/timeconst.h
 
-quiet_cmd_hzfile = HZFILE  $@
-      cmd_hzfile = echo "hz=$(CONFIG_HZ)" > $@
-
-targets += hz.bc
-$(obj)/hz.bc: $(objtree)/include/config/hz.h FORCE
-	$(call if_changed,hzfile)
-
-quiet_cmd_bc  = BC      $@
-      cmd_bc  = bc -q $(filter-out FORCE,$^) > $@
-
+quiet_cmd_timeconst  = TIMEC   $@
+      cmd_timeconst  = $(PERL) $< $(CONFIG_HZ) > $@
 targets += timeconst.h
-$(obj)/timeconst.h: $(obj)/hz.bc $(src)/timeconst.bc FORCE
-	$(call if_changed,bc)
+$(obj)/timeconst.h: $(src)/timeconst.pl FORCE
+	$(call if_changed,timeconst)

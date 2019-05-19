@@ -566,7 +566,7 @@ inline static void MUTEX_UNLOCK_SOFTAP_SET(dhd_pub_t * dhdp)
 
 #define DHD_OS_WD_WAKE_LOCK(pub)		dhd_os_wd_wake_lock(pub)
 #define DHD_OS_WD_WAKE_UNLOCK(pub)		dhd_os_wd_wake_unlock(pub)
-#define DHD_PACKET_TIMEOUT_MS	250
+#define DHD_PACKET_TIMEOUT_MS	400
 #define DHD_EVENT_TIMEOUT_MS	1500
 
 
@@ -854,16 +854,16 @@ extern uint dhd_force_tx_queueing;
 #ifndef CUSTOM_GLOM_SETTING
 #define CUSTOM_GLOM_SETTING 	DEFAULT_GLOM_VALUE
 #endif
-#define WL_AUTO_ROAM_TRIGGER -60 //was 75
+#define WL_AUTO_ROAM_TRIGGER -65
 /* hooks for custom Roaming Trigger  setting via Makefile */
-#define DEFAULT_ROAM_TRIGGER_VALUE -60 /* dBm default roam trigger all band */
+#define DEFAULT_ROAM_TRIGGER_VALUE -65 /* dBm default roam trigger all band */
 #define DEFAULT_ROAM_TRIGGER_SETTING 	-1
 #ifndef CUSTOM_ROAM_TRIGGER_SETTING
 #define CUSTOM_ROAM_TRIGGER_SETTING 	DEFAULT_ROAM_TRIGGER_VALUE
 #endif
 
 /* hooks for custom Roaming Romaing  setting via Makefile */
-#define DEFAULT_ROAM_DELTA_VALUE  15 /* dBm default roam delta all band. was 10 */
+#define DEFAULT_ROAM_DELTA_VALUE  5 /* dBm default roam delta all band */
 #define DEFAULT_ROAM_DELTA_SETTING 	-1
 #ifndef CUSTOM_ROAM_DELTA_SETTING
 #define CUSTOM_ROAM_DELTA_SETTING 	DEFAULT_ROAM_DELTA_VALUE
@@ -886,7 +886,7 @@ extern uint dhd_force_tx_queueing;
 #define CUSTOM_LISTEN_INTERVAL 		LISTEN_INTERVAL
 #endif /* CUSTOM_LISTEN_INTERVAL */
 
-#define DEFAULT_SUSPEND_BCN_LI_DTIM		5
+#define DEFAULT_SUSPEND_BCN_LI_DTIM		3
 #ifndef CUSTOM_SUSPEND_BCN_LI_DTIM
 #define CUSTOM_SUSPEND_BCN_LI_DTIM		DEFAULT_SUSPEND_BCN_LI_DTIM
 #endif
@@ -929,7 +929,7 @@ extern uint dhd_force_tx_queueing;
 
 #define MAX_DTIM_SKIP_BEACON_INTERVAL	100 /* max allowed associated AP beacon for DTIM skip */
 #ifndef MAX_DTIM_ALLOWED_INTERVAL
-#define MAX_DTIM_ALLOWED_INTERVAL 900 /* max allowed total beacon interval for DTIM skip */
+#define MAX_DTIM_ALLOWED_INTERVAL 600 /* max allowed total beacon interval for DTIM skip */
 #endif
 #define NO_DTIM_SKIP 1
 #ifdef SDTEST

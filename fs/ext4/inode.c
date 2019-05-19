@@ -3001,7 +3001,7 @@ static int ext4_set_bh_endio(struct buffer_head *bh, struct inode *inode)
 	size_t size = bh->b_size;
 
 retry:
-	io_end = ext4_init_io_end(inode, GFP_ATOMIC);
+	io_end = ext4_init_io_end(inode, 0, GFP_ATOMIC);
 	if (!io_end) {
 		pr_warn_ratelimited("%s: allocation fail\n", __func__);
 		schedule();
@@ -3075,11 +3075,9 @@ static ssize_t ext4_ext_direct_IO(int rw, struct kiocb *iocb,
 		iocb->private = NULL;
 		EXT4_I(inode)->cur_aio_dio = NULL;
 		if (!is_sync_kiocb(iocb)) {
-			ext4_io_end_t *io_end =
-				ext4_init_io_end(inode, GFP_NOFS);
+			ext4_io_end_t *io_end = ext4_init_io_end(inode, 1, GFP_NOFS);
 			if (!io_end)
 				return -ENOMEM;
-			io_end->flag |= EXT4_IO_END_DIRECT;
 			iocb->private = io_end;
 			/*
 			 * we save the io structure for current async

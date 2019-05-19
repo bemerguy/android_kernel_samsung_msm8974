@@ -15,11 +15,14 @@ BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-LOS16-$VAR"
 
 #TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
 #8.2
-TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.11-1/bin/arm-linux-"
+#TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.11-1/bin/arm-linux-"
 #8.2
 #TOOLCHAIN="/root/armv7-eabihf--glibc--bleeding-edge-2018.11-1/bin/arm-linux-"
 #7.3
 #TOOLCHAIN="/root/armv7-eabihf--musl--bleeding-edge-2018.02-1/bin/arm-linux-"
+
+#9.1
+TOOLCHAIN="/root/arm-eabi-gcc/bin/arm-eabi-"
 
 ARCHITECTURE=arm
 COMPILER_FLAGS_KERNEL="-Wno-maybe-uninitialized -Wno-array-bounds"

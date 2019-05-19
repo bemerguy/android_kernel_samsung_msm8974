@@ -239,28 +239,28 @@ fi
 
 if [ "conf_cpu_volt" == "$1" ]; then
 	if [ "No undervolting" == "$2" ]; then
-		echo "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0"
+		echo "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0"
 	fi
 	if [ "undervolt -25mV" == "$2" ]; then
-		echo "-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25"
+		echo "-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25"
 	fi
 	if [ "undervolt -50mV" == "$2" ]; then
-		echo "-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50"
+		echo "-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50"
 	fi
 	if [ "undervolt -75mV" == "$2" ]; then
-		echo "-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75"
+		echo "-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75;-75"
 	fi
 	if [ "undervolt -100mV" == "$2" ]; then
-		echo "-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100"
+		echo "-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100;-100"
 	fi
 	if [ "undervolt light" == "$2" ]; then
-		echo "-50;-50;-50;-50;-50;-25;-25;-25;-25;-25;-25;-25;0;0;0;0;0;0;0"
+		echo "-50;-50;-50;-50;-50;-25;-25;-25;-25;-25;-25;-25;0;0;0;0;0;0;0;0;0;0"
 	fi
 	if [ "undervolt medium" == "$2" ]; then
-		echo "-75;-75;-75;-75;-75;-75;-50;-50;-50;-50;-50;-25;-25;-25;-25;-25;-25;-25;-25"
+		echo "-75;-75;-75;-75;-75;-75;-50;-50;-50;-50;-50;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25;-25"
 	fi
 	if [ "undervolt heavy" == "$2" ]; then
-		echo "-100;-100;-100;-100;-100;-100;-100;-75;-75;-75;-75;-75;-50;-50;-50;-50;-50;-50;-50"
+		echo "-100;-100;-100;-100;-100;-100;-100;-75;-75;-75;-75;-75;-50;-50;-50;-50;-50;-50;-50;-50;-50;-50"
 	fi
 	exit 0
 fi
@@ -445,19 +445,18 @@ if [ "apply_cpu_hotplug_profile" == "$1" ]; then
         if [ "Tuned" == "$2" ]; then
 		echo "1" >/sys/module/tuned_plug/parameters/tunedplug_active
 		stop mpdecision
-		busybox find /sys/devices/system/cpu/cpu? -name online -exec sh -c "echo 1 > {}" \;
+                busybox find /sys/devices/system/cpu/cpu? -name online_control -exec sh -c "echo 0 > {}" \;
+                busybox find /sys/devices/system/cpu/cpu? -name online -exec sh -c "echo 1 > {}" \;
+                busybox find /sys/devices/system/cpu/cpu? -name scaling_min_freq -exec sh -c "echo 268800 > {}" \;
                 exit 0
         else
 	        echo "0" >/sys/module/tuned_plug/parameters/tunedplug_active
                 start mpdecision
-		exit 0
+                busybox find /sys/devices/system/cpu/cpu? -name online_control -exec sh -c "echo 0 > {}" \;
 	fi
 
 	if [ "MPDecision" == "$2" ]; then
-		echo "0" >/sys/devices/system/cpu/cpu0/online_control
-		echo "0" >/sys/devices/system/cpu/cpu1/online_control
-		echo "0" >/sys/devices/system/cpu/cpu2/online_control
-		echo "0" >/sys/devices/system/cpu/cpu3/online_control
+                busybox find /sys/devices/system/cpu/cpu? -name online_control -exec sh -c "echo 0 > {}" \;
 		exit 0
 	fi
 
@@ -502,10 +501,7 @@ if [ "apply_cpu_hotplug_profile" == "$1" ]; then
 	fi
 
 	if [ "4 cores min" == "$2" ]; then
-		echo "1" >/sys/devices/system/cpu/cpu0/online_control
-		echo "1" >/sys/devices/system/cpu/cpu1/online_control
-		echo "1" >/sys/devices/system/cpu/cpu2/online_control
-		echo "1" >/sys/devices/system/cpu/cpu3/online_control
+                busybox find /sys/devices/system/cpu/cpu? -name online_control -exec sh -c "echo 1 > {}" \;
 		exit 0
 	fi
 
@@ -716,7 +712,6 @@ if [ "apply_governor_profile" == "$1" ]; then
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
 		echo "70" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
 		echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
-		echo "-1" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
@@ -731,7 +726,6 @@ if [ "apply_governor_profile" == "$1" ]; then
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "80" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
                 echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
-                echo "-1" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
@@ -746,7 +740,6 @@ if [ "apply_governor_profile" == "$1" ]; then
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "95" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
                 echo "30000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
-                echo "-1" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
 
 		busybox sleep 0.5s
 		busybox sync
@@ -756,12 +749,11 @@ if [ "apply_governor_profile" == "$1" ]; then
                 echo "10000 2265600:80000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "80" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "2265600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "60" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
-                echo "10000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
-                echo "-1" > /sys/devices/system/cpu/cpufreq/Tuned/timer_slack
+                echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
 
 		busybox sleep 0.5s
 		busybox sync

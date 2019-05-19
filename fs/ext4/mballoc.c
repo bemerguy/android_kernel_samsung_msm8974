@@ -4073,7 +4073,7 @@ ext4_mb_initialize_context(struct ext4_allocation_context *ac,
 
 	/* we have to define context: we'll we work with a file or
 	 * locality group. this is a policy, actually */
-	ext4_mb_group_or_file(ac);
+	//ext4_mb_group_or_file(ac);
 
 	mb_debug(1, "init ac: %u blocks @ %u, goal %u, flags %x, 2^%d, "
 			"left: %u/%u, right %u/%u to %swritable\n",

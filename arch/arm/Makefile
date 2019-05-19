@@ -35,7 +35,7 @@ endif
 
 # Extended optimization set for ARM devices,
 # more precisely the Cortex-A15 with NEON support.
-ifeq ($(CONFIG_FAST_LANE_ARM),y)
+#ifeq ($(CONFIG_FAST_LANE_ARM),y)
 FAST_LANE_ARM_OPT := -mtune=cortex-a15 \
 	-mcpu=cortex-a15 \
 	-mfpu=neon-vfpv4 \
@@ -48,7 +48,7 @@ FAST_LANE_OPT_FLAGS := -g0 \
 	-funsafe-math-optimizations \
 	$(FAST_LANE_ARM_OPT)
 KBUILD_CFLAGS	+= $(FAST_LANE_OPT_FLAGS)
-endif
+#endif
 
 ifeq ($(CONFIG_FRAME_POINTER),y)
 KBUILD_CFLAGS	+=-fno-omit-frame-pointer -mapcs -mno-sched-prolog

@@ -50,12 +50,12 @@
 	ldr1w \ptr, \reg3, \abort
 	ldr1w \ptr, \reg4, \abort
 	.endm
-
+#ifndef CONFIG_USE_LDRDSTRD_OVER_LDMSTM
 	.macro ldr8w ptr reg1 reg2 reg3 reg4 reg5 reg6 reg7 reg8 abort
 	ldr4w \ptr, \reg1, \reg2, \reg3, \reg4, \abort
 	ldr4w \ptr, \reg5, \reg6, \reg7, \reg8, \abort
 	.endm
-
+#endif
 	.macro ldr1b ptr reg cond=al abort
 	ldrusr	\reg, \ptr, 1, \cond, abort=\abort
 	.endm

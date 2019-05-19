@@ -1154,10 +1154,10 @@ static int sec_chg_set_property(struct power_supply *psy,
 					sprintf(charge_info_text, "Wireless charger");
 					if (wireless_level != 0)
 					{
-						charge_stock_logic = 0;
+						charge_stock_logic = 1;
 						charge_level_nom = wireless_level;
 						set_charging_current = wireless_level;
-						set_charging_current_max = wireless_level;
+						set_charging_current_max = WIRELESS_CHARGE_LEVEL_MAX;
 					}
 					break;
 

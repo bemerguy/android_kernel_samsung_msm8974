@@ -1583,7 +1583,7 @@ static void vfsspi_timer_func(unsigned long ptr)
 		round_jiffies_up(jiffies + FPSENSOR_DEBUG_TIMER_SEC));
 }
 
-#define TEST_DEBUG
+//#define TEST_DEBUG
 
 int vfsspi_probe(struct spi_device *spi)
 {

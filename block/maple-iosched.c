@@ -25,12 +25,12 @@ extern bool displayon;
 enum { ASYNC, SYNC };
 
 /* Tunables */
-static const int sync_read_expire = 10;		/* max time before a read sync is submitted. */
-static const int sync_write_expire = 35;	/* max time before a write sync is submitted. */
-static const int async_read_expire = 20;	/* ditto for read async, these limits are SOFT! */
-static const int async_write_expire = 50;	/* ditto for write async, these limits are SOFT! */
-static const int fifo_batch = 20;		/* # of sequential requests treated as one by the above parameters. */
-static const int writes_starved = 5;		/* max times reads can starve a write */
+static const int sync_read_expire = 100;		/* max time before a read sync is submitted. */
+static const int sync_write_expire = 350;	/* max time before a write sync is submitted. */
+static const int async_read_expire = 200;	/* ditto for read async, these limits are SOFT! */
+static const int async_write_expire = 500;	/* ditto for write async, these limits are SOFT! */
+static const int fifo_batch = 16;		/* # of sequential requests treated as one by the above parameters. */
+static const int writes_starved = 4;		/* max times reads can starve a write */
 static const int sleep_latency_multiple = 10;	/* multiple for expire time when device is asleep */
 
 /* Elevator data */
@@ -46,7 +46,7 @@ struct maple_data {
 	int fifo_expire[2][2];
 	int fifo_batch;
 	int writes_starved;
-  int sleep_latency_multiple;
+	int sleep_latency_multiple;
 };
 
 static inline struct maple_data *
@@ -117,11 +117,11 @@ maple_expired_request(struct maple_data *mdata, int sync, int data_dir)
 
 static struct request *
 maple_choose_expired_request(struct maple_data *mdata)
-{		/* yes this is inverted --heiler */
-	struct request *rq_sync_read = maple_expired_request(mdata, ASYNC, READ);
-	struct request *rq_sync_write = maple_expired_request(mdata, ASYNC, WRITE);
-	struct request *rq_async_read = maple_expired_request(mdata, SYNC, READ);
-	struct request *rq_async_write = maple_expired_request(mdata, SYNC, WRITE);
+{
+	struct request *rq_sync_read = maple_expired_request(mdata, SYNC, READ);
+	struct request *rq_sync_write = maple_expired_request(mdata, SYNC, WRITE);
+	struct request *rq_async_read = maple_expired_request(mdata, ASYNC, READ);
+	struct request *rq_async_write = maple_expired_request(mdata, ASYNC, WRITE);
 
 	/* Reset (non-expired-)batch-counter */
 	mdata->batched = 0;
@@ -129,7 +129,7 @@ maple_choose_expired_request(struct maple_data *mdata)
 	/*
 	 * Check expired requests.
 	 * Asynchronous requests have priority over synchronous.
-	 * Read requests have priority over write. I inverted that --heiler
+	 * Read requests have priority over write.
 	 */
 
    if (rq_async_read && rq_sync_read) {

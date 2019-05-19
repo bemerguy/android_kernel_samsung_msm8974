@@ -3396,11 +3396,11 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	set_opt(sb, POSIX_ACL);
 #endif
 	set_opt(sb, MBLK_IO_SUBMIT);
-/*	if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_DATA)
+	if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_DATA)
 		set_opt(sb, JOURNAL_DATA);
 	else if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_ORDERED)
 		set_opt(sb, ORDERED_DATA);
-	else if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_WBACK) */
+	else if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_WBACK)
 		set_opt(sb, WRITEBACK_DATA);
 
 	if (le16_to_cpu(sbi->s_es->s_errors) == EXT4_ERRORS_PANIC)
@@ -3411,8 +3411,8 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		set_opt(sb, ERRORS_RO);
 	if (def_mount_opts & EXT4_DEFM_BLOCK_VALIDITY)
 		set_opt(sb, BLOCK_VALIDITY);
-//	if (def_mount_opts & EXT4_DEFM_DISCARD)
-//		set_opt(sb, DISCARD);
+	if (def_mount_opts & EXT4_DEFM_DISCARD)
+		set_opt(sb, DISCARD);
 
 	sbi->s_resuid = le16_to_cpu(es->s_def_resuid);
 	sbi->s_resgid = le16_to_cpu(es->s_def_resgid);
@@ -3427,8 +3427,8 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	 * enable delayed allocation by default
 	 * Use -o nodelalloc to turn it off
 	 */
-/*	if (!IS_EXT3_SB(sb) &&
-	    ((def_mount_opts & EXT4_DEFM_NODELALLOC) == 0))*/
+	if (!IS_EXT3_SB(sb) &&
+	    ((def_mount_opts & EXT4_DEFM_NODELALLOC) == 0))
 	if (!IS_EXT3_SB(sb))
 		set_opt(sb, DELALLOC);
 

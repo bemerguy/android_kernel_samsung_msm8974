@@ -70,7 +70,7 @@
 #include "bfq.h"
 #include "blk.h"
 
-/* Expiration time of sync (1) and async (0) requests, in jiffies. */
+/* Expiration time of sync (0) and async (1) requests, in jiffies. */
 static const int bfq_fifo_expire[2] = { HZ / 4, HZ / 8 };
 
 /* Idling period duration, in jiffies. */

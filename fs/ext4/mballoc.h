@@ -57,7 +57,7 @@ extern u8 mb_enable_debug;
 /*
  * How long mballoc can look for a best extent (in found extents)
  */
-#define MB_DEFAULT_MAX_TO_SCAN		50
+#define MB_DEFAULT_MAX_TO_SCAN		20
 
 /*
  * How long mballoc must look for a best extent
@@ -67,7 +67,7 @@ extern u8 mb_enable_debug;
 /*
  * How many groups mballoc will scan looking for the best chunk
  */
-#define MB_DEFAULT_MAX_GROUPS_TO_SCAN	2
+#define MB_DEFAULT_MAX_GROUPS_TO_SCAN	5
 
 /*
  * with 'ext4_mb_stats' allocator will collect stats that will be
@@ -82,7 +82,7 @@ extern u8 mb_enable_debug;
  * We use locality group prealloc space for stream request.
  * We can tune the same via /proc/fs/ext4/<parition>/stream_req
  */
-#define MB_DEFAULT_STREAM_THRESHOLD	16	/* 64K */
+#define MB_DEFAULT_STREAM_THRESHOLD	0	/* 64K */
 
 /*
  * for which requests use 2^N search using buddies

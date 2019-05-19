@@ -214,7 +214,7 @@ typedef struct ext4_io_end {
 	struct kiocb		*iocb;		/* iocb struct for AIO */
 	int			result;		/* error value for AIO */
 	int			num_io_pages;   /* for writepages() */
-	struct ext4_io_page	*pages[MAX_IO_PAGES]; /* for writepages() */
+	struct ext4_io_page	**pages; 	/* for writepages() */
 } ext4_io_end_t;
 
 struct ext4_io_submit {
@@ -2444,7 +2444,7 @@ extern int __init ext4_init_pageio(void);
 extern void ext4_exit_pageio(void);
 extern void ext4_ioend_wait(struct inode *);
 extern void ext4_free_io_end(ext4_io_end_t *io);
-extern ext4_io_end_t *ext4_init_io_end(struct inode *inode, gfp_t flags);
+extern ext4_io_end_t *ext4_init_io_end(struct inode *inode, int directio, gfp_t flags);
 extern int ext4_end_io_nolock(ext4_io_end_t *io);
 extern void ext4_io_submit(struct ext4_io_submit *io);
 extern int ext4_bio_write_page(struct ext4_io_submit *io,

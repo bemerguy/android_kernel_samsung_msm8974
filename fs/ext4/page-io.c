@@ -29,16 +29,26 @@
 #include "acl.h"
 #include "ext4_extents.h"
 
-static struct kmem_cache *io_page_cachep, *io_end_cachep;
+static struct kmem_cache *io_page_cachep, *io_pgvec_cachep, *io_end_cachep;
 
 int __init ext4_init_pageio(void)
 {
 	io_page_cachep = KMEM_CACHE(ext4_io_page, SLAB_RECLAIM_ACCOUNT);
 	if (io_page_cachep == NULL)
 		return -ENOMEM;
+
+	io_pgvec_cachep = kmem_cache_create("ext4_io_pgvec",
+					    sizeof(struct ext4_io_page*)
+					    * MAX_IO_PAGES,
+					    0, (SLAB_RECLAIM_ACCOUNT), NULL);
+	if (io_pgvec_cachep == NULL) {
+		kmem_cache_destroy(io_page_cachep);
+		return -ENOMEM;
+	}
 	io_end_cachep = KMEM_CACHE(ext4_io_end, SLAB_RECLAIM_ACCOUNT);
 	if (io_end_cachep == NULL) {
 		kmem_cache_destroy(io_page_cachep);
+		kmem_cache_destroy(io_pgvec_cachep);
 		return -ENOMEM;
 	}
 	return 0;
@@ -47,6 +57,7 @@ int __init ext4_init_pageio(void)
 void ext4_exit_pageio(void)
 {
 	kmem_cache_destroy(io_end_cachep);
+	kmem_cache_destroy(io_pgvec_cachep);
 	kmem_cache_destroy(io_page_cachep);
 }
 
@@ -78,6 +89,8 @@ void ext4_free_io_end(ext4_io_end_t *io)
 	io->num_io_pages = 0;
 	if (atomic_dec_and_test(&EXT4_I(io->inode)->i_ioend_count))
 		wake_up_all(ext4_ioend_wq(io->inode));
+        if (io->pages)
+                kmem_cache_free(io_pgvec_cachep, io->pages);
 	kmem_cache_free(io_end_cachep, io);
 }
 
@@ -164,15 +177,24 @@ free:
 	ext4_free_io_end(io);
 }
 
-ext4_io_end_t *ext4_init_io_end(struct inode *inode, gfp_t flags)
+ext4_io_end_t *ext4_init_io_end(struct inode *inode, int directio, gfp_t flags)
 {
 	ext4_io_end_t *io = kmem_cache_zalloc(io_end_cachep, flags);
-	if (io) {
-		atomic_inc(&EXT4_I(inode)->i_ioend_count);
-		io->inode = inode;
-		INIT_WORK(&io->work, ext4_end_io_work);
-		INIT_LIST_HEAD(&io->list);
+       if (!io)
+               return NULL;
+
+       if (directio) {
+               io->flag = EXT4_IO_END_DIRECT;
+       } else {
+               io->pages = kmem_cache_zalloc(io_pgvec_cachep, flags);
+               if (!io->pages) {
+                       kmem_cache_free(io_end_cachep, io);
+                       return NULL;
+               }
 	}
+        atomic_inc(&EXT4_I(inode)->i_ioend_count);
+        io->inode = inode;
+        INIT_LIST_HEAD(&io->list);
 	return io;
 }
 
@@ -289,7 +311,7 @@ static int io_submit_init(struct ext4_io_submit *io,
 	int nvecs = bio_get_nr_vecs(bh->b_bdev);
 	struct bio *bio;
 
-	io_end = ext4_init_io_end(inode, GFP_NOFS);
+	io_end = ext4_init_io_end(inode, 0, GFP_NOFS);
 	if (!io_end)
 		return -ENOMEM;
 	bio = bio_alloc(GFP_NOIO, min(nvecs, BIO_MAX_PAGES));

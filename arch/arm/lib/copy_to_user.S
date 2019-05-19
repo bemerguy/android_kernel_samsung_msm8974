@@ -47,11 +47,11 @@
 	.macro ldr4w ptr reg1 reg2 reg3 reg4 abort
 	ldmia \ptr!, {\reg1, \reg2, \reg3, \reg4}
 	.endm
-
+#ifndef CONFIG_USE_LDRDSTRD_OVER_LDMSTM
 	.macro ldr8w ptr reg1 reg2 reg3 reg4 reg5 reg6 reg7 reg8 abort
 	ldmia \ptr!, {\reg1, \reg2, \reg3, \reg4, \reg5, \reg6, \reg7, \reg8}
 	.endm
-
+#endif
 	.macro ldr1b ptr reg cond=al abort
 	ldr\cond\()b \reg, [\ptr], #1
 	.endm
