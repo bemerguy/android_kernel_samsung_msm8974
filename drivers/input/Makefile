@@ -28,4 +28,4 @@ obj-$(CONFIG_INPUT_OF_MATRIX_KEYMAP) += of_keymap.o
 obj-$(CONFIG_INPUT_KEYRESET)	+= keyreset.o
 
 # Input Booster
-obj-$(CONFIG_INPUT_BOOSTER)	+= input_booster.o
+#obj-$(CONFIG_INPUT_BOOSTER)	+= input_booster.o

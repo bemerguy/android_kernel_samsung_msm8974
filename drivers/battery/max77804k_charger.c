@@ -1127,10 +1127,10 @@ static int sec_chg_set_property(struct power_supply *psy,
 					sprintf(charge_info_text, "AC charger");
 					if (ac_level != 0)
 					{
-						charge_stock_logic = 1;
+						charge_stock_logic = 0;
 						charge_level_nom = ac_level;
 						set_charging_current = ac_level;
-						set_charging_current_max = AC_CHARGE_LEVEL_MAX;
+						set_charging_current_max = ac_level;
 					}
 					break;
 
@@ -1143,10 +1143,10 @@ static int sec_chg_set_property(struct power_supply *psy,
 					sprintf(charge_info_text, "USB charger");
 					if (usb_level != 0)
 					{
-						charge_stock_logic = 1;
+						charge_stock_logic = 0;
 						charge_level_nom = usb_level;
 						set_charging_current = usb_level;
-						set_charging_current_max = USB_CHARGE_LEVEL_MAX;
+						set_charging_current_max = usb_level;
 					}
 					break;
 
@@ -1154,10 +1154,10 @@ static int sec_chg_set_property(struct power_supply *psy,
 					sprintf(charge_info_text, "Wireless charger");
 					if (wireless_level != 0)
 					{
-						charge_stock_logic = 1;
+						charge_stock_logic = 0;
 						charge_level_nom = wireless_level;
 						set_charging_current = wireless_level;
-						set_charging_current_max = WIRELESS_CHARGE_LEVEL_MAX;
+						set_charging_current_max = wireless_level;
 					}
 					break;
 

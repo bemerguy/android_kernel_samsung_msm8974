@@ -30,8 +30,8 @@ module_param(tunedplug_active, uint, 0644);
 
 static unsigned long sampling_time;
 
-#define DEF_SAMPLING msecs_to_jiffies(20)
-#define MAX_SAMPLING msecs_to_jiffies(200)
+#define DEF_SAMPLING msecs_to_jiffies(40)
+#define MAX_SAMPLING msecs_to_jiffies(500)
 
 
 bool displayon = true;
@@ -43,7 +43,7 @@ static void inline down_one(void){
 	unsigned int i;
 	for (i = NR_CPUS-1; i > 0; i--) {
 		if (cpu_online(i)) {
-			if (down[i] > 300) {
+			if (down[i] > 150) {
 				cpu_down(i);
 				pr_info("tunedplug: DOWN cpu %d. sampling: %lu", i, sampling_time);
 				down[i]=0;
@@ -58,10 +58,11 @@ static void inline up_one(void){
         unsigned int i;
         for (i = 1; i < NR_CPUS; i++) {
                 if (!cpu_online(i)) {
-			if (down[i] < -5) {
+			int high = i * 4;
+			if (down[i] < -high) {
 				struct cpufreq_policy policy, *p = &policy;
 
-				pr_info("tunedplug: UP cpu %d. sampling: %lu", i, sampling_time);
+				pr_info("tunedplug: UP cpu %d. sampling: %lu. down < %d", i, sampling_time, high);
 
 				cpu_up(i);
 
@@ -70,7 +71,7 @@ static void inline up_one(void){
 				else
 					__cpufreq_driver_target(p, p->max, CPUFREQ_RELATION_H);
 
-				down[i]=-100;
+				down[i]=-60;
 			}
 			else down[i]--;
 			return;

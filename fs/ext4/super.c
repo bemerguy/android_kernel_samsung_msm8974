@@ -1621,7 +1621,7 @@ static int handle_mount_opt(struct super_block *sb, char *opt, int token,
 		} else if (token == Opt_commit) {
 //			if (arg == 0)
 //				arg = JBD2_DEFAULT_MAX_COMMIT_AGE;
-			sbi->s_commit_interval = HZ * 2;
+			sbi->s_commit_interval = HZ * 5;
 		} else if (token == Opt_max_batch_time) {
 			if (arg == 0)
 				arg = EXT4_DEF_MAX_BATCH_TIME;
@@ -3396,11 +3396,11 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	set_opt(sb, POSIX_ACL);
 #endif
 	set_opt(sb, MBLK_IO_SUBMIT);
-	if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_DATA)
+/*	if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_DATA)
 		set_opt(sb, JOURNAL_DATA);
 	else if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_ORDERED)
 		set_opt(sb, ORDERED_DATA);
-	else if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_WBACK)
+	else if ((def_mount_opts & EXT4_DEFM_JMODE) == EXT4_DEFM_JMODE_WBACK)*/
 		set_opt(sb, WRITEBACK_DATA);
 
 	if (le16_to_cpu(sbi->s_es->s_errors) == EXT4_ERRORS_PANIC)
