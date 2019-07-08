@@ -882,7 +882,6 @@ static const struct platform_suspend_ops lpm_suspend_ops = {
 	.valid = suspend_valid_only_mem,
 	.prepare_late = lpm_suspend_prepare,
 	.wake = lpm_suspend_wake,
-	.suspend_again = quickwakeup_suspend_again,
 };
 
 static void setup_broadcast_timer(void *arg)

@@ -33,55 +33,54 @@ static unsigned long sampling_time;
 #define DEF_SAMPLING msecs_to_jiffies(40)
 #define MAX_SAMPLING msecs_to_jiffies(500)
 
-
 bool displayon = true;
 
 static int down[NR_CPUS-1];
 /* 123 are cpu cores. 0 will be used for flags */
 
 static void inline down_one(void){
-	unsigned int i;
-	for (i = NR_CPUS-1; i > 0; i--) {
-		if (cpu_online(i)) {
-			if (down[i] > 150) {
-				cpu_down(i);
-				pr_info("tunedplug: DOWN cpu %d. sampling: %lu", i, sampling_time);
-				down[i]=0;
-			}
-			else down[i]++;
-			return;
-		}
-	}
+        unsigned int i;
+        for (i = NR_CPUS-1; i > 0; i--) {
+                if (cpu_online(i)) {
+                        int dow = 150 - (i * 30);
+                        if (down[i] > dow) {
+                                cpu_down(i);
+                                pr_info("tunedplug: DOWN cpu %d. sampling: %lu", i, sampling_time);
+                                down[i]=0;
+                        }
+                        else down[i]++;
+                        return;
+                }
+        }
 }
 
 static void inline up_one(void){
         unsigned int i;
         for (i = 1; i < NR_CPUS; i++) {
                 if (!cpu_online(i)) {
-			int high = i * 4;
-			if (down[i] < -high) {
-				struct cpufreq_policy policy, *p = &policy;
+                        if (down[i] < 0) {
+                                struct cpufreq_policy policy, *p = &policy;
 
-				pr_info("tunedplug: UP cpu %d. sampling: %lu. down < %d", i, sampling_time, high);
+                                pr_info("tunedplug: UP cpu %d. sampling: %lu.", i, sampling_time);
 
-				cpu_up(i);
+                                cpu_up(i);
 
-	                        if (cpufreq_get_policy(&policy, i) != 0)
-        	                        pr_info("tunedplug: no policy for cpu %d ?", i);
-				else
-					__cpufreq_driver_target(p, p->max, CPUFREQ_RELATION_H);
+                                if (cpufreq_get_policy(&policy, i) != 0)
+                                        pr_info("tunedplug: no policy for cpu %d ?", i);
+                                else
+                                        __cpufreq_driver_target(p, p->max, CPUFREQ_RELATION_H);
 
-				down[i]=-60;
-			}
-			else down[i]--;
-			return;
+                                down[i]=-60;
+                        }
+                        else down[i]--;
+                        return;
                 }
         }
 }
 
 static void tunedplug_work_fn(struct work_struct *work)
 {
-	unsigned int nr_cpus, i;
+	unsigned int i, status[3] = { 0 };
 	struct cpufreq_policy policy;
 
 	queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, sampling_time);
@@ -92,34 +91,22 @@ static void tunedplug_work_fn(struct work_struct *work)
 	if (!displayon && (sampling_time < MAX_SAMPLING))
 		sampling_time++;
 
-	nr_cpus = num_online_cpus();
-	down[0]=0;
+#define TMAXFREQ status[0]
+#define TLOWFREQ status[1]
+#define TONLINE status[2]
 
-	//up
-	if (nr_cpus < NR_CPUS) {
-		for_each_online_cpu(i) {
-			if (cpufreq_get_policy(&policy, i) != 0)
-				continue;
-			if (i < NR_CPUS-1 && (policy.cur >= policy.max)) {
-				up_one();
-				down[0]=3;
-				break;
-			}
-		}
+	for_each_possible_cpu(i) {
+		if (cpu_online(i)) TONLINE++;
+		if (i >= NR_CPUS-1 || (cpufreq_get_policy(&policy, i) != 0))
+			continue;
+		if (policy.cur >= policy.max) TMAXFREQ++;
+		else if (policy.cur <= policy.min) TLOWFREQ++;
 	}
 
-	//down
-	if (down[0]!=3 && nr_cpus > 1) {
-                for_each_online_cpu(i) {
-                        if (!i || cpufreq_get_policy(&policy, i) != 0)
-                                continue;
-                        if (policy.cur <= policy.min)
-				down[0] = 1;
-			else if (policy.cur >= policy.max)
-				down[0] = 2;
-                }
-		if (down[0]==1) down_one();
-	}
+//	pr_info("ON=%d. LOW=%d. MAX=%d.\n", TONLINE, TLOWFREQ, TMAXFREQ);
+
+	if (TMAXFREQ == TONLINE) up_one();
+	else if (TLOWFREQ) down_one();
 
 }
 static int lcd_notifier_callback(struct notifier_block *this,
@@ -153,7 +140,7 @@ static void initnotifier(void)
 static int __init tuned_plug_init(void)
 {
 
-	tunedplug_wq = alloc_workqueue("tunedplug", WQ_HIGHPRI, 1);
+	tunedplug_wq = alloc_workqueue("tunedplugv2", WQ_HIGHPRI, 1);
         if (!tunedplug_wq)
                 return -ENOMEM;
 
@@ -161,7 +148,7 @@ static int __init tuned_plug_init(void)
 
 	sampling_time = DEF_SAMPLING;
 
-        queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, 1);
+        queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, 5000);
 
 	initnotifier();
 

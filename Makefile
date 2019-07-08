@@ -364,8 +364,9 @@ OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision
                 --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
                 --param max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
-                --param=max-modulo-backtrack-attempts=500000 --param=inline-unit-growth=15 \
-                --param=max-hoist-depth=0 --param=l2-cache-size=2048 --param=inline-min-speedup=50
+                --param=max-modulo-backtrack-attempts=500000 --param=inline-unit-growth=25 \
+                --param=max-hoist-depth=0 --param l1-cache-size=32 --param l1-cache-line-size=32 --param l2-cache-size=2048 --param=inline-min-speedup=30 \
+                -fgraphite -fgraphite-identity -fschedule-fusion -ftree-lrs -floop-nest-optimize -falign-functions=16 -falign-loops=16
 
 #to get code smaller: -fno-unroll-loops -fno-inline-functions -fno-unswitch-loops -fno-prefetch-loop-arrays
 GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers

@@ -134,9 +134,9 @@ static int __maybe_unused two = 2;
 static int __maybe_unused three = 3;
 static unsigned long one_ul = 1;
 static int one_hundred = 100;
-//#ifdef CONFIG_INCREASE_MAXIMUM_SWAPPINESS
+#ifdef CONFIG_INCREASE_MAXIMUM_SWAPPINESS
 extern int max_swappiness;
-//#endif
+#endif
 #ifdef CONFIG_PRINTK
 static int ten_thousand = 10000;
 #endif
@@ -1096,7 +1096,7 @@ static struct ctl_table vm_table[] = {
 		.procname	= "page-cluster", 
 		.data		= &page_cluster,
 		.maxlen		= sizeof(int),
-		.mode		= 0444,
+		.mode		= 0644,
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= &zero,
 	},
@@ -1104,7 +1104,7 @@ static struct ctl_table vm_table[] = {
 		.procname	= "dirty_background_ratio",
 		.data		= &dirty_background_ratio,
 		.maxlen		= sizeof(dirty_background_ratio),
-		.mode		= 0444,
+		.mode		= 0644,
 		.proc_handler	= dirty_background_ratio_handler,
 		.extra1		= &zero,
 		.extra2		= &one_hundred,
@@ -1121,7 +1121,7 @@ static struct ctl_table vm_table[] = {
 		.procname	= "dirty_ratio",
 		.data		= &vm_dirty_ratio,
 		.maxlen		= sizeof(vm_dirty_ratio),
-		.mode		= 0444,
+		.mode		= 0644,
 		.proc_handler	= dirty_ratio_handler,
 		.extra1		= &zero,
 		.extra2		= &one_hundred,

@@ -150,22 +150,32 @@ enum sec_battery_full_charged {
   * full-charged by absolute-timer only in high voltage
   */
 #define SEC_BATTERY_FULL_CONDITION_NOTIMEFULL	1
+
+
 /* SEC_BATTERY_FULL_CONDITION_NOSLEEPINFULL
   * do not set polling time as sleep polling time in full-charged
   */
 #define SEC_BATTERY_FULL_CONDITION_NOSLEEPINFULL	2
+
+
 /* SEC_BATTERY_FULL_CONDITION_SOC
   * use capacity for full-charged check
   */
 #define SEC_BATTERY_FULL_CONDITION_SOC		4
+
+
 /* SEC_BATTERY_FULL_CONDITION_VCELL
   * use VCELL for full-charged check
   */
 #define SEC_BATTERY_FULL_CONDITION_VCELL	8
+
+
 /* SEC_BATTERY_FULL_CONDITION_AVGVCELL
   * use average VCELL for full-charged check
   */
 #define SEC_BATTERY_FULL_CONDITION_AVGVCELL	16
+
+
 /* SEC_BATTERY_FULL_CONDITION_OCV
   * use OCV for full-charged check
   */

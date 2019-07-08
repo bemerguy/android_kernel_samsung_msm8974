@@ -9,7 +9,7 @@
 #######################################
 # Parameters to be configured manually
 #######################################
-VAR="klte"
+VAR="$2"
 
 BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-LOS16-$VAR"
 
@@ -113,7 +113,7 @@ step0_copy_code()
 
 	# Replace version information in mkcompile_h with the one from x-settings.sh
 	sed "s/\`echo \$LINUX_COMPILE_BY | \$UTS_TRUNCATE\`/$KERNEL_NAME-$BOEFFLA_VERSION-$BOEFFLA_DATE-[supported-by-www.android-hubo.de]/g" -i $BUILD_PATH/scripts/mkcompile_h
-	sed "s/\`echo \$LINUX_COMPILE_HOST | \$UTS_TRUNCATE\`/andip71/g" -i $BUILD_PATH/scripts/mkcompile_h
+#	sed "s/\`echo \$LINUX_COMPILE_HOST | \$UTS_TRUNCATE\`/andip71/g" -i $BUILD_PATH/scripts/mkcompile_h
 }
 
 step1_make_clean()

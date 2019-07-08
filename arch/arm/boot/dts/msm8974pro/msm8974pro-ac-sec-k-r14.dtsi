@@ -498,7 +498,7 @@
 		battery,temp_low_threshold_lpm = <0>;
 		battery,temp_low_recovery_lpm = <50>;
 		battery,full_check_type = <7>; /* SEC_BATTERY_FULLCHARGED_CHGPSY */
-		battery,full_check_type_2nd = <7>; /* SEC_BATTERY_FULLCHARGED_CHGPSY */
+		battery,full_check_type_2nd = <3>; /* SEC_BATTERY_FULLCHARGED_CHGPSY */
 		battery,full_check_count = <1>;
 		battery,chg_gpio_full_check = <0>;
 		battery,chg_polarity_full_check = <1>;
@@ -506,14 +506,14 @@
 		/* SEC_BATTERY_FULL_CONDITION_SOC |
 		   SEC_BATTERY_FULL_CONDITION_NOTIMEFULL |
 		   SEC_BATTERY_FULL_CONDITION_VCELL */
-		battery,full_condition_type = <13>;
-		battery,full_condition_soc = <100>;
-		battery,full_condition_vcell = <4400>;
+		battery,full_condition_type = <9>;
+		battery,full_condition_soc = <93>;
+		battery,full_condition_vcell = <4200>;
 
 		battery,recharge_check_count = <1>;
 		battery,recharge_condition_type = <4>; /* SEC_BATTERY_RECHARGE_CONDITION_VCELL */
 		battery,recharge_condition_soc = <98>;
-		battery,recharge_condition_vcell = <4230>;
+		battery,recharge_condition_vcell = <4350>;
 
 		battery,charging_total_time = <21600>;
 		battery,recharging_total_time = <5400>;

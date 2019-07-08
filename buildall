@@ -1,0 +1,8 @@
+#!/bin/bash
+#Boeffla_@klte@_defconfig  Boeffla_@klteduos@_defconfig  Boeffla_@kltedv@_defconfig  Boeffla_@kltekdi@_defconfig  Boeffla_@kltekor@_defconfig Boeffla_@kltechn@_defconfig
+
+for f in klte klteduos kltedv kltekor kltechn kltekdi
+do
+./bbuild-anykernel.sh a $f
+cp ~/repack/tuned-kernel-*.zip ~/dist
+done
