@@ -1102,6 +1102,11 @@ thermal_remove_hwmon_sysfs(struct thermal_zone_device *tz)
 static void thermal_zone_device_set_polling(struct thermal_zone_device *tz,
                                             int delay)
 {
+	cancel_delayed_work_sync(&(tz->poll_queue));
+
+	if (!delay)
+		return;
+
 	if (delay > 1000)
 		mod_delayed_work(system_freezable_wq, &(tz->poll_queue),
 				      round_jiffies(msecs_to_jiffies(delay)));
