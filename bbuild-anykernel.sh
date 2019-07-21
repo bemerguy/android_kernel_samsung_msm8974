@@ -11,7 +11,9 @@
 #######################################
 VAR="$2"
 
-BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-LOS16-$VAR"
+#BOEFFLA_VERSION="4.1-$(date +"%d%m%y")-LOS16-$VAR"
+
+BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-LOS16-$VAR"
 
 #TOOLCHAIN="/root/arm-eabi-8.x/bin/arm-eabi-"
 #8.2
@@ -88,7 +90,7 @@ if [ -f ~/x-settings.sh ]; then
 fi
 
 #BOEFFLA_FILENAME="${KERNEL_NAME,,}-$BOEFFLA_VERSION"
-BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-LOS16-$VAR"
+#BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-LOS16-$VAR"
 
 # set environment
 export ARCH=$ARCHITECTURE
@@ -112,7 +114,8 @@ step0_copy_code()
 	cp -r $SOURCE_PATH/* $BUILD_PATH
 
 	# Replace version information in mkcompile_h with the one from x-settings.sh
-	sed "s/\`echo \$LINUX_COMPILE_BY | \$UTS_TRUNCATE\`/$KERNEL_NAME-$BOEFFLA_VERSION-$BOEFFLA_DATE-[supported-by-www.android-hubo.de]/g" -i $BUILD_PATH/scripts/mkcompile_h
+	sed "s/\`echo \$LINUX_COMPILE_BY | \$UTS_TRUNCATE\`/Boeffla-Kernel-4.1-TUNED/g" -i $BUILD_PATH/scripts/mkcompile_h
+#	sed "s/\`echo \$LINUX_COMPILE_BY | \$UTS_TRUNCATE\`/$KERNEL_NAME-$BOEFFLA_VERSION-$BOEFFLA_DATE-[supported-by-www.android-hubo.de]/g" -i $BUILD_PATH/scripts/mkcompile_h
 #	sed "s/\`echo \$LINUX_COMPILE_HOST | \$UTS_TRUNCATE\`/andip71/g" -i $BUILD_PATH/scripts/mkcompile_h
 }
 

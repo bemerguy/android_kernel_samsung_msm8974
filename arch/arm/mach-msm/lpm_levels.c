@@ -25,7 +25,6 @@
 #include <linux/tick.h>
 #include <linux/suspend.h>
 #include <linux/pm_qos.h>
-#include <linux/quickwakeup.h>
 #include <linux/of_platform.h>
 #include <linux/of_gpio.h>
 #include <mach/mpm.h>

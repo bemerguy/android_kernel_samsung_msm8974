@@ -140,7 +140,7 @@ static void initnotifier(void)
 static int __init tuned_plug_init(void)
 {
 
-	tunedplug_wq = alloc_workqueue("tunedplugv2", WQ_HIGHPRI, 1);
+	tunedplug_wq = alloc_workqueue("tunedplugv2", WQ_HIGHPRI|WQ_FREEZABLE, 1);
         if (!tunedplug_wq)
                 return -ENOMEM;
 

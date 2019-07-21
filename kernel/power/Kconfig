@@ -43,13 +43,6 @@ config SUSPEND_TIME_TIMEKEEPING
 	  Get the suspend time in suspend from timekeeping for the archs
 	  that don't support persistent clock.
 
-config POWERSUSPEND
-	bool "Power suspend"
-	default y
-	---help---
-	  Call early suspend handlers when the user requested sleep state
-	  changes.
-
 config HIBERNATE_CALLBACKS
 	bool
 
@@ -138,7 +131,7 @@ config PM_SLEEP_SMP
 config PM_AUTOSLEEP
 	bool "Opportunistic sleep"
 	depends on PM_SLEEP
-	default n
+	default y
 	---help---
 	Allow the kernel to trigger a system transition into a global sleep
 	state automatically whenever there are no active wakeup sources.
@@ -146,7 +139,7 @@ config PM_AUTOSLEEP
 config PM_WAKELOCKS
 	bool "User space wakeup sources interface"
 	depends on PM_SLEEP
-	default n
+	default y
 	---help---
 	Allow user space to create, activate and deactivate wakeup source
 	objects with the help of a sysfs-based interface.

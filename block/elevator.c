@@ -463,7 +463,7 @@ int elv_merge(struct request_queue *q, struct request **req, struct bio *bio)
 	 * 	merges:	   All merge tries attempted
 	 */
 //	if (blk_queue_nomerges(q))
-		return ELEVATOR_NO_MERGE;
+//		return ELEVATOR_NO_MERGE;
 
 	/*
 	 * First try one-hit cache.

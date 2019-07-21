@@ -206,10 +206,10 @@ static void timelylmk(struct work_struct *work)
 
 #ifdef CONFIG_TUNED_PLUG
 	if (displayon)
-		queue_delayed_work(system_nrt_freezable_wq, dwork, 300);
+		queue_delayed_work(system_nrt_freezable_wq, dwork, HZ*2);
 	else
 #endif
-		queue_delayed_work(system_nrt_freezable_wq, dwork, 600);
+		queue_delayed_work(system_nrt_freezable_wq, dwork, HZ*10);
 }
 
 static int __init lowmem_init(void)

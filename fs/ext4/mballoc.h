@@ -57,12 +57,12 @@ extern u8 mb_enable_debug;
 /*
  * How long mballoc can look for a best extent (in found extents)
  */
-#define MB_DEFAULT_MAX_TO_SCAN		20
+#define MB_DEFAULT_MAX_TO_SCAN		100
 
 /*
  * How long mballoc must look for a best extent
  */
-#define MB_DEFAULT_MIN_TO_SCAN		0
+#define MB_DEFAULT_MIN_TO_SCAN		5
 
 /*
  * How many groups mballoc will scan looking for the best chunk
