@@ -66,7 +66,6 @@ enum {
 char *companion_fw_path[] = {
 	"/system/cameradata/",
 	"/vendor/cameradata/",
-	"/data/media/0/",
 };
 
 enum {
@@ -85,10 +84,8 @@ char *companion_fw_name[] = {
 #define FW_EXTENSION			".bin"
 
 #define REV_OFFSET_ISP_CC			28
-#define REV_OFFSET_ISP_SD			23
 
 #define REV_OFFSET_MASTER_CC			25
-#define REV_OFFSET_MASTER_SD			20
 
 #endif
 
