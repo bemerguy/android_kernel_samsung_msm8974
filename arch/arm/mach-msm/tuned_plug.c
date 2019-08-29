@@ -28,24 +28,30 @@ static struct delayed_work tunedplug_work;
 static unsigned int tunedplug_active = 1;
 module_param(tunedplug_active, uint, 0644);
 
-static unsigned long sampling_time;
+#define DEF_SAMPLING 10*HZ/1000   //10ms
+#define MAX_SAMPLING 1000*HZ/1000 //1000ms
 
-#define DEF_SAMPLING msecs_to_jiffies(40)
-#define MAX_SAMPLING msecs_to_jiffies(500)
+/* up threshold. lower means more delay */
+static int u[] = { -1, -17, -40 };
 
+/* down threshold. higher means more delay */
+static int d[] = { 170, 100, 40 };
+
+
+static unsigned long sampling_time = DEF_SAMPLING;
 bool displayon = true;
 
 static int down[NR_CPUS-1];
-/* 123 are cpu cores. 0 will be used for flags */
+/* 123 are cpu cores. */
 
 static void inline down_one(void){
         unsigned int i;
         for (i = NR_CPUS-1; i > 0; i--) {
                 if (cpu_online(i)) {
-                        int dow = 150 - (i * 30);
-                        if (down[i] > dow) {
+                        if (down[i] > d[i-1]) {
                                 cpu_down(i);
-                                pr_info("tunedplug: DOWN cpu %d. sampling: %lu", i, sampling_time);
+                                pr_info("tunedplug: DOWN cpu %d. (%d > %d) sampling: %lu\n",
+					i, down[i], d[i-1], sampling_time);
                                 down[i]=0;
                         }
                         else down[i]++;
@@ -53,15 +59,15 @@ static void inline down_one(void){
                 }
         }
 }
-
 static void inline up_one(void){
         unsigned int i;
         for (i = 1; i < NR_CPUS; i++) {
                 if (!cpu_online(i)) {
-                        if (down[i] < 0) {
+                        if (down[i] < u[i-1]) {
                                 struct cpufreq_policy policy, *p = &policy;
 
-                                pr_info("tunedplug: UP cpu %d. sampling: %lu.", i, sampling_time);
+                                pr_info("tunedplug: UP cpu %d. (%d < %d) sampling: %lu\n",
+					i, down[i], u[i-1], sampling_time);
 
                                 cpu_up(i);
 

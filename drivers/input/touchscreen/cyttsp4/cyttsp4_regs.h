@@ -452,7 +452,7 @@ enum cyttsp4_cmd_status {
 #define CY_RAM_ID_TOUCHMODE_ENABLED		0xD0 /* Enable proximity */
 
 #ifdef CONFIG_SEC_DVFS
-#define TSP_BOOSTER
+//#define TSP_BOOSTER
 #else
 #undef TSP_BOOSTER
 #endif

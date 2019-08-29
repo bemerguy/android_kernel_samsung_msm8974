@@ -1421,6 +1421,7 @@ int jbd2_journal_stop(handle_t *handle)
 	pid = current->pid;
 	if (handle->h_sync && journal->j_last_sync_writer != pid) {
 		u64 commit_time, trans_time;
+		ktime_t tmp = ktime_get();
 
 		journal->j_last_sync_writer = pid;
 
@@ -1428,7 +1429,7 @@ int jbd2_journal_stop(handle_t *handle)
 		commit_time = journal->j_average_commit_time;
 		read_unlock(&journal->j_state_lock);
 
-		trans_time = ktime_to_ns(ktime_sub(ktime_get(),
+		trans_time = ktime_to_ns(ktime_sub(tmp,
 						   transaction->t_start_time));
 
 		commit_time = max_t(u64, commit_time,
@@ -1437,7 +1438,7 @@ int jbd2_journal_stop(handle_t *handle)
 				    1000*journal->j_max_batch_time);
 
 		if (trans_time < commit_time) {
-			ktime_t expires = ktime_add_ns(ktime_get(),
+			ktime_t expires = ktime_add_ns(tmp,
 						       commit_time);
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			schedule_hrtimeout(&expires, HRTIMER_MODE_ABS);

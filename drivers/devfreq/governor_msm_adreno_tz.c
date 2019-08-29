@@ -28,17 +28,18 @@ static DEFINE_SPINLOCK(tz_lock);
  * FLOOR is 5msec to capture up to 3 re-draws
  * per frame for 60fps content.
  */
+#define MIN_BUSY		1000
 #define FLOOR			4000
-#define LONG_FLOOR		50000
-#define HIST			5
+#define LONG_FLOOR		20000
+#define HIST			10
 #define TARGET			80
-#define CAP			75
+#define CAP			80
 
 /*
  * CEILING is 50msec, larger than any standard
  * frame length, but less than the idle timer.
  */
-#define CEILING			30000
+#define CEILING			20000
 #define TZ_RESET_ID		0x3
 #define TZ_UPDATE_ID		0x4
 #define TZ_INIT_ID		0x6
@@ -96,7 +97,9 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 		stats.private_data = &b;
 	else
 		stats.private_data = NULL;
+
 	result = devfreq->profile->get_dev_status(devfreq->dev.parent, &stats);
+
 	if (result) {
 		pr_err(TAG "get_status failed %d\n", result);
 		return result;
@@ -106,6 +109,7 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 	*flag = 0;
 	priv->bin.total_time += stats.total_time;
 	priv->bin.busy_time += stats.busy_time;
+
 	if (priv->bus.num) {
 		priv->bus.total_time += stats.total_time;
 		priv->bus.gpu_time += stats.busy_time;
@@ -113,15 +117,16 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 		priv->bus.ram_time += b.ram_wait;
 	}
 
+	printk(TAG "1: %lu %lld %lld\n", stats.total_time, priv->bin.total_time, priv->bin.busy_time);
+
 	/*
 	 * Do not waste CPU cycles running this algorithm if
 	 * the GPU just started, or if less than FLOOR time
 	 * has passed since the last run.
 	 */
-	if ((stats.total_time == 0) ||
-		(priv->bin.total_time < FLOOR)) {
-		return 1;
-	}
+
+        if ( stats.total_time == 0 || priv->bin.total_time < FLOOR || (unsigned int) priv->bin.busy_time < MIN_BUSY)
+		return 0;
 
 	level = devfreq_get_freq_level(devfreq, stats.current_frequency);
 
@@ -134,14 +139,13 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 	 * If there is an extended block of busy processing,
 	 * increase frequency.  Otherwise run the normal algorithm.
 	 */
+
 	if (priv->bin.busy_time > CEILING) {
 		val = -1 * level;
 	} else {
-		val = __secure_tz_entry3(TZ_UPDATE_ID,
-				level,
-				priv->bin.total_time,
-				priv->bin.busy_time);
+		val = __secure_tz_entry3(TZ_UPDATE_ID, level, priv->bin.total_time, priv->bin.busy_time);
 	}
+
 	priv->bin.total_time = 0;
 	priv->bin.busy_time = 0;
 
@@ -152,7 +156,8 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 	if (val) {
 		level += val;
 		level = max(level, 0);
-		level = min_t(int, level, devfreq->profile->max_state);
+		level = min_t(int, level, devfreq->profile->max_state - 1);
+		printk(TAG "level now: %d\n", level);
 		goto clear;
 	}
 
@@ -162,6 +167,9 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 			(unsigned int) priv->bus.total_time;
 	gpu_percent = (100 * (unsigned int)priv->bus.gpu_time) /
 			(unsigned int) priv->bus.total_time;
+
+	printk(TAG "%d %d\n", norm_cycles, gpu_percent);
+
 	/*
 	 * If there's a new high watermark, update the cutoffs and send the
 	 * FAST hint.  Otherwise check the current value against the current
@@ -178,10 +186,8 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 		norm_cycles = (100 * norm_cycles) / TARGET;
 		act_level = priv->bus.index[level] + b.mod;
 		act_level = (act_level < 0) ? 0 : act_level;
-		act_level = (act_level >= priv->bus.num) ?
-			(priv->bus.num - 1) : act_level;
-		if (norm_cycles > priv->bus.up[act_level] &&
-			gpu_percent > CAP)
+		act_level = (act_level >= priv->bus.num) ? (priv->bus.num - 1) : act_level;
+		if (norm_cycles > priv->bus.up[act_level] && gpu_percent > CAP)
 			*flag = DEVFREQ_FLAG_FAST_HINT;
 		else if (norm_cycles < priv->bus.down[act_level] && level)
 			*flag = DEVFREQ_FLAG_SLOW_HINT;
@@ -194,6 +200,7 @@ clear:
 
 end:
 	*freq = devfreq->profile->freq_table[level];
+
 	return 0;
 }
 
@@ -251,16 +258,14 @@ static int tz_start(struct devfreq *devfreq)
 	/* Set up the cut-over percentages for the bus calculation. */
 	if (priv->bus.num) {
 		for (i = 0; i < priv->bus.num; i++) {
-			t1 = (u32)(100 * priv->bus.ib[i]) /
-					(u32)priv->bus.ib[priv->bus.num - 1];
+			t1 = (u32)(100 * priv->bus.ib[i]) / (u32)priv->bus.ib[priv->bus.num - 1];
 			priv->bus.p_up[i] = t1 - HIST;
 			priv->bus.p_down[i] = t2 - 2 * HIST;
 			t2 = t1;
 		}
 		/* Set the upper-most and lower-most bounds correctly. */
 		priv->bus.p_down[0] = 0;
-		priv->bus.p_down[1] = (priv->bus.p_down[1] > (2 * HIST)) ?
-					priv->bus.p_down[1] : (2 * HIST);
+		priv->bus.p_down[1] = (priv->bus.p_down[1] > (2 * HIST)) ? priv->bus.p_down[1] : (2 * HIST);
 		if (priv->bus.num - 1 >= 0)
 			priv->bus.p_up[priv->bus.num - 1] = 100;
 		_update_cutoff(priv, priv->bus.max);
@@ -274,6 +279,10 @@ static int tz_stop(struct devfreq *devfreq)
 	struct devfreq_msm_adreno_tz_data *priv = devfreq->data;
 
 	kgsl_devfreq_del_notifier(devfreq->dev.parent, &priv->nb);
+
+	/* leaving the governor and cleaning the pointer to private data */
+	devfreq->data = NULL;
+
 	return 0;
 }
 

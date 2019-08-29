@@ -107,14 +107,14 @@ static int lowmem_shrink(void)
 	if (++expire > 20) { expire=0; count=0; }
 
 	if (min_score_adj == OOM_SCORE_ADJ_MAX + 1) {
-		lowmem_print(3, "min_score_adj = %d. We still have %u pages in cache",
+		lowmem_print(3, "min_score_adj = %d. We still have %u pages in cache\n",
 			min_score_adj, other_file);
 		return 0;
 	}
 	else {
 		free = other_free * (long)(PAGE_SIZE / 1024);
 		cache_size = other_file * (long)(PAGE_SIZE / 1024);
-		lowmem_print(1, "############### LOW MEMORY KILLER: %ldKb less than adj %d's minimum: %ldKb.",
+		lowmem_print(1, "############### LOW MEMORY KILLER: %ldKb less than adj %d's minimum: %ldKb.\n",
 			cache_size+free, min_score_adj, minfree*(long)(PAGE_SIZE / 1024));
 	}
 	rcu_read_lock();

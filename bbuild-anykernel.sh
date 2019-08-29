@@ -11,7 +11,7 @@
 #######################################
 VAR="$2"
 
-BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-LOS16-$VAR"
+BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-LOS14-$VAR"
 
 #9.1
 TOOLCHAIN="/root/arm-eabi-gcc/bin/arm-eabi-"

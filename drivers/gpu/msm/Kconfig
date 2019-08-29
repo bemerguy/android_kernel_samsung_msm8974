@@ -1,6 +1,6 @@
 config MSM_KGSL
 	tristate "MSM 3D Graphics driver"
-	default n
+	default y
 	depends on ARCH_MSM && !ARCH_MSM7X00A && !ARCH_MSM7X25
 	select GENERIC_ALLOCATOR
 	select FW_LOADER
@@ -81,7 +81,7 @@ config MSM_KGSL_DRM
 
 config KGSL_PER_PROCESS_PAGE_TABLE
 	bool "Enable Per Process page tables for the KGSL driver"
-	default n
+	default y
 	depends on !MSM_KGSL_DRM
 	---help---
 	  The MMU will use per process pagetables when enabled.
@@ -109,5 +109,5 @@ config MSM_KGSL_MMU_PAGE_FAULT
 
 config MSM_KGSL_DISABLE_SHADOW_WRITES
 	bool "Disable register shadow writes for context switches"
-	default n
+	default y
 	depends on MSM_KGSL

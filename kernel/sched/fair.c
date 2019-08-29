@@ -617,13 +617,10 @@ calc_delta_fair(unsigned long delta, struct sched_entity *se)
  */
 static u64 __sched_period(unsigned long nr_running)
 {
-	u64 period = sysctl_sched_latency;
-
-	if (unlikely(nr_running > sched_nr_latency)) {
-		period = sysctl_sched_min_granularity;
-		period *= nr_running;
-	}
-	return period;
+// 	if (unlikely(nr_running > sched_nr_latency))
+		return nr_running * sysctl_sched_min_granularity;
+/*	else
+		return sysctl_sched_latency;*/
 }
 
 /*
@@ -3278,27 +3275,6 @@ migrate_task_rq_fair(struct task_struct *p, int next_cpu)
 #endif
 #endif /* CONFIG_SMP */
 
-static unsigned long
-wakeup_gran(struct sched_entity *curr, struct sched_entity *se)
-{
-	unsigned long gran = sysctl_sched_wakeup_granularity;
-
-	/*
-	 * Since its curr running now, convert the gran from real-time
-	 * to virtual-time in his units.
-	 *
-	 * By using 'se' instead of 'curr' we penalize light tasks, so
-	 * they get preempted easier. That is, if 'se' < 'curr' then
-	 * the resulting gran will be larger, therefore penalizing the
-	 * lighter, if otoh 'se' > 'curr' then the resulting gran will
-	 * be smaller, again penalizing the lighter task.
-	 *
-	 * This is especially important for buddies when the leftmost
-	 * task is higher priority than the buddy.
-	 */
-	return calc_delta_fair(gran, se);
-}
-
 /*
  * Should 'se' preempt 'curr'.
  *
@@ -3321,7 +3297,8 @@ wakeup_preempt_entity(struct sched_entity *curr, struct sched_entity *se)
 	if (vdiff <= 0)
 		return -1;
 
-	gran = wakeup_gran(curr, se);
+	gran = calc_delta_fair(sysctl_sched_wakeup_granularity, se);
+
 	if (vdiff > gran)
 		return 1;
 

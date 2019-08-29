@@ -23,7 +23,7 @@ DHDCFLAGS += -DWL_CFG80211
 DHDCFLAGS += -DSIMPLE_MAC_PRINT
 DHDCFLAGS += -DDEBUGFS_CFG80211
 # Enable wakelock debug function
-DHDCFLAGS += -DDHD_TRACE_WAKE_LOCK
+#DHDCFLAGS += -DDHD_TRACE_WAKE_LOCK
 # Print out kernel panic point of file and line info when assertion happened
 #DHDCFLAGS += -DBCMASSERT_LOG
 # Collect Current Assoc/Reject Status for Big Data logging

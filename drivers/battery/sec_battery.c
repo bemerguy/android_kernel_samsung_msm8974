@@ -852,18 +852,15 @@ static bool sec_bat_check_recharge(struct sec_battery_info *battery)
 		goto check_recharge_check_count;
 	}
 
-	if (battery->status == POWER_SUPPLY_STATUS_FULL &&
-			battery->charging_mode == SEC_BATTERY_CHARGING_NONE) {
+	if (battery->status == POWER_SUPPLY_STATUS_FULL && battery->charging_mode == SEC_BATTERY_CHARGING_NONE) {
 		int recharging_voltage = battery->pdata->recharge_condition_vcell;
 		if (battery->current_event & SEC_BAT_CURRENT_EVENT_LOW_TEMP) {
 			recharging_voltage = battery->pdata->chg_float_voltage - 150; // float voltage - 150mV
 			dev_info(battery->dev, "%s: recharging voltage changed by low temp(%d)\n",
 					__func__, recharging_voltage);
 		}
-		if ((battery->pdata->recharge_condition_type &
-					SEC_BATTERY_RECHARGE_CONDITION_SOC) &&
-				(battery->capacity <=
-				 battery->pdata->recharge_condition_soc)) {
+		if ((battery->pdata->recharge_condition_type & SEC_BATTERY_RECHARGE_CONDITION_SOC) &&
+				(battery->capacity <= battery->pdata->recharge_condition_soc)) {
 			battery->expired_time = battery->pdata->recharging_expired_time;
 			battery->prev_safety_time = 0;
 			dev_info(battery->dev,
@@ -872,8 +869,7 @@ static bool sec_bat_check_recharge(struct sec_battery_info *battery)
 			goto check_recharge_check_count;
 		}
 
-		if ((battery->pdata->recharge_condition_type &
-					SEC_BATTERY_RECHARGE_CONDITION_AVGVCELL) &&
+		if ((battery->pdata->recharge_condition_type & SEC_BATTERY_RECHARGE_CONDITION_AVGVCELL) &&
 				(battery->voltage_avg <= recharging_voltage)) {
 			battery->expired_time = battery->pdata->recharging_expired_time;
 			battery->prev_safety_time = 0;

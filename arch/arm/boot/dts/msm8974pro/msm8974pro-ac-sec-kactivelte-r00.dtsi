@@ -469,13 +469,13 @@
 		   SEC_BATTERY_FULL_CONDITION_NOTIMEFULL |
 		   SEC_BATTERY_FULL_CONDITION_VCELL */
 		battery,full_condition_type = <13>;
-		battery,full_condition_soc = <90>;
-		battery,full_condition_vcell = <4200>;
+		battery,full_condition_soc = <98>;
+		battery,full_condition_vcell = <4350>;
 
 		battery,recharge_check_count = <1>;
 		battery,recharge_condition_type = <4>; /* SEC_BATTERY_RECHARGE_CONDITION_VCELL */
-		battery,recharge_condition_soc = <98>;
-		battery,recharge_condition_vcell = <4230>;
+		battery,recharge_condition_soc = <99>;
+		battery,recharge_condition_vcell = <4360>;
 
 		battery,charging_total_time = <21600>;
 		battery,recharging_total_time = <5400>;
@@ -499,7 +499,7 @@
 		battery,swelling_high_rechg_voltage = <4000>;
 		battery,swelling_low_rechg_voltage = <4000>;
 
-		battery,chg_float_voltage = <4300>;
+		battery,chg_float_voltage = <4400>;
 		battery,expired_time = <12000>;
 
 		charger{
@@ -510,7 +510,7 @@
 			battery,chg_polarity_en = <0>;
 			battery,chg_gpio_status = <0>;
 			battery,chg_polarity_status = <0>;
-			battery,chg_float_voltage = <4300>;
+			battery,chg_float_voltage = <4400>;
 			battery,ovp_uvlo_check_type = <3>; /* SEC_BATTERY_OVP_UVLO_CHGPOLLING */
 
 			battery,input_current_limit = <1800 460 460 1800 460 900 1000 460 460 1000 760 1800 1800 460 1300 400 700 1300 300 1000 1800 460 460>;

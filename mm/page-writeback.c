@@ -42,7 +42,7 @@
 /*
  * Sleep at most 200ms at a time in balance_dirty_pages().
  */
-#define MAX_PAUSE		max(HZ/3, 1)
+#define MAX_PAUSE		max(HZ/4, 1)
 
 /*
  * Try to keep balance_dirty_pages() call intervals higher than this many pages
@@ -53,7 +53,7 @@
 /*
  * Estimate write bandwidth at 200ms intervals.
  */
-#define BANDWIDTH_INTERVAL	max(HZ/3, 1)
+#define BANDWIDTH_INTERVAL	max(HZ/4, 1)
 
 #define RATELIMIT_CALC_SHIFT	10
 
@@ -103,7 +103,7 @@ EXPORT_SYMBOL_GPL(dirty_writeback_interval);
 /*
  * The longest time for which data is allowed to remain dirty
  */
-unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
+unsigned int dirty_expire_interval = 20 * 100; /* centiseconds */
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.

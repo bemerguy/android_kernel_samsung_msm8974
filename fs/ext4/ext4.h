@@ -1539,7 +1539,7 @@ static inline void ext4_clear_state_flags(struct ext4_inode_info *ei)
 #define	EXT4_DEF_RESUID		0
 #define	EXT4_DEF_RESGID		0
 
-#define EXT4_DEF_INODE_READAHEAD_BLKS	0
+#define EXT4_DEF_INODE_READAHEAD_BLKS	64
 
 /*
  * Default mount options
@@ -1562,7 +1562,7 @@ static inline void ext4_clear_state_flags(struct ext4_inode_info *ei)
  * Default journal batch times
  */
 #define EXT4_DEF_MIN_BATCH_TIME	0
-#define EXT4_DEF_MAX_BATCH_TIME	15000 /* 15ms */
+#define EXT4_DEF_MAX_BATCH_TIME	5000 /* 15ms */
 
 /*
  * Minimum number of groups in a flexgroup before we separate out

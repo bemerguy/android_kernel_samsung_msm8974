@@ -53,8 +53,8 @@
 #include "mballoc.h"
 #include "../mount.h"
 
-#define CREATE_TRACE_POINTS
-#include <trace/events/ext4.h>
+//#define CREATE_TRACE_POINTS
+//#include <trace/events/ext4.h>
 
 static struct proc_dir_entry *ext4_proc_root;
 static struct kset *ext4_kset;
@@ -336,7 +336,7 @@ handle_t *ext4_journal_start_sb(struct super_block *sb, int nblocks)
 	journal_t *journal;
 	handle_t  *handle;
 
-	trace_ext4_journal_start(sb, nblocks, _RET_IP_);
+//	trace_ext4_journal_start(sb, nblocks, _RET_IP_);
 	if (sb->s_flags & MS_RDONLY && !journal_current_handle())
 		return ERR_PTR(-EROFS);
 
@@ -1052,7 +1052,7 @@ static int ext4_drop_inode(struct inode *inode)
 {
 	int drop = generic_drop_inode(inode);
 
-	trace_ext4_drop_inode(inode, drop);
+//	trace_ext4_drop_inode(inode, drop);
 	return drop;
 }
 
@@ -3420,8 +3420,8 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	sbi->s_min_batch_time = EXT4_DEF_MIN_BATCH_TIME;
 	sbi->s_max_batch_time = EXT4_DEF_MAX_BATCH_TIME;
 
-	if ((def_mount_opts & EXT4_DEFM_NOBARRIER) == 0)
-		set_opt(sb, BARRIER);
+/*	if ((def_mount_opts & EXT4_DEFM_NOBARRIER) == 0)
+		set_opt(sb, BARRIER);*/
 
 	/*
 	 * enable delayed allocation by default
@@ -4535,7 +4535,7 @@ static int ext4_sync_fs(struct super_block *sb, int wait)
 	tid_t target;
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 
-	trace_ext4_sync_fs(sb, wait);
+//	trace_ext4_sync_fs(sb, wait);
 	flush_workqueue(sbi->dio_unwritten_wq);
 	if (jbd2_journal_start_commit(sbi->s_journal, &target)) {
 		if (wait)

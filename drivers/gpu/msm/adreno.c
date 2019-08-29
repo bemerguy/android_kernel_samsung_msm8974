@@ -76,7 +76,7 @@
 	 | (MMU_CONFIG << MH_MMU_CONFIG__TC_R_CLNT_BEHAVIOR__SHIFT)	\
 	 | (MMU_CONFIG << MH_MMU_CONFIG__PA_W_CLNT_BEHAVIOR__SHIFT))
 
-#define KGSL_LOG_LEVEL_DEFAULT 3
+#define KGSL_LOG_LEVEL_DEFAULT 5
 
 static void adreno_input_work(struct work_struct *work);
 
@@ -150,8 +150,8 @@ static struct adreno_device device_3d0 = {
 	.ft_pf_policy = KGSL_FT_PAGEFAULT_DEFAULT_POLICY,
 	.fast_hang_detect = 1,
 	.long_ib_detect = 1,
-	.input_work = __WORK_INITIALIZER(device_3d0.input_work,
-		adreno_input_work),
+/*	.input_work = __WORK_INITIALIZER(device_3d0.input_work,
+		adreno_input_work),*/
 };
 
 unsigned int ft_detect_regs[FT_DETECT_REGS_COUNT];
@@ -3422,9 +3422,9 @@ static void adreno_power_stats(struct kgsl_device *device,
 	struct adreno_device *adreno_dev = ADRENO_DEVICE(device);
 	struct kgsl_pwrctrl *pwr = &device->pwrctrl;
 	struct adreno_busy_data busy_data;
-
+#if 0
 	memset(stats, 0, sizeof(*stats));
-
+#endif
 	/*
 	 * If we're not currently active, there shouldn't have been
 	 * any cycles since the last time this function was called.
@@ -3436,8 +3436,7 @@ static void adreno_power_stats(struct kgsl_device *device,
 	/* Get the busy cycles counted since the counter was last reset */
 	adreno_dev->gpudev->busy_cycles(adreno_dev, &busy_data);
 
-	stats->busy_time = adreno_ticks_to_us(busy_data.gpu_busy,
-					      kgsl_pwrctrl_active_freq(pwr));
+	stats->busy_time = adreno_ticks_to_us(busy_data.gpu_busy, kgsl_pwrctrl_active_freq(pwr));
 	stats->ram_time = busy_data.vbif_ram_cycles;
 	stats->ram_wait = busy_data.vbif_starved_ram;
 }

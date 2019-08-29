@@ -72,7 +72,7 @@
 #ifdef WLMEDIA_HTSF
 extern void htsf_update(struct dhd_info *dhd, void *data);
 #endif
-int dhd_msg_level = DHD_INFO_VAL;
+int dhd_msg_level = DHD_ERROR_VAL;
 
 #ifdef SOFTAP
 char fw_path2[MOD_PARAM_PATHLEN];
