@@ -30,9 +30,9 @@
 #include "internal.h"
 
 /*
- * 4MB minimal write chunk size
+ * 4MB minimal write chunk size. 1mb?
  */
-#define MIN_WRITEBACK_PAGES	(4096UL >> (PAGE_CACHE_SHIFT - 10))
+#define MIN_WRITEBACK_PAGES	(2048UL >> (PAGE_CACHE_SHIFT - 10))
 
 /*
  * Passed into wb_writeback(), essentially a subset of writeback_control
@@ -626,7 +626,7 @@ static long writeback_sb_inodes(struct super_block *sb,
 		 * background threshold and other termination conditions.
 		 */
 		if (wrote) {
-			if (time_is_before_jiffies(start_time + HZ / 10UL))
+			if (time_is_before_jiffies(start_time + HZ / 30UL))
 				break;
 			if (work->nr_pages <= 0)
 				break;

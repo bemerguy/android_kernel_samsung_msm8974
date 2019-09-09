@@ -462,7 +462,7 @@ isolate_migratepages_range(struct zone *zone, struct compact_control *cc,
 		if (!cc->sync)
 			return 0;
 
-		congestion_wait(BLK_RW_ASYNC, HZ/10);
+		congestion_wait(BLK_RW_ASYNC, HZ/30);
 
 		if (fatal_signal_pending(current))
 			return 0;

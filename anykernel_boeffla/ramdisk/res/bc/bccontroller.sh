@@ -711,7 +711,7 @@ if [ "apply_governor_profile" == "$1" ]; then
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
 		echo "85" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
-		echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+		echo "15000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
 
 		busybox sleep 0.5s
 		busybox sync

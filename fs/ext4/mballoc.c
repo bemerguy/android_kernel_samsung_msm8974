@@ -3844,7 +3844,7 @@ repeat:
 			ext4_msg(sb, KERN_ERR,
 				 "uh-oh! used pa while discarding");
 			WARN_ON(1);
-			schedule_timeout_uninterruptible(HZ);
+			schedule_timeout_uninterruptible(HZ/3);
 			goto repeat;
 
 		}
@@ -3872,7 +3872,7 @@ repeat:
 		 * add a flag to force wait only in case
 		 * of ->clear_inode(), but not in case of
 		 * regular truncate */
-		schedule_timeout_uninterruptible(HZ);
+		schedule_timeout_uninterruptible(HZ/3);
 		goto repeat;
 	}
 	spin_unlock(&ei->i_prealloc_lock);
@@ -4073,7 +4073,7 @@ ext4_mb_initialize_context(struct ext4_allocation_context *ac,
 
 	/* we have to define context: we'll we work with a file or
 	 * locality group. this is a policy, actually */
-	//ext4_mb_group_or_file(ac);
+	ext4_mb_group_or_file(ac);
 
 	mb_debug(1, "init ac: %u blocks @ %u, goal %u, flags %x, 2^%d, "
 			"left: %u/%u, right %u/%u to %swritable\n",
