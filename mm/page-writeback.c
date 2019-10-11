@@ -53,7 +53,7 @@
 /*
  * Estimate write bandwidth at 200ms intervals.
  */
-#define BANDWIDTH_INTERVAL	max(HZ/2, 1)
+#define BANDWIDTH_INTERVAL	max(HZ/4, 1)
 
 #define RATELIMIT_CALC_SHIFT	10
 
@@ -61,7 +61,7 @@
  * After a CPU has dirtied this many pages, balance_dirty_pages_ratelimited
  * will look to see if it needs to force writeback or throttling.
  */
-static long ratelimit_pages = 128;
+static long ratelimit_pages = 64;
 
 /* The following parameters are exported via /proc/sys/vm */
 
@@ -91,7 +91,7 @@ int vm_dirty_ratio;
  * vm_dirty_bytes starts at 0 (disabled) so that it is a function of
  * vm_dirty_ratio * the amount of dirtyable memory
  */
-unsigned long vm_dirty_bytes = 16777216;
+unsigned long vm_dirty_bytes = 8388608;
 
 /*
  * The interval between `kupdate'-style writebacks

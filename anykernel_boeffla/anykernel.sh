@@ -57,7 +57,12 @@ dump_boot;
 
 mount -o rw,remount /system;
 
-replace_file /system/vendor/etc/thermal-engine-8974.conf 644 thermal-engine-8974.conf;
+ASD=$(cat /system/build.prop | grep ro.build.version.sdk | cut -d "=" -f 2)
+
+if [ "$ASD" == "24" ] || [ "$ASD" == "25" ]; then
+ ui_print "Android 7.0/7.1 detected!";
+ touch $ramdisk/nougat;
+fi;
 
 remove_line init.qcom.rc scaling_min_freq;
 remove_line init.qcom.rc scaling_min_freq;

@@ -11,7 +11,7 @@
 #######################################
 VAR="$2"
 
-BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-LOS14-$VAR"
+BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-$VAR"
 
 #9.1
 TOOLCHAIN="/root/arm-eabi-gcc/bin/arm-eabi-"
@@ -79,9 +79,6 @@ if [ -f ~/x-settings.sh ]; then
 	. ~/x-settings.sh
 fi
 
-#BOEFFLA_FILENAME="${KERNEL_NAME,,}-$BOEFFLA_VERSION"
-#BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-LOS16-$VAR"
-
 # set environment
 export ARCH=$ARCHITECTURE
 export CROSS_COMPILE="${CCACHE} $TOOLCHAIN"
@@ -105,8 +102,7 @@ step0_copy_code()
 
 	# Replace version information in mkcompile_h with the one from x-settings.sh
 	sed "s/\`echo \$LINUX_COMPILE_BY | \$UTS_TRUNCATE\`/Boeffla-Kernel-4.1-TUNED/g" -i $BUILD_PATH/scripts/mkcompile_h
-#	sed "s/\`echo \$LINUX_COMPILE_BY | \$UTS_TRUNCATE\`/$KERNEL_NAME-$BOEFFLA_VERSION-$BOEFFLA_DATE-[supported-by-www.android-hubo.de]/g" -i $BUILD_PATH/scripts/mkcompile_h
-#	sed "s/\`echo \$LINUX_COMPILE_HOST | \$UTS_TRUNCATE\`/andip71/g" -i $BUILD_PATH/scripts/mkcompile_h
+	sed "s/\`echo \$LINUX_COMPILE_HOST | \$UTS_TRUNCATE\`/HeilerBemerguy/g" -i $BUILD_PATH/scripts/mkcompile_h
 }
 
 step1_make_clean()
@@ -267,8 +263,6 @@ step4_prepare_anykernel()
 	cd $REPACK_PATH
 	KERNELNAME="Flashing $KERNEL_NAME $BOEFFLA_VERSION"
 	sed -i "s;###kernelname###;${KERNELNAME};" META-INF/com/google/android/update-binary;
-	COPYRIGHT="(c) Lord Boeffla (aka andip71), $(date +%Y.%m.%d-%H:%M:%S)"
-	sed -i "s;###copyright###;${COPYRIGHT};" META-INF/com/google/android/update-binary;
 }
 
 step5_create_anykernel_zip()
@@ -280,22 +274,22 @@ step5_create_anykernel_zip()
 
 	# create zip file
 	cd $REPACK_PATH
-	zip -r9 $BOEFFLA_FILENAME.recovery.zip * -x $BOEFFLA_FILENAME.recovery.zip
+	zip -r9 $BOEFFLA_FILENAME.zip * -x $BOEFFLA_FILENAME.zip
 
 	# sign recovery zip if there are keys available
 	if [ -f "$BUILD_PATH/tools_boeffla/testkey.x509.pem" ]; then
 		echo -e ">>> signing recovery zip\n"
-		java -jar $BUILD_PATH/tools_boeffla/signapk.jar -w $BUILD_PATH/tools_boeffla/testkey.x509.pem $BUILD_PATH/tools_boeffla/testkey.pk8 $BOEFFLA_FILENAME.recovery.zip $BOEFFLA_FILENAME.recovery.zip_signed
-		cp $BOEFFLA_FILENAME.recovery.zip_signed $BOEFFLA_FILENAME.recovery.zip
-		rm $BOEFFLA_FILENAME.recovery.zip_signed
+		java -jar $BUILD_PATH/tools_boeffla/signapk.jar -w $BUILD_PATH/tools_boeffla/testkey.x509.pem $BUILD_PATH/tools_boeffla/testkey.pk8 $BOEFFLA_FILENAME.zip $BOEFFLA_FILENAME.zip_signed
+		cp $BOEFFLA_FILENAME.zip_signed $BOEFFLA_FILENAME.zip
+		rm $BOEFFLA_FILENAME.zip_signed
 	fi
 
-	md5sum $BOEFFLA_FILENAME.recovery.zip > $BOEFFLA_FILENAME.recovery.zip.md5
+	md5sum $BOEFFLA_FILENAME.zip > $BOEFFLA_FILENAME.zip.md5
 
 	# Creating additional files for load&flash
 	echo -e ">>> create load&flash files\n"
 
-	cp $BOEFFLA_FILENAME.recovery.zip cm-kernel.zip
+	cp $BOEFFLA_FILENAME.zip cm-kernel.zip
 	md5sum cm-kernel.zip > checksum
 }
 
