@@ -366,7 +366,7 @@ OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
                 --param=max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
                 --param=max-modulo-backtrack-attempts=500000 --param=inline-unit-growth=1000 --param=large-function-growth=1000 --param=large-stack-frame-growth=10000 \
-                --param=max-hoist-depth=0 --param=inline-min-speedup=20 --param=max-pending-list-length=320 \
+                --param=max-hoist-depth=0 --param=inline-min-speedup=10 --param=max-pending-list-length=320 \
                 -fgraphite -fgraphite-identity -fschedule-fusion -ftree-lrs -floop-nest-optimize
 
 #--param l1-cache-size=32 --param l1-cache-line-size=32 --param l2-cache-size=2048 -falign-functions=16 -falign-loops=16

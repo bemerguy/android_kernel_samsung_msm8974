@@ -1,5 +1,7 @@
 #!/system/bin/sh
-sleep 20
+sleep 2
 echo "524288000" > /sys/block/vnswap0/disksize
 busybox mkswap /dev/block/vnswap0
 swapon /dev/block/vnswap0
+echo 0 > /sys/module/selinux/parameters/force_permissive
+setenforce 1

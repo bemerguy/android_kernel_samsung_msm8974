@@ -8,6 +8,7 @@ busybox mount -o remount,rw /
 chcon u:object_r:system_file:s0 /boeffla-anykernel
 chcon u:object_r:system_file:s0 /sbin/busybox
 chcon -R u:object_r:system_file:s0 /res/bc
+chcon -R u:object_r:system_file:s0 /etc/init.d
 
 busybox mount -o remount,ro /
 
