@@ -330,9 +330,10 @@ include $(srctree)/scripts/Kbuild.include
 
 AS		= $(CROSS_COMPILE)as
 LD		= $(CROSS_COMPILE)ld
+LDFINAL		= $(LD)
 REAL_CC		= $(CROSS_COMPILE)gcc
 CPP		= $(CC) -E
-AR		= $(CROSS_COMPILE)ar
+AR		= $(CROSS_COMPILE)gcc-ar
 NM		= $(CROSS_COMPILE)nm
 STRIP		= $(CROSS_COMPILE)strip
 OBJCOPY		= $(CROSS_COMPILE)objcopy
@@ -360,12 +361,12 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap \
                 -fgcse-sm -fgcse-las -fipa-pta -ftree-lrs \
                 -fschedule-fusion -freorder-blocks-algorithm=simple -fira-loop-pressure \
-                -ftracer -fno-ipa-cp-clone -funroll-loops -fno-prefetch-loop-arrays \
+                -ftracer -funroll-loops \
                 --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
-                --param max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
-                --param=max-modulo-backtrack-attempts=500000 --param=inline-unit-growth=25 \
-                --param=max-hoist-depth=0 --param=inline-min-speedup=20 \
+                --param=max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
+                --param=max-modulo-backtrack-attempts=500000 --param=inline-unit-growth=1000 --param=large-function-growth=1000 --param=large-stack-frame-growth=10000 \
+                --param=max-hoist-depth=0 --param=inline-min-speedup=20 --param=max-pending-list-length=320 \
                 -fgraphite -fgraphite-identity -fschedule-fusion -ftree-lrs -floop-nest-optimize
 
 #--param l1-cache-size=32 --param l1-cache-line-size=32 --param l2-cache-size=2048 -falign-functions=16 -falign-loops=16
@@ -410,7 +411,8 @@ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(S
 
 export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
 export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
-export CPP AR NM STRIP OBJCOPY OBJDUMP
+export CPP AR NM STRIP OBJCOPY OBJDUMP LDFINAL
+
 export MAKE AWK GENKSYMS INSTALLKERNEL PERL UTS_MACHINE
 export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
 
@@ -660,7 +662,7 @@ KBUILD_CFLAGS += $(call cc-disable-warning, pointer-sign)
 KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
 
 # conserve stack if available
-KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
+#KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
 
 # use the deterministic mode of AR if available
 KBUILD_ARFLAGS := $(call ar-option,D)

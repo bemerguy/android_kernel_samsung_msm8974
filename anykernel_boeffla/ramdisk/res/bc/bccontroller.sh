@@ -704,24 +704,24 @@ if [ "apply_governor_profile" == "$1" ]; then
 	fi
 
 	if [ "Tuned - standard" == "$2" ]; then
-		echo "10000 2265600:100000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
-		echo "99" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
-		echo "2265600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-		echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+		echo "10000 1497600:100000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+		echo "100" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
+		echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+		echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
-		echo "85" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
-		echo "15000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+		echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
+		echo "10000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
 
 		busybox sleep 0.5s
 		busybox sync
 	fi
 
 	if [ "Tuned - battery" == "$2" ]; then
-                echo "20000 2265600:120000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
-                echo "99" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
-                echo "1958400" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "20000 1497600:120000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "100" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
+                echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+                echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
@@ -732,10 +732,10 @@ if [ "apply_governor_profile" == "$1" ]; then
 	fi
 
 	if [ "Tuned - battery extreme" == "$2" ]; then
-                echo "40000 2265600:200000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "40000 1497600:200000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "100" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
-                echo "1574400" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+                echo "30000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "98" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
@@ -746,14 +746,14 @@ if [ "apply_governor_profile" == "$1" ]; then
 	fi
 
 	if [ "Tuned - performance" == "$2" ]; then
-                echo "10000 2265600:80000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "10000 1497600:80000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
-                echo "2265600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+                echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
                 echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "70" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
-                echo "15000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+                echo "10000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
 
 		busybox sleep 0.5s
 		busybox sync

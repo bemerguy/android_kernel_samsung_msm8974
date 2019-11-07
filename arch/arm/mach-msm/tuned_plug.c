@@ -25,43 +25,48 @@ static struct notifier_block lcd_notif;
 static struct workqueue_struct *tunedplug_wq;
 static struct delayed_work tunedplug_work;
 
-static unsigned int tunedplug_active = 1;
+static unsigned int tunedplug_active __read_mostly = 1;
 module_param(tunedplug_active, uint, 0644);
 
-#define DEF_SAMPLING 10*HZ/1000   //10ms
-#define MAX_SAMPLING 1000*HZ/1000 //1000ms
+#define DEF_SAMPLING 10   *HZ/1000   	//10ms
+#define MAX_SAMPLING 1000 *HZ/1000	//1000ms
+
+/* frequency threshold to wake one more cpu */
+#define PMAX 1497600
 
 /* up threshold. lower means more delay */
-static int u[] = { -1, -17, -40 };
+static const int u[] = { -45, -20, 0 };
 
 /* down threshold. higher means more delay */
-static int d[] = { 170, 100, 40 };
+static const int d[] = { 40, 100, 170 };
 
 
-static unsigned long sampling_time = DEF_SAMPLING;
-bool displayon = true;
+static const unsigned long max_sampling = MAX_SAMPLING;
+static unsigned long sampling_time __read_mostly = DEF_SAMPLING;
+
+bool displayon __read_mostly = true;
 
 static int down[NR_CPUS-1];
 /* 123 are cpu cores. */
 
 static void inline down_one(void){
         unsigned int i;
-        for (i = NR_CPUS-1; i > 0; i--) {
-                if (cpu_online(i)) {
-                        if (down[i] > d[i-1]) {
+	for_each_online_cpu(i) {
+		if (i) {
+			if (down[i] > d[i-1]) {
                                 cpu_down(i);
                                 pr_info("tunedplug: DOWN cpu %d. (%d > %d) sampling: %lu\n",
 					i, down[i], d[i-1], sampling_time);
                                 down[i]=0;
-                        }
-                        else down[i]++;
-                        return;
-                }
+				return;
+                	}
+                	else down[i]++;
+		}
         }
 }
 static void inline up_one(void){
         unsigned int i;
-        for (i = 1; i < NR_CPUS; i++) {
+        for (i = NR_CPUS-1; i > 0; i--) {
                 if (!cpu_online(i)) {
                         if (down[i] < u[i-1]) {
                                 struct cpufreq_policy policy, *p = &policy;
@@ -94,19 +99,19 @@ static void tunedplug_work_fn(struct work_struct *work)
         if (!tunedplug_active)
                 return;
 
-	if (!displayon && (sampling_time < MAX_SAMPLING))
+	if (!displayon && (sampling_time < max_sampling))
 		sampling_time++;
 
 #define TMAXFREQ status[0]
 #define TLOWFREQ status[1]
 #define TONLINE status[2]
 
-	for_each_possible_cpu(i) {
-		if (cpu_online(i)) TONLINE++;
-		if (i >= NR_CPUS-1 || (cpufreq_get_policy(&policy, i) != 0))
-			continue;
-		if (policy.cur >= policy.max) TMAXFREQ++;
-		else if (policy.cur <= policy.min) TLOWFREQ++;
+	for_each_online_cpu(i) {
+			TONLINE++;
+			if (cpufreq_get_policy(&policy, i) != 0)
+				continue;
+			if (policy.cur > PMAX) TMAXFREQ++;
+			else if (i && policy.cur <= policy.min) TLOWFREQ++;
 	}
 
 //	pr_info("ON=%d. LOW=%d. MAX=%d.\n", TONLINE, TLOWFREQ, TMAXFREQ);
@@ -146,7 +151,7 @@ static void initnotifier(void)
 static int __init tuned_plug_init(void)
 {
 
-	tunedplug_wq = alloc_workqueue("tunedplugv2", WQ_HIGHPRI|WQ_FREEZABLE, 1);
+	tunedplug_wq = alloc_workqueue("tunedplugv2", WQ_HIGHPRI | WQ_FREEZABLE, 1);
         if (!tunedplug_wq)
                 return -ENOMEM;
 
@@ -154,7 +159,7 @@ static int __init tuned_plug_init(void)
 
 	sampling_time = DEF_SAMPLING;
 
-        queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, 5000);
+        queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, 50*HZ);
 
 	initnotifier();
 

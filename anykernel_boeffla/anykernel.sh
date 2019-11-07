@@ -8,7 +8,7 @@
 
 # EDIFY properties
 do.devicecheck=1
-do.initd=0
+do.initd=1
 do.modules=0
 do.cleanup=1
 device.name1=kltexx
@@ -63,6 +63,8 @@ if [ "$ASD" == "24" ] || [ "$ASD" == "25" ]; then
  ui_print "Android 7.0/7.1 detected!";
  touch $ramdisk/nougat;
 fi;
+
+replace_file /system/etc/init.d/10vnswap 755 10vnswap
 
 remove_line init.qcom.rc scaling_min_freq;
 remove_line init.qcom.rc scaling_min_freq;

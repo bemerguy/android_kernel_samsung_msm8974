@@ -1,0 +1,5 @@
+#!/system/bin/sh
+sleep 20
+echo "524288000" > /sys/block/vnswap0/disksize
+busybox mkswap /dev/block/vnswap0
+swapon /dev/block/vnswap0

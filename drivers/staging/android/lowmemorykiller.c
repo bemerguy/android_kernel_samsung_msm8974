@@ -80,9 +80,8 @@ extern bool displayon;
 static int lowmem_shrink(void)
 {
 	struct task_struct *tsk, *tokill[16], *p;
-	struct task_struct *selected = NULL;
 	unsigned long rem = 0;
-	int i, selected_oom_score;
+	int i;
 	short min_score_adj = OOM_SCORE_ADJ_MAX + 1;
 	int minfree = 0, oom_score, tki = 0;
 	int array_size = ARRAY_SIZE(lowmem_adj);
@@ -121,8 +120,6 @@ static int lowmem_shrink(void)
 
 	restart:
 	tki = -1;
-	selected = NULL;
-	selected_oom_score = min_score_adj;
 
 	for_each_process(tsk) {
 		oom_score = 0;
@@ -130,8 +127,10 @@ static int lowmem_shrink(void)
 		if (tsk->flags & PF_KTHREAD)
 			continue;
 
+#if 0
 		if (same_thread_group(tsk, current))
 			continue;
+#endif
 
                 p = find_lock_task_mm(tsk);
                 if (!p)
@@ -144,23 +143,13 @@ static int lowmem_shrink(void)
 			continue;
 
 
-		if (selected) {
-			if (oom_score < selected_oom_score)
-				continue;
-			else if ((oom_score == selected_oom_score) && (tki < 16)) {
-					tki++;
-					tokill[tki] = p;
-			}
-			else if (oom_score > selected_oom_score) {
-					tki=0;
-					tokill[0] = p;
-			}
+		if ((oom_score >= min_score_adj) && (tki < 16)) {
+				tki++;
+				tokill[tki] = p;
 		}
-		selected = p;
-		selected_oom_score = oom_score;
 	}
 
-	lowmem_print(3,"NOW start killing %d process(es)", tki+1);
+	if (tki!=-1) lowmem_print(3, "NOW start killing %d process(es)", tki+1);
 
 	while (tki >=0) {
 		task_lock(tokill[tki]);

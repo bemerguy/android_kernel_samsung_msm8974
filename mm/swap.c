@@ -35,7 +35,7 @@
 #include "internal.h"
 
 /* How many pages do we try to swap or page in/out together? */
-int page_cluster;
+int page_cluster=8;
 
 static DEFINE_PER_CPU(struct pagevec[NR_LRU_LISTS], lru_add_pvecs);
 static DEFINE_PER_CPU(struct pagevec, lru_rotate_pvecs);
@@ -852,12 +852,13 @@ void __init swap_setup(void)
 		INIT_LIST_HEAD(&swapper_spaces[i].i_mmap_nonlinear);
 	}
 #endif
-
+#if 0
 	/* Use a smaller cluster for small-memory machines */
 	if (megs < 16)
 		page_cluster = 2;
 	else
 		page_cluster = 3;
+#endif
 	/*
 	 * Right now other parts of the system means that we
 	 * _really_ don't want to cluster much more

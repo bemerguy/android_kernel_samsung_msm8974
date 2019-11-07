@@ -462,9 +462,10 @@ int elv_merge(struct request_queue *q, struct request **req, struct bio *bio)
 	 * 	noxmerges: Only simple one-hit cache try
 	 * 	merges:	   All merge tries attempted
 	 */
-//	if (blk_queue_nomerges(q))
-//		return ELEVATOR_NO_MERGE;
-
+#if 0
+	if (blk_queue_nomerges(q))
+		return ELEVATOR_NO_MERGE;
+#endif
 	/*
 	 * First try one-hit cache.
 	 */
@@ -476,7 +477,7 @@ int elv_merge(struct request_queue *q, struct request **req, struct bio *bio)
 		}
 	}
 
-	if (blk_queue_noxmerges(q))
+//	if (blk_queue_noxmerges(q))
 		return ELEVATOR_NO_MERGE;
 
 	/*
@@ -919,6 +920,8 @@ int __elv_register_queue(struct request_queue *q, struct elevator_queue *e)
 		}
 		kobject_uevent(&e->kobj, KOBJ_ADD);
 		e->registered = 1;
+		if (e->type->ops.elevator_registered_fn)
+			e->type->ops.elevator_registered_fn(q);
 	}
 	return error;
 }

@@ -19,7 +19,7 @@
 
 /* Default constants for DevFreq-Simple-Ondemand (DFSO) */
 #define DFSO_UPTHRESHOLD	95
-#define DFSO_DOWNDIFFERENCTIAL	10
+#define DFSO_DOWNDIFFERENCTIAL	0
 
 static unsigned int dfso_upthreshold = DFSO_UPTHRESHOLD;
 static unsigned int dfso_downdifferential = DFSO_DOWNDIFFERENCTIAL;
@@ -51,31 +51,18 @@ static int devfreq_simple_ondemand_func(struct devfreq *df,
 #endif
 
 	/* Assume min if not busy enough */
-	if (stat.total_time == 0 || stat.busy_time < 12000 || stat.current_frequency == 0) {
+	if (stat.total_time == 0 || stat.busy_time < 6000 || stat.current_frequency == 0) {
 		*freq = min;
 		return 0;
 	}
-#if 0
-	/* Set MAX if it's busy enough */
-	if (stat.busy_time * 100 > stat.total_time * dfso_upthreshold) {
-		*freq = max;
-		printk("simple set max busy enough! busy_time %lu * 100 > total_time %lu * upthresh %lu, freq: %lu\n",
-			stat.busy_time, stat.total_time, dfso_upthreshold, max);
-		return 0;
-	}
 
-	/* Keep the current frequency */
-	if (stat.busy_time * 100 > stat.total_time * (dfso_upthreshold - dfso_downdifferential)) {
-		*freq = stat.current_frequency;
-                printk("simple stay in %lu because: busy_time %lu * 100 > total_time %lu * (upthr %u - downd %u)\n", *freq, stat.busy_time, stat.total_time, dfso_upthreshold, dfso_downdifferential);
-		return 0;
-	}
-#endif
+//	printk("simple busy_time %lu and total_time %lu\n", stat.busy_time, stat.total_time);
+
 	/* Set the desired frequency based on the load */
 	a = stat.busy_time;
 	a *= stat.current_frequency;
 	b = div_u64(a, stat.total_time);
-	b *= 90;
+	b *= 100;
 	b = div_u64(b, (dfso_upthreshold - dfso_downdifferential / 2));
 
         *freq = (unsigned long) b;

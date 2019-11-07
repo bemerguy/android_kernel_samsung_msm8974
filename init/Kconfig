@@ -1474,3 +1474,8 @@ config PADATA
 	bool
 
 source "kernel/Kconfig.locks"
+
+config LTO
+	bool
+	default y
+

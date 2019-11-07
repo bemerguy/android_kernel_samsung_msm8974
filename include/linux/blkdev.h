@@ -34,7 +34,7 @@ struct sg_io_hdr;
 struct bsg_job;
 
 #define BLKDEV_MIN_RQ	1
-#define BLKDEV_MAX_RQ	512	/* Default maximum */
+#define BLKDEV_MAX_RQ	256	/* Default maximum */
 
 struct request;
 typedef void (rq_end_io_fn)(struct request *, int);
@@ -932,7 +932,7 @@ struct blk_plug {
 	struct list_head cb_list; /* md requires an unplug callback */
 	unsigned int should_sort; /* list to be sorted before flushing? */
 };
-#define BLK_MAX_REQUEST_COUNT 16
+#define BLK_MAX_REQUEST_COUNT 8
 
 struct blk_plug_cb {
 	struct list_head list;

@@ -79,12 +79,12 @@ static bool zswap_enabled = 1;
 module_param_named(enabled, zswap_enabled, bool, 0);
 
 /* Compressor to be used by zswap (fixed at boot for now) */
-#define ZSWAP_COMPRESSOR_DEFAULT "lzo"
+#define ZSWAP_COMPRESSOR_DEFAULT "lz4"
 static char *zswap_compressor = ZSWAP_COMPRESSOR_DEFAULT;
 module_param_named(compressor, zswap_compressor, charp, 0);
 
 /* The maximum percentage of memory that the compressed pool can occupy */
-static unsigned int zswap_max_pool_percent = 20;
+static unsigned int zswap_max_pool_percent = 100;
 module_param_named(max_pool_percent,
 			zswap_max_pool_percent, uint, 0644);
 
@@ -93,7 +93,7 @@ module_param_named(max_pool_percent,
  * compressed page. Any pages that do not compress by at least
  * this ratio will be rejected.
 */
-static unsigned int zswap_max_compression_ratio = 80;
+static unsigned int zswap_max_compression_ratio = 50;
 module_param_named(max_compression_ratio,
 			zswap_max_compression_ratio, uint, 0644);
 
@@ -806,7 +806,12 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
 		ret = -EINVAL;
 		goto freepage;
 	}
+#if 0
 	if ((dlen * 100 / PAGE_SIZE) > zswap_max_compression_ratio) {
+#else
+	if (dlen > 3072) {
+#endif
+
 		zswap_reject_compress_poor++;
 		ret = -E2BIG;
 		goto freepage;

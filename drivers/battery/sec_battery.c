@@ -2268,7 +2268,7 @@ static void sec_bat_get_battery_info(
 		"%s:Vnow(%dmV),Inow(%dmA),Imax(%dmA),SOC(%d%%),Tbat(%d),is_hc_usb(%d)\n",
 		__func__,
 		battery->voltage_now, battery->current_now,
-		battery->current_max/1000 /*convert to mA*/, battery->capacity,
+		battery->current_max, battery->capacity,
 		battery->temperature, battery->is_hc_usb);
 	dev_dbg(battery->dev,
 		"%s,Vavg(%dmV),Vocv(%dmV),Tamb(%d),"
