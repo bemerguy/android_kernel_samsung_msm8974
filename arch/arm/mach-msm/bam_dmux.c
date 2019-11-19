@@ -104,7 +104,6 @@ static uint32_t bam_dmux_write_cpy_cnt;
 static uint32_t bam_dmux_write_cpy_bytes;
 static uint32_t bam_dmux_tx_sps_failure_cnt;
 static uint32_t bam_dmux_tx_stall_cnt;
-static uint32_t bam_dmux_ratelimit;
 static atomic_t bam_dmux_ack_out_cnt = ATOMIC_INIT(0);
 static atomic_t bam_dmux_ack_in_cnt = ATOMIC_INIT(0);
 static atomic_t bam_dmux_a2_pwr_cntl_in_cnt = ATOMIC_INIT(0);
@@ -232,7 +231,7 @@ static struct workqueue_struct *bam_mux_tx_workqueue;
 static struct srcu_struct bam_dmux_srcu;
 
 /* A2 power collaspe */
-#define UL_TIMEOUT_DELAY 2000	/* in ms */
+#define UL_TIMEOUT_DELAY 1000	/* in ms */
 #define ENABLE_DISCONNECT_ACK	0x1
 #define SHUTDOWN_TIMEOUT_MS	3000
 #define UL_WAKEUP_TIMEOUT_MS	2000
@@ -494,8 +493,6 @@ static void bam_mux_process_data(struct sk_buff *rx_skb)
 	unsigned long flags;
 	struct bam_mux_hdr *rx_hdr;
 	unsigned long event_data;
-	void (*notify)(void *, int, unsigned long);
-	void *priv;
 
 	rx_hdr = (struct bam_mux_hdr *)rx_skb->data;
 
@@ -505,19 +502,15 @@ static void bam_mux_process_data(struct sk_buff *rx_skb)
 	rx_skb->truesize = rx_hdr->pkt_len + sizeof(struct sk_buff);
 
 	event_data = (unsigned long)(rx_skb);
-	notify = NULL;
-	priv = NULL;
 
 	spin_lock_irqsave(&bam_ch[rx_hdr->ch_id].lock, flags);
-	if (bam_ch[rx_hdr->ch_id].notify) {
-		notify = bam_ch[rx_hdr->ch_id].notify;
-		priv = bam_ch[rx_hdr->ch_id].priv;
-	}
-	spin_unlock_irqrestore(&bam_ch[rx_hdr->ch_id].lock, flags);
-	if (notify)
-		notify(priv, BAM_DMUX_RECEIVE, event_data);
+	if (bam_ch[rx_hdr->ch_id].notify)
+		bam_ch[rx_hdr->ch_id].notify(
+			bam_ch[rx_hdr->ch_id].priv, BAM_DMUX_RECEIVE,
+							event_data);
 	else
 		dev_kfree_skb_any(rx_skb);
+	spin_unlock_irqrestore(&bam_ch[rx_hdr->ch_id].lock, flags);
 
 	queue_rx();
 }
@@ -1548,7 +1541,6 @@ static inline void ul_powerdown_finish(void)
 		unvote_dfab();
 		complete_all(&dfab_unvote_completion);
 		wait_for_dfab = 0;
-		bam_dmux_ratelimit = 0;
 	}
 }
 
@@ -1618,7 +1610,7 @@ static void ul_timeout(struct work_struct *work)
 		return;
 	ret = write_trylock_irqsave(&ul_wakeup_lock, flags);
 	if (!ret) { /* failed to grab lock, reschedule and bail */
-		queue_delayed_work(system_power_efficient_wq, &ul_timeout_work,
+		schedule_delayed_work(&ul_timeout_work,
 				msecs_to_jiffies(UL_TIMEOUT_DELAY));
 		return;
 	}
@@ -1630,13 +1622,8 @@ static void ul_timeout(struct work_struct *work)
 
 				info = list_first_entry(&bam_tx_pool,
 						struct tx_pkt_info, list_node);
-				if (!bam_dmux_ratelimit) {
-					DMUX_LOG_KERR
-					    ("%s: UL delayed ts=%u.%09lu\n",
-					     __func__, info->ts_sec,
-					     info->ts_nsec);
-					bam_dmux_ratelimit++;
-				}
+				DMUX_LOG_KERR("%s: UL delayed ts=%u.%09lu\n",
+					__func__, info->ts_sec, info->ts_nsec);
 				DBG_INC_TX_STALL_CNT();
 				ul_packet_written = 1;
 			}
@@ -1647,7 +1634,7 @@ static void ul_timeout(struct work_struct *work)
 			BAM_DMUX_LOG("%s: pkt written %d\n",
 				__func__, ul_packet_written);
 			ul_packet_written = 0;
-			queue_delayed_work(system_power_efficient_wq, &ul_timeout_work,
+			schedule_delayed_work(&ul_timeout_work,
 					msecs_to_jiffies(UL_TIMEOUT_DELAY));
 		} else {
 			ul_powerdown();
@@ -1672,7 +1659,7 @@ static int ssrestart_check(void)
 	in_global_reset = 1;
 	ret = subsystem_restart("modem");
 	if (ret == -ENODEV)
-		PR_BUG("modem subsystem restart failed\n");
+		panic("modem subsystem restart failed\n");
 	return 1;
 }
 
@@ -1733,7 +1720,7 @@ static void ul_wakeup(void)
 		}
 		if (likely(do_vote_dfab))
 			vote_dfab();
-		queue_delayed_work(system_power_efficient_wq, &ul_timeout_work,
+		schedule_delayed_work(&ul_timeout_work,
 				msecs_to_jiffies(UL_TIMEOUT_DELAY));
 		bam_is_connected = 1;
 		mutex_unlock(&wakeup_lock);
@@ -1778,7 +1765,7 @@ static void ul_wakeup(void)
 
 	bam_is_connected = 1;
 	BAM_DMUX_LOG("%s complete\n", __func__);
-	queue_delayed_work(system_power_efficient_wq, &ul_timeout_work,
+	schedule_delayed_work(&ul_timeout_work,
 				msecs_to_jiffies(UL_TIMEOUT_DELAY));
 	mutex_unlock(&wakeup_lock);
 }

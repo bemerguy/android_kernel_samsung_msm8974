@@ -4,7 +4,7 @@
 #include <linux/idr.h>
 
 /* Amount of time in which a process may batch requests */
-#define BLK_BATCH_TIME	(HZ/50UL)
+#define BLK_BATCH_TIME	(HZ/80UL)
 
 /* Number of requests a "batching" process may submit */
 #define BLK_BATCH_REQ	64

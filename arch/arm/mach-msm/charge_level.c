@@ -23,7 +23,7 @@
 static ssize_t charge_level_ac_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
 	// print current value
-	return sprintf(buf, "%d", ac_level);
+	return sprintf(buf, "%d mA", ac_level);
 }
 
 
@@ -55,7 +55,7 @@ static ssize_t charge_level_ac_store(struct kobject *kobj, struct kobj_attribute
 static ssize_t charge_level_usb_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
 	// print current value
-	return sprintf(buf, "%d", usb_level);
+	return sprintf(buf, "%d mA", usb_level);
 }
 
 
@@ -86,7 +86,7 @@ static ssize_t charge_level_usb_store(struct kobject *kobj, struct kobj_attribut
 static ssize_t charge_level_wireless_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
 	// print current value
-	return sprintf(buf, "%d", wireless_level);
+	return sprintf(buf, "%d mA", wireless_level);
 }
 
 
@@ -123,13 +123,13 @@ static ssize_t charge_info_show(struct kobject *kobj, struct kobj_attribute *att
 		if (charge_level_nom == 0)
 			return sprintf(buf, "No charger");
 		else
-			return sprintf(buf, "%s: ~%d (SL) mA", charge_info_text, charge_level_cur);
+			return sprintf(buf, "%s: %d (SL) mA", charge_info_text, charge_level_cur);
 	
 	else
 		if (charge_level_nom == 0)
 			return sprintf(buf, "No charger");
 		else
-			return sprintf(buf, "%s: ~%d (%d) mA", charge_info_text, charge_level_cur, charge_level_nom);
+			return sprintf(buf, "%s: %d (%d) mA", charge_info_text, charge_level_cur, charge_level_nom);
 }
 
 

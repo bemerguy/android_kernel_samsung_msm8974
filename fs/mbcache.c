@@ -37,6 +37,7 @@
 #include <linux/init.h>
 #include <linux/mbcache.h>
 
+#define MB_CACHE_DEBUG 1
 
 #ifdef MB_CACHE_DEBUG
 # define mb_debug(f...) do { \

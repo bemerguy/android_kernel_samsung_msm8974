@@ -198,7 +198,7 @@ static void timelylmk(struct work_struct *work)
 		queue_delayed_work(system_nrt_freezable_wq, dwork, HZ*2);
 	else
 #endif
-		queue_delayed_work(system_nrt_freezable_wq, dwork, HZ*10);
+		queue_delayed_work(system_nrt_freezable_wq, dwork, HZ*4);
 }
 
 static int __init lowmem_init(void)

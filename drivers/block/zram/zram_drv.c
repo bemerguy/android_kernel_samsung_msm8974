@@ -15,9 +15,9 @@
 #define KMSG_COMPONENT "zram"
 #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
 
-//#ifdef CONFIG_ZRAM_DEBUG
+#ifdef CONFIG_ZRAM_DEBUG
 #define DEBUG
-//#endif
+#endif
 
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -38,7 +38,7 @@
 /* Globals */
 static int zram_major;
 static struct zram *zram_devices;
-static const char *default_compressor = "lz4";
+static const char *default_compressor = "lzo";
 
 /* Module params (documentation at end) */
 static unsigned int num_devices = 1;
