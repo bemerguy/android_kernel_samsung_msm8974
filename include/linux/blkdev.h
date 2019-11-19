@@ -33,7 +33,7 @@ struct request;
 struct sg_io_hdr;
 struct bsg_job;
 
-#define BLKDEV_MIN_RQ	1
+#define BLKDEV_MIN_RQ	4
 #define BLKDEV_MAX_RQ	512	/* Default maximum */
 
 struct request;
@@ -409,8 +409,6 @@ struct request_queue {
 	/* Throttle data */
 	struct throtl_data *td;
 #endif
-
-	char elevator_hard[ELV_NAME_MAX];
 };
 
 #define QUEUE_FLAG_QUEUED	1	/* uses generic tag queueing */
@@ -438,7 +436,7 @@ struct request_queue {
 #define QUEUE_FLAG_DEFAULT	((0 << QUEUE_FLAG_IO_STAT) |		\
 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
-				 (0 << QUEUE_FLAG_ADD_RANDOM))
+				 (1 << QUEUE_FLAG_ADD_RANDOM))
 
 static inline void queue_lockdep_assert_held(struct request_queue *q)
 {
@@ -932,7 +930,7 @@ struct blk_plug {
 	struct list_head cb_list; /* md requires an unplug callback */
 	unsigned int should_sort; /* list to be sorted before flushing? */
 };
-#define BLK_MAX_REQUEST_COUNT 8
+#define BLK_MAX_REQUEST_COUNT 16
 
 struct blk_plug_cb {
 	struct list_head list;
@@ -1145,6 +1143,16 @@ static inline int queue_limit_discard_alignment(struct queue_limits *lim, sector
 
 	return (lim->discard_granularity + lim->discard_alignment - alignment)
 		& (lim->discard_granularity - 1);
+}
+
+static inline int bdev_discard_alignment(struct block_device *bdev)
+{
+	struct request_queue *q = bdev_get_queue(bdev);
+
+	if (bdev != bdev->bd_contains)
+		return bdev->bd_part->discard_alignment;
+
+	return q->limits.discard_alignment;
 }
 
 static inline unsigned int queue_discard_zeroes_data(struct request_queue *q)
