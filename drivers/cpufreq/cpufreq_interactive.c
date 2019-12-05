@@ -88,7 +88,7 @@ static int ntarget_loads = ARRAY_SIZE(default_target_loads);
 /*
  * The minimum amount of time to spend at a frequency before we can ramp down.
  */
-#define DEFAULT_MIN_SAMPLE_TIME (40 * USEC_PER_MSEC)
+#define DEFAULT_MIN_SAMPLE_TIME (60 * USEC_PER_MSEC)
 static unsigned long min_sample_time = DEFAULT_MIN_SAMPLE_TIME;
 
 /*
@@ -122,10 +122,10 @@ static u64 boostpulse_endtime;
  * minimum before wakeup to reduce speed, or -1 if unnecessary.
  */
 
-#define DEFAULT_TIMER_SLACK (6 * DEFAULT_TIMER_RATE)
+#define DEFAULT_TIMER_SLACK -1
 static int timer_slack_val = DEFAULT_TIMER_SLACK;
 
-static bool io_is_busy = false;
+static bool io_is_busy = true;
 
 #ifdef CONFIG_MODE_AUTO_CHANGE
 struct cpufreq_loadinfo {
@@ -282,17 +282,15 @@ static void cpufreq_interactive_timer_resched(
 	pcpu->cputime_speedadj_timestamp = pcpu->time_in_idle_timestamp;
 #ifdef CONFIG_TUNED_PLUG
 	if (displayon)
-		expires = jiffies + usecs_to_jiffies(timer_rate);
+		expires = jiffies + HZ/100;
 	else
-		expires = jiffies + usecs_to_jiffies(timer_rate*5);
+		expires = jiffies + HZ;
 #else
 	expires = jiffies + usecs_to_jiffies(timer_rate);
 #endif
 
 #ifdef DYN_DEFER
-       if (pcpu->target_freq > pcpu->policy->min)
-               timer_set_nondeferrable(&pcpu->cpu_timer);
-       else
+       if (pcpu->target_freq <= pcpu->policy->min)
                timer_set_deferrable(&pcpu->cpu_timer);
 #endif
 

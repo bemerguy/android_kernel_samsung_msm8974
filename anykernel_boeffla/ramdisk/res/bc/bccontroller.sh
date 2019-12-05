@@ -447,7 +447,6 @@ if [ "apply_cpu_hotplug_profile" == "$1" ]; then
 		stop mpdecision
                 busybox find /sys/devices/system/cpu/cpu? -name online_control -exec sh -c "echo 0 > {}" \;
                 busybox find /sys/devices/system/cpu/cpu? -name online -exec sh -c "echo 1 > {}" \;
-                busybox find /sys/devices/system/cpu/cpu? -name scaling_min_freq -exec sh -c "echo 268800 > {}" \;
                 exit 0
         else
 	        echo "0" >/sys/module/tuned_plug/parameters/tunedplug_active

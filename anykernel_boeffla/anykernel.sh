@@ -65,6 +65,7 @@ if [ "$ASD" == "24" ] || [ "$ASD" == "25" ]; then
 fi;
 
 replace_file /system/etc/init.d/10vnswap 755 10vnswap
+replace_file /system/etc/init/init_d.rc 755 init_d.rc
 
 remove_line init.qcom.rc scaling_min_freq;
 remove_line init.qcom.rc scaling_min_freq;

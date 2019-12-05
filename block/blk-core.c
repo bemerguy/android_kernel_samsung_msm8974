@@ -1513,6 +1513,7 @@ get_rq:
 		if (list_empty(&plug->list))
 			trace_block_plug(q);
 		else {
+			struct request *last;
 			if (!plug->should_sort) {
 				struct request *__rq;
 
@@ -1520,7 +1521,9 @@ get_rq:
 				if (__rq->q != q)
 					plug->should_sort = 1;
 			}
-			if (request_count >= BLK_MAX_REQUEST_COUNT) {
+                        last = list_entry_rq(plug->list.prev);
+                        if (request_count >= BLK_MAX_REQUEST_COUNT ||
+                            blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE) {
 				blk_flush_plug_list(plug, false);
 				trace_block_plug(q);
 			}

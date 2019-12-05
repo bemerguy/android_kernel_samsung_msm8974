@@ -210,11 +210,13 @@ struct row_data {
 
 #define RQ_ROWQ(rq) ((struct row_queue *) ((rq)->elv.priv[0]))
 
+
 #define row_log(q, fmt, args...)   \
 	blk_add_trace_msg(q, "%s():" fmt , __func__, ##args)
 #define row_log_rowq(rdata, rowq_id, fmt, args...)		\
 	blk_add_trace_msg(rdata->dispatch_queue, "rowq%d " fmt, \
 		rowq_id, ##args)
+
 
 static inline void row_mark_rowq_unserved(struct row_data *rd,
 					 enum row_queue_prio qnum)
@@ -363,7 +365,7 @@ static void row_add_request(struct request_queue *q,
 			rqueue->idle_data.begin_idling = false;
 			return;
 		}
-		if (diff_ms < rd->rd_idle_data.freq_ms) {
+		if (diff_ms > rd->rd_idle_data.freq_ms) {
 			rqueue->idle_data.begin_idling = true;
 			row_log_rowq(rd, rqueue->prio, "Enable idling");
 		} else {

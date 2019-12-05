@@ -47,11 +47,11 @@
 	.macro ldr4w ptr reg1 reg2 reg3 reg4 abort
 	ldmia \ptr!, {\reg1, \reg2, \reg3, \reg4}
 	.endm
-#ifndef CONFIG_USE_LDRDSTRD_OVER_LDMSTM
+
 	.macro ldr8w ptr reg1 reg2 reg3 reg4 reg5 reg6 reg7 reg8 abort
 	ldmia \ptr!, {\reg1, \reg2, \reg3, \reg4, \reg5, \reg6, \reg7, \reg8}
 	.endm
-#endif
+
 	.macro ldr1b ptr reg cond=al abort
 	ldr\cond\()b \reg, [\ptr], #1
 	.endm
@@ -69,6 +69,25 @@
 	str1w \ptr, \reg6, \abort
 	str1w \ptr, \reg7, \abort
 	str1w \ptr, \reg8, \abort
+	.endm
+
+	.macro ldstr8w ptrl ptrw reg1 reg2 reg3 reg4 reg5 reg6 reg7 reg8 abort
+	ldr1w \ptrl, \reg1, \abort
+	str1w \ptrw, \reg1, \abort
+	ldr1w \ptrl, \reg2, \abort
+	str1w \ptrw, \reg2, \abort
+	ldr1w \ptrl, \reg3, \abort
+	str1w \ptrw, \reg3, \abort
+	ldr1w \ptrl, \reg4, \abort
+	str1w \ptrw, \reg4, \abort
+	ldr1w \ptrl, \reg5, \abort
+	str1w \ptrw, \reg5, \abort
+	ldr1w \ptrl, \reg6, \abort
+	str1w \ptrw, \reg6, \abort
+	ldr1w \ptrl, \reg7, \abort
+	str1w \ptrw, \reg7, \abort
+	ldr1w \ptrl, \reg8, \abort
+	str1w \ptrw, \reg8, \abort
 	.endm
 
 #ifdef CONFIG_USE_LDRDSTRD_OVER_LDMSTM

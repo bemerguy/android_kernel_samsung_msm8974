@@ -33,8 +33,8 @@
 #include <linux/suspend.h>
 
 #define MAX_LONG_SIZE 24
-#define DEFAULT_RQ_POLL_JIFFIES 5
-#define DEFAULT_DEF_TIMER_JIFFIES 20
+#define DEFAULT_RQ_POLL_JIFFIES 6
+#define DEFAULT_DEF_TIMER_JIFFIES 60
 
 struct notifier_block freq_transition;
 struct notifier_block cpu_hotplug;

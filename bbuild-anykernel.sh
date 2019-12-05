@@ -81,7 +81,7 @@ fi
 
 # set environment
 export ARCH=$ARCHITECTURE
-export CROSS_COMPILE="${CCACHE} $TOOLCHAIN"
+export CROSS_COMPILE="ccache $TOOLCHAIN"
 
 
 #####################
