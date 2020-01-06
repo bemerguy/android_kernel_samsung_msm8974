@@ -36,7 +36,7 @@ ENTRY(__cpu_suspend)
 	add	r3, r3, lr, lsl #2
 #endif
 	bl	__cpu_suspend_save
-	adr	lr, BSYM(cpu_suspend_abort)
+	badr	lr, cpu_suspend_abort
 	ldmfd	sp!, {r0, pc}		@ call suspend fn
 ENDPROC(__cpu_suspend)
 	.ltorg

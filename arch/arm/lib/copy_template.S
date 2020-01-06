@@ -126,7 +126,7 @@
 .32cpy:		ldr8w	r1, r3, r4, r5, r6, r7, r8, ip, lr, abort = 20f
 		str8w	r0, r3, r4, r5, r6, r7, r8, ip, lr, abort = 20f
 #endif
-#else
+#else /* CONFIG_ARM_PLD_64BYTE */
 
 2:	PLD(	subs	r2, r2, #192		)
 	/* R2 is now -480 offset from the size passed in*/

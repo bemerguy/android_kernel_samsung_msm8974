@@ -28,7 +28,6 @@
 #include "governor.h"
 
 static struct class *devfreq_class;
-static struct kobject *gpufreq_kobj;
 
 /*
  * devfreq core provides delayed work based load monitoring helper
@@ -116,32 +115,35 @@ EXPORT_SYMBOL(devfreq_get_freq_level);
  */
 static int devfreq_update_status(struct devfreq *devfreq, unsigned long freq)
 {
-	int lev, prev_lev;
+	int lev, prev_lev, ret = 0;
 	unsigned long cur_time;
 
-	lev = devfreq_get_freq_level(devfreq, freq);
-	if (lev < 0)
-		return lev;
-
 	cur_time = jiffies;
-	devfreq->time_in_state[lev] +=
-			 cur_time - devfreq->last_stat_updated;
-	devfreq->last_stat_updated = cur_time;
-
-	if(freq == devfreq->previous_freq)
-		return 0;
 
 	prev_lev = devfreq_get_freq_level(devfreq, devfreq->previous_freq);
-	if(prev_lev < 0)
-		return 0;
+	if (prev_lev < 0) {
+		ret = prev_lev;
+		goto out;
+	}
 
-	if(lev != prev_lev) {
+	devfreq->time_in_state[prev_lev] +=
+			 cur_time - devfreq->last_stat_updated;
+
+	lev = devfreq_get_freq_level(devfreq, freq);
+	if (lev < 0) {
+		ret = lev;
+		goto out;
+	}
+
+	if (lev != prev_lev) {
 		devfreq->trans_table[(prev_lev *
 				devfreq->profile->max_state) + lev]++;
 		devfreq->total_trans++;
 	}
 
-	return 0;
+out:
+	devfreq->last_stat_updated = cur_time;
+	return ret;
 }
 
 /**
@@ -261,7 +263,7 @@ static void devfreq_monitor(struct work_struct *work)
  */
 void devfreq_monitor_start(struct devfreq *devfreq)
 {
-	INIT_DELAYED_WORK(&devfreq->work, devfreq_monitor);
+	INIT_DELAYED_WORK_DEFERRABLE(&devfreq->work, devfreq_monitor);
 	if (devfreq->profile->polling_ms)
 		queue_delayed_work(devfreq_wq, &devfreq->work,
 			msecs_to_jiffies(devfreq->profile->polling_ms));
@@ -302,6 +304,7 @@ void devfreq_monitor_suspend(struct devfreq *devfreq)
 		return;
 	}
 
+	devfreq_update_status(devfreq, devfreq->previous_freq);
 	devfreq->stop_polling = true;
 	mutex_unlock(&devfreq->lock);
 	cancel_delayed_work_sync(&devfreq->work);
@@ -318,6 +321,8 @@ EXPORT_SYMBOL(devfreq_monitor_suspend);
  */
 void devfreq_monitor_resume(struct devfreq *devfreq)
 {
+	unsigned long freq;
+
 	mutex_lock(&devfreq->lock);
 	if (!devfreq->stop_polling)
 		goto out;
@@ -326,7 +331,13 @@ void devfreq_monitor_resume(struct devfreq *devfreq)
 			devfreq->profile->polling_ms)
 		queue_delayed_work(devfreq_wq, &devfreq->work,
 			msecs_to_jiffies(devfreq->profile->polling_ms));
+
+	devfreq->last_stat_updated = jiffies;
 	devfreq->stop_polling = false;
+
+	if (devfreq->profile->get_cur_freq &&
+		!devfreq->profile->get_cur_freq(devfreq->dev.parent, &freq))
+		devfreq->previous_freq = freq;
 
 out:
 	mutex_unlock(&devfreq->lock);
@@ -347,7 +358,6 @@ void devfreq_interval_update(struct devfreq *devfreq, unsigned int *delay)
 	unsigned int new_delay = *delay;
 
 	mutex_lock(&devfreq->lock);
-	devfreq->profile->polling_ms = new_delay;
 
 	if (devfreq->stop_polling)
 		goto out;
@@ -407,7 +417,7 @@ static int devfreq_notifier_call(struct notifier_block *nb, unsigned long type,
  * @devfreq:	the devfreq struct
  * @skip:	skip calling device_unregister().
  */
-static void _remove_devfreq(struct devfreq *devfreq, bool skip)
+static void _remove_devfreq(struct devfreq *devfreq)
 {
 	mutex_lock(&devfreq_list_lock);
 	if (IS_ERR(find_device_devfreq(devfreq->dev.parent))) {
@@ -425,11 +435,6 @@ static void _remove_devfreq(struct devfreq *devfreq, bool skip)
 	if (devfreq->profile->exit)
 		devfreq->profile->exit(devfreq->dev.parent);
 
-	if (!skip && get_device(&devfreq->dev)) {
-		device_unregister(&devfreq->dev);
-		put_device(&devfreq->dev);
-	}
-
 	mutex_destroy(&devfreq->lock);
 	kfree(devfreq);
 }
@@ -439,14 +444,12 @@ static void _remove_devfreq(struct devfreq *devfreq, bool skip)
  * @dev:	the devfreq device
  *
  * This calls _remove_devfreq() if _remove_devfreq() is not called.
- * Note that devfreq_dev_release() could be called by _remove_devfreq() as
- * well as by others unregistering the device.
  */
 static void devfreq_dev_release(struct device *dev)
 {
 	struct devfreq *devfreq = to_devfreq(dev);
 
-	_remove_devfreq(devfreq, true);
+	_remove_devfreq(devfreq);
 }
 
 /**
@@ -532,9 +535,10 @@ struct devfreq *devfreq_add_device(struct device *dev,
 						devfreq->profile->max_state *
 						devfreq->profile->max_state,
 						GFP_KERNEL);
-	devfreq->time_in_state = devm_kzalloc(dev, sizeof(unsigned int) *
-						devfreq->profile->max_state,
-						GFP_KERNEL);
+	devfreq->time_in_state = devm_kzalloc(dev,
+					sizeof(*(devfreq->time_in_state)) *
+					devfreq->profile->max_state,
+					GFP_KERNEL);
 	devfreq->last_stat_updated = jiffies;
 	devfreq_set_freq_limits(devfreq);
 
@@ -549,10 +553,6 @@ struct devfreq *devfreq_add_device(struct device *dev,
 	mutex_unlock(&devfreq->lock);
 
 	mutex_lock(&devfreq_list_lock);
-	gpufreq_kobj = kobject_create_and_add("gpufreq", &devfreq->dev.kobj);
-	if (!gpufreq_kobj)
-		goto err_dev;
-
 	list_add(&devfreq->node, &devfreq_list);
 
 	governor = find_devfreq_governor(devfreq->governor_name);
@@ -589,7 +589,7 @@ int devfreq_remove_device(struct devfreq *devfreq)
 	if (!devfreq)
 		return -EINVAL;
 
-	_remove_devfreq(devfreq, false);
+	device_unregister(&devfreq->dev);
 
 	return 0;
 }
@@ -754,9 +754,9 @@ int devfreq_policy_add_files(struct devfreq *devfreq,
 {
 	int ret;
 
-	ret = sysfs_create_group(gpufreq_kobj, &attr_group);
+	ret = sysfs_create_group(&devfreq->dev.kobj, &attr_group);
 	if (ret)
-		kobject_put(gpufreq_kobj);
+		kobject_put(&devfreq->dev.kobj);
 
 	return ret;
 }
@@ -765,7 +765,7 @@ EXPORT_SYMBOL(devfreq_policy_add_files);
 void devfreq_policy_remove_files(struct devfreq *devfreq,
 				 struct attribute_group attr_group)
 {
-	sysfs_remove_group(gpufreq_kobj, &attr_group);
+	sysfs_remove_group(&devfreq->dev.kobj, &attr_group);;
 }
 EXPORT_SYMBOL(devfreq_policy_remove_files);
 
@@ -809,7 +809,7 @@ static ssize_t store_governor(struct device *dev, struct device_attribute *attr,
 	}
 	df->data = find_governor_data(df->profile, str_governor);
 	df->governor = governor;
-	strncpy(df->governor_name, governor->name, DEVFREQ_NAME_LEN);
+	memcpy(df->governor_name, governor->name, DEVFREQ_NAME_LEN);
 	ret = df->governor->event_handler(df, DEVFREQ_GOV_START, NULL);
 	if (ret)
 		dev_warn(dev, "%s: Governor %s not started(%d)\n",
@@ -883,6 +883,7 @@ static ssize_t store_polling_interval(struct device *dev,
 	if (ret != 1)
 		return -EINVAL;
 
+	df->profile->polling_ms = value;
 	df->governor->event_handler(df, DEVFREQ_GOV_INTERVAL, &value);
 	ret = count;
 
@@ -960,30 +961,14 @@ static ssize_t show_available_freqs(struct device *d,
 				    char *buf)
 {
 	struct devfreq *df = to_devfreq(d);
-	struct device *dev = df->dev.parent;
-	struct opp *opp;
-	ssize_t count = 0;
-	unsigned long freq = 0;
+	int index, num_chars = 0;
 
-	rcu_read_lock();
-	do {
-		opp = opp_find_freq_ceil(dev, &freq);
-		if (IS_ERR(opp))
-			break;
+	for (index = 0; index < df->profile->max_state; index++)
+		num_chars += snprintf(buf + num_chars, PAGE_SIZE, "%d ",
+		df->profile->freq_table[index]);
+	buf[num_chars++] = '\n';
 
-		count += scnprintf(&buf[count], (PAGE_SIZE - count - 2),
-				   "%lu ", freq);
-		freq++;
-	} while (1);
-	rcu_read_unlock();
-
-	/* Truncate the trailing space */
-	if (count)
-		count--;
-
-	count += sprintf(&buf[count], "\n");
-
-	return count;
+	return num_chars;
 }
 
 static ssize_t show_trans_table(struct device *dev, struct device_attribute *attr,
@@ -991,11 +976,11 @@ static ssize_t show_trans_table(struct device *dev, struct device_attribute *att
 {
 	struct devfreq *devfreq = to_devfreq(dev);
 	ssize_t len;
-	int i, j, err;
+	int i, j;
 	unsigned int max_state = devfreq->profile->max_state;
 
-	err = devfreq_update_status(devfreq, devfreq->previous_freq);
-	if (err)
+	if (!devfreq->stop_polling &&
+			devfreq_update_status(devfreq, devfreq->previous_freq))
 		return 0;
 
 	len = sprintf(buf, "   From  :   To\n");
@@ -1069,7 +1054,10 @@ static int __init devfreq_init(void)
 		return PTR_ERR(devfreq_class);
 	}
 
-	devfreq_wq = create_freezable_workqueue("devfreq_wq");
+	devfreq_wq =
+	    alloc_workqueue("devfreq_wq",
+			    WQ_HIGHPRI | WQ_UNBOUND | WQ_FREEZABLE |
+			    WQ_MEM_RECLAIM, 0);
 	if (IS_ERR(devfreq_wq)) {
 		class_destroy(devfreq_class);
 		pr_err("%s: couldn't create workqueue\n", __FILE__);

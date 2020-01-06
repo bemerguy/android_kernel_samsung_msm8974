@@ -34,6 +34,8 @@
 
 #define DRIVER_NAME "synaptics_rmi4_i2c"
 
+#define CONFIG_SAMSUNG_PRODUCT_SHIP 1
+
 #define SYNAPTICS_PM_GPIO_STATE_WAKE	0
 #define SYNAPTICS_PM_GPIO_STATE_SLEEP	1
 
@@ -1749,9 +1751,6 @@ static int synaptics_rmi4_f12_abs_report(struct synaptics_rmi4_data *rmi4_data,
 						"[%d][P] 0x%02x, x = %d, y = %d, wx = %d, wy = %d |[%d]\n",
 						finger, finger_status, x, y, wx, wy, fingers_to_process);
 #else
-				dev_info(&rmi4_data->i2c_client->dev,
-						"[%d][P] 0x%02x\n",
-						finger, finger_status);
 #endif
 			} else {
 				rmi4_data->finger[finger].mcount++;
@@ -1772,9 +1771,6 @@ static int synaptics_rmi4_f12_abs_report(struct synaptics_rmi4_data *rmi4_data,
 					finger, finger_status, rmi4_data->finger[finger].mcount,
 					rmi4_data->ic_revision_of_ic, rmi4_data->fw_version_of_ic, rmi4_data->lcd_id, system_rev);
 #else
-			dev_info(&rmi4_data->i2c_client->dev, "[%d][R] 0x%02x M[%d], Ver[%02X%02X][%X/%d]\n",
-					finger, finger_status, rmi4_data->finger[finger].mcount,
-					rmi4_data->ic_revision_of_ic, rmi4_data->fw_version_of_ic, rmi4_data->lcd_id, system_rev);
 #endif
 			rmi4_data->finger[finger].mcount = 0;
 		}

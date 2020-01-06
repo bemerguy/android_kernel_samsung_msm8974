@@ -1054,6 +1054,7 @@ static void default_options(struct f2fs_sb_info *sbi)
 	set_opt(sbi, EXTENT_CACHE);
 	set_opt(sbi, NOHEAP);
 	set_opt(sbi, FLUSH_MERGE);
+	set_opt(sbi, DISCARD);
 	if (f2fs_sb_mounted_blkzoned(sbi->sb)) {
 		set_opt_mode(sbi, F2FS_MOUNT_LFS);
 		set_opt(sbi, DISCARD);

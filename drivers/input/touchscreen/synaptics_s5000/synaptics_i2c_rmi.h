@@ -123,7 +123,7 @@
 #endif
 
 //#ifdef SEC_PRODUCT_SHIP
-//#define	CONFIG_SAMSUNG_PRODUCT_SHIP
+#define	CONFIG_SAMSUNG_PRODUCT_SHIP
 //#endif
 
 

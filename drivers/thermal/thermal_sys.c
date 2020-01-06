@@ -703,6 +703,7 @@ passive_show(struct device *dev, struct device_attribute *attr,
 }
 
 static DEVICE_ATTR(type, 0444, type_show, NULL);
+static DEVICE_ATTR(curr_temp, 0444, temp_show, NULL);
 static DEVICE_ATTR(temp, 0444, temp_show, NULL);
 static DEVICE_ATTR(mode, 0644, mode_show, mode_store);
 static DEVICE_ATTR(passive, S_IRUGO | S_IWUSR, passive_show, passive_store);
@@ -1635,6 +1636,10 @@ struct thermal_zone_device *thermal_zone_device_register(char *type,
 		if (result)
 			goto unregister;
 	}
+
+        result = device_create_file(&tz->device, &dev_attr_curr_temp);
+        if (result)
+                goto unregister;
 
 	result = device_create_file(&tz->device, &dev_attr_temp);
 	if (result)

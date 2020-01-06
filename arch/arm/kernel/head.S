@@ -86,7 +86,7 @@
 	__HEAD
 ENTRY(stext)
 
- THUMB(	adr	r9, BSYM(1f)	)	@ Kernel is always entered in ARM.
+ THUMB(	badr	r9, 1f		)	@ Kernel is always entered in ARM.
  THUMB(	bx	r9		)	@ If this is a Thumb-2 kernel,
  THUMB(	.thumb			)	@ switch to Thumb now.
  THUMB(1:			)
@@ -138,7 +138,7 @@ ENTRY(stext)
 	 */
 	ldr	r13, =__mmap_switched		@ address to jump to after
 						@ mmu has been enabled
-	adr	lr, BSYM(1f)			@ return (PIC) address
+	badr	lr, 1f				@ return (PIC) address
 	mov	r8, r4				@ set TTBR1 to swapper_pg_dir
  ARM(	add	pc, r10, #PROCINFO_INITFUNC	)
  THUMB(	add	r12, r10, #PROCINFO_INITFUNC	)
@@ -366,7 +366,7 @@ ENTRY(secondary_startup)
 	ldr	r4, [r7, lr]			@ get secondary_data.pgdir
 	add	r7, r7, #4
 	ldr	r8, [r7, lr]			@ get secondary_data.swapper_pg_dir
-	adr	lr, BSYM(__enable_mmu)		@ return address
+	badr	lr, __enable_mmu		@ return address
 	mov	r13, r12			@ __secondary_switched address
  ARM(	add	pc, r10, #PROCINFO_INITFUNC	) @ initialise processor
 						  @ (return control reg)

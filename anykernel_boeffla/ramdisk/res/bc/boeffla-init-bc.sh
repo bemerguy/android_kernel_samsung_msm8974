@@ -112,9 +112,9 @@
 
 # Apply Boeffla-Kernel default settings 2
 
-	# Sdcard buffer tweaks default to 512 kb
-	echo 32 > /sys/block/mmcblk0/bdi/read_ahead_kb
-	echo 32 > /sys/block/mmcblk1/bdi/read_ahead_kb
+	# Sdcard buffer tweaks default to 64 kb
+	echo 64 > /sys/block/mmcblk0/bdi/read_ahead_kb
+	echo 64 > /sys/block/mmcblk1/bdi/read_ahead_kb
 
 	echo $(date) Boeffla-Kernel default settings 2 applied >> $BOEFFLA_LOGFILE
 

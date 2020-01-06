@@ -939,10 +939,6 @@ static irqreturn_t cypress_touchkey_interrupt(int irq, void *dev_id)
 				back_data ? (back_press ? "back P " : "back R ") : "",
 				buf[0], info->ic_fw_ver, info->module_ver);
 #else
-		dev_info(&info->client->dev, "%s: key %s%s fw_ver: 0x%x, modue_ver: 0x%x\n", __func__,
-				menu_data ? (menu_press ? "P" : "R") : "",
-				back_data ? (back_press ? "P" : "R") : "",
-				info->ic_fw_ver, info->module_ver);
 #endif
 	} else {
 		press = !(buf[0] & PRESS_BIT_MASK);
@@ -953,9 +949,6 @@ static irqreturn_t cypress_touchkey_interrupt(int irq, void *dev_id)
 				"%s: code=%d %s. fw_ver=0x%x, module_ver=0x%x \n", __func__,
 				code, press ? "pressed" : "released", info->ic_fw_ver, info->module_ver);
 #else
-		dev_info(&info->client->dev,
-				"%s: %s. fw_ver=0x%x, module_ver=0x%x \n", __func__,
-				press ? "pressed" : "released", info->ic_fw_ver, info->module_ver);
 #endif
 		if (code < 0) {
 			dev_info(&info->client->dev,

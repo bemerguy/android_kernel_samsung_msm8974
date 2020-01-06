@@ -447,7 +447,7 @@ local_restart:
 	bne	__sys_trace
 
 	cmp	scno, #NR_syscalls		@ check upper syscall limit
-	adr	lr, BSYM(ret_fast_syscall)	@ return address
+	badr	lr, ret_fast_syscall		@ return address
 	ldrcc	pc, [tbl, scno, lsl #2]		@ call sys_* routine
 
 	add	r1, sp, #S_OFF
@@ -468,7 +468,7 @@ __sys_trace:
 	mov	r0, #0				@ trace entry [IP = 0]
 	bl	syscall_trace
 
-	adr	lr, BSYM(__sys_trace_return)	@ return address
+	badr	lr, __sys_trace_return		@ return address
 	mov	scno, r0			@ syscall number (possibly new)
 	add	r1, sp, #S_R0 + S_OFF		@ pointer to regs
 	cmp	scno, #NR_syscalls		@ check upper syscall limit

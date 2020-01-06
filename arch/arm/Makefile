@@ -21,6 +21,15 @@ GZFLAGS		:=-9
 # Explicitly specifiy 32-bit ARM ISA since toolchain default can be -mthumb:
 KBUILD_CFLAGS	+=$(call cc-option,-marm,)
 
+ifeq ($(cc-name),clang)
+# Clang options
+KBUILD_CPPFLAGS        += $(call cc-option,-target $(CROSS_COMPILE:-=),)
+KBUILD_CFLAGS   += $(call cc-option,-fno-builtin,)
+KBUILD_CFLAGS   += $(call cc-disable-warning,asm-operand-widths)
+KBUILD_CFLAGS   += $(call cc-option,-Xassembler,)
+KBUILD_CFLAGS   += $(call cc-option,-mno-warn-deprecated,)
+endif
+
 # Never generate .eh_frame
 KBUILD_CFLAGS	+= $(call cc-option,-fno-dwarf2-cfi-asm)
 
@@ -32,23 +41,6 @@ KBUILD_DEFCONFIG := versatile_defconfig
 ifeq ($(CONFIG_MMU),)
 MMUEXT		:= -nommu
 endif
-
-# Extended optimization set for ARM devices,
-# more precisely the Cortex-A15 with NEON support.
-#ifeq ($(CONFIG_FAST_LANE_ARM),y)
-#FAST_LANE_ARM_OPT := -mtune=cortex-a15 \
-#	-mcpu=cortex-a15 \
-#	-mfpu=neon-vfpv4 \
-#	-marm \
-#	-munaligned-access \
-#	-mvectorize-with-neon-quad
-#FAST_LANE_OPT_FLAGS := -g0 \
-#	-DNDEBUG \
-#	-ftree-vectorize \
-#	-funsafe-math-optimizations \
-#	$(FAST_LANE_ARM_OPT)
-#KBUILD_CFLAGS	+= $(FAST_LANE_OPT_FLAGS)
-#endif
 
 #ifeq ($(CONFIG_FRAME_POINTER),y)
 #KBUILD_CFLAGS	+=-fno-omit-frame-pointer -mapcs -mno-sched-prolog
@@ -104,7 +96,7 @@ arch-$(CONFIG_CPU_32v3)		:=-D__LINUX_ARM_ARCH__=3 -march=armv3
 # keep things simpler, we don't bother with a fallback option if the compiler
 # doesn't even support -march=armv7-a, since in that situation we would have
 # bigger problems.
-arch-$(CONFIG_ARCH_MSM_KRAIT)	:=-D__LINUX_ARM_ARCH__=7 -mcpu=cortex-a15 -mfpu=neon-vfpv4 -mvectorize-with-neon-quad
+arch-$(CONFIG_ARCH_MSM_KRAIT)	:=-D__LINUX_ARM_ARCH__=7 -mcpu=cortex-a15 -mfpu=neon-vfpv4
 arch-$(CONFIG_MSM_CORTEX_A7)	:=-D__LINUX_ARM_ARCH__=7 $(call cc-option,-mcpu=cortex-a15,-march=armv7-a)
 
 # This selects how we optimise for the processor.
@@ -150,9 +142,13 @@ CFLAGS_MODULE	+=-fno-optimize-sibling-calls
 endif
 endif
 
-# Need -Uarm for gcc < 3.x
-KBUILD_CFLAGS	+=$(CFLAGS_ABI) $(CFLAGS_THUMB2) $(arch-y) $(tune-y) $(call cc-option,-mshort-load-bytes,$(call cc-option,-malignment-traps,)) -Uarm
-KBUILD_AFLAGS	+=$(CFLAGS_ABI) $(AFLAGS_THUMB2) $(arch-y) $(tune-y) -include asm/unified.h
+ # Need -Uarm for gcc < 3.x
+ifeq ($(cc-name),clang)
+KBUILD_CFLAGS  +=$(CFLAGS_ABI) $(CFLAGS_THUMB2) $(arch-y) $(tune-y) -msoft-float
+else
+KBUILD_CFLAGS  +=$(CFLAGS_ABI) $(CFLAGS_THUMB2) $(arch-y) $(tune-y) $(call cc-option,-mshort-load-bytes,$(call cc-option,-malignment-traps,)) -mfloat-abi=soft -Uarm
+endif
+KBUILD_AFLAGS  +=$(CFLAGS_ABI) $(AFLAGS_THUMB2) $(arch-y) $(tune-y) -include asm/unified.h -mfloat-abi=soft
 
 CHECKFLAGS	+= -D__arm__
 

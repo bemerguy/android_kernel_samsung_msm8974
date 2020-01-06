@@ -285,6 +285,8 @@ unsigned long ra_submit(struct file_ra_state *ra,
  */
 static unsigned long get_init_ra_size(unsigned long size, unsigned long max)
 {
+//test
+#if 0
 	unsigned long newsize = roundup_pow_of_two(size);
 
 	if (newsize <= 1)
@@ -295,6 +297,9 @@ static unsigned long get_init_ra_size(unsigned long size, unsigned long max)
 		newsize = max;
 
 	return newsize;
+#else
+	return 4;
+#endif
 }
 
 /*
@@ -304,6 +309,9 @@ static unsigned long get_init_ra_size(unsigned long size, unsigned long max)
 static unsigned long get_next_ra_size(struct file_ra_state *ra,
 						unsigned long max)
 {
+#if 1
+	return 8;
+#else
 	unsigned long cur = ra->size;
 	unsigned long newsize;
 
@@ -313,6 +321,7 @@ static unsigned long get_next_ra_size(struct file_ra_state *ra,
 		newsize = cur << 1;
 
 	return min(newsize, max);
+#endif
 }
 
 /*
@@ -573,9 +582,12 @@ page_cache_async_readahead(struct address_space *mapping,
 	/*
 	 * Defer asynchronous read-ahead on IO congestion.
 	 */
-	if (bdi_read_congested(mapping->backing_dev_info))
+//test
+#if 0
+	if (bdi_read_congested(mapping->backing_dev_info)) {
 		return;
-
+	}
+#endif
 	/* do read-ahead */
 	ondemand_readahead(mapping, ra, filp, true, offset, req_size);
 }

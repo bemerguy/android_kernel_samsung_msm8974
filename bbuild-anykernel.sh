@@ -14,7 +14,10 @@ VAR="$2"
 BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-$VAR"
 
 #9.1
-TOOLCHAIN="/root/arm-eabi-gcc/bin/arm-eabi-"
+#TOOLCHAIN="/root/arm-eabi-gcc/bin/arm-eabi-"
+
+#9.2 musl
+TOOLCHAIN="/root/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf-"
 
 ARCHITECTURE=arm
 COMPILER_FLAGS_KERNEL="-Wno-maybe-uninitialized -Wno-array-bounds"

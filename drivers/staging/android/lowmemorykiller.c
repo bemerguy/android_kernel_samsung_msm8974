@@ -88,7 +88,6 @@ static int lowmem_shrink(void)
 	int other_free = global_page_state(NR_FREE_PAGES) - totalreserve_pages;
 	int other_file = global_page_state(NR_FILE_PAGES);
 
-        long cache_size, free;
 	static unsigned int expire=0, count=0;
 
 	if (lowmem_adj_size < array_size)
@@ -106,15 +105,13 @@ static int lowmem_shrink(void)
 	if (++expire > 20) { expire=0; count=0; }
 
 	if (min_score_adj == OOM_SCORE_ADJ_MAX + 1) {
-		lowmem_print(3, "min_score_adj = %d. We still have %u pages in cache\n",
-			min_score_adj, other_file);
+		lowmem_print(3, "min_score_adj = %d. We still have %ldKb that can be used\n",
+			min_score_adj, (other_file+other_free) * (long)(PAGE_SIZE / 1024));
 		return 0;
 	}
 	else {
-		free = other_free * (long)(PAGE_SIZE / 1024);
-		cache_size = other_file * (long)(PAGE_SIZE / 1024);
 		lowmem_print(1, "############### LOW MEMORY KILLER: %ldKb less than adj %d's minimum: %ldKb.\n",
-			cache_size+free, min_score_adj, minfree*(long)(PAGE_SIZE / 1024));
+			(other_file+other_free) * (long)(PAGE_SIZE / 1024), min_score_adj, minfree*(long)(PAGE_SIZE / 1024));
 	}
 	rcu_read_lock();
 
@@ -126,11 +123,6 @@ static int lowmem_shrink(void)
 
 		if (tsk->flags & PF_KTHREAD)
 			continue;
-
-#if 0
-		if (same_thread_group(tsk, current))
-			continue;
-#endif
 
                 p = find_lock_task_mm(tsk);
                 if (!p)

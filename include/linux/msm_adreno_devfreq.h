@@ -1,6 +1,7 @@
 #ifndef MSM_ADRENO_DEVFREQ_H
 #define MSM_ADRENO_DEVFREQ_H
 
+#include <linux/devfreq.h>
 #include <linux/notifier.h>
 
 #define ADRENO_DEVFREQ_NOTIFY_SUBMIT	1
@@ -14,7 +15,7 @@ int kgsl_devfreq_add_notifier(struct device *, struct notifier_block *);
 int kgsl_devfreq_del_notifier(struct device *, struct notifier_block *);
 
 /* same as KGSL_MAX_PWRLEVELS */
-#define MSM_ADRENO_MAX_PWRLEVELS 12
+#define MSM_ADRENO_MAX_PWRLEVELS 10
 
 struct xstats {
 	u64 ram_time;
@@ -42,6 +43,18 @@ struct devfreq_msm_adreno_tz_data {
 		uint64_t *ib;
 	} bus;
 	unsigned int device_id;
+};
+
+struct devfreq_conservative_data {
+	struct {
+		unsigned long total_time;
+		unsigned long busy_time;
+	} bin;
+};
+
+struct msm_adreno_extended_profile {
+	struct devfreq_msm_adreno_tz_data *private_data;
+	struct devfreq_dev_profile profile;
 };
 
 #endif

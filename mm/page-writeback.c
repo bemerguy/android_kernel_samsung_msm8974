@@ -40,9 +40,9 @@
 #include "internal.h"
 
 /*
- * Sleep at most 200ms at a time in balance_dirty_pages().
+ * Sleep at most 500ms at a time in balance_dirty_pages().
  */
-#define MAX_PAUSE		max(HZ/2, 1)
+#define MAX_PAUSE		HZ/2
 
 /*
  * Try to keep balance_dirty_pages() call intervals higher than this many pages
@@ -51,9 +51,9 @@
 #define DIRTY_POLL_THRESH	(128 >> (PAGE_SHIFT - 10))
 
 /*
- * Estimate write bandwidth at 200ms intervals.
+ * Estimate write bandwidth at 500ms intervals.
  */
-#define BANDWIDTH_INTERVAL	max(HZ/3, 1)
+#define BANDWIDTH_INTERVAL	HZ
 
 #define RATELIMIT_CALC_SHIFT	10
 
@@ -61,7 +61,7 @@
  * After a CPU has dirtied this many pages, balance_dirty_pages_ratelimited
  * will look to see if it needs to force writeback or throttling.
  */
-static long ratelimit_pages = 64;
+static long ratelimit_pages = 128;
 
 /* The following parameters are exported via /proc/sys/vm */
 
@@ -96,14 +96,14 @@ unsigned long vm_dirty_bytes = 8388608;
 /*
  * The interval between `kupdate'-style writebacks
  */
-unsigned int dirty_writeback_interval = 5 * 100; /* centiseconds */
+unsigned int dirty_writeback_interval = 0; /* centiseconds */
 
 EXPORT_SYMBOL_GPL(dirty_writeback_interval);
 
 /*
  * The longest time for which data is allowed to remain dirty
  */
-unsigned int dirty_expire_interval = 3 * 100; /* centiseconds */
+unsigned int dirty_expire_interval = 10 * 100; /* centiseconds */
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.
@@ -1602,12 +1602,14 @@ void laptop_sync_completion(void)
 
 void writeback_set_ratelimit(void)
 {
+#if 0
 	unsigned long background_thresh;
 	unsigned long dirty_thresh;
 	global_dirty_limits(&background_thresh, &dirty_thresh);
 	ratelimit_pages = dirty_thresh / (num_online_cpus() * 32);
 	if (ratelimit_pages < 16)
 		ratelimit_pages = 16;
+#endif
 }
 
 static int __cpuinit

@@ -65,6 +65,8 @@
 #define ADRENO_DEFAULT_PWRSCALE_POLICY  NULL
 #endif
 
+void adreno_debugfs_init(struct kgsl_device *device);
+
 #define ADRENO_ISTORE_START 0x5000 /* Istore offset */
 
 #define ADRENO_NUM_CTX_SWITCH_ALLOWED_BEFORE_DRAW	50
@@ -140,7 +142,7 @@ struct adreno_dispatcher {
 	struct kgsl_cmdbatch *cmdqueue[ADRENO_DISPATCH_CMDQUEUE_SIZE];
 	unsigned int head;
 	unsigned int tail;
-	struct work_struct work;
+	struct kthread_work work;
 	struct kobject kobj;
 };
 
@@ -959,5 +961,11 @@ static inline void adreno_set_protected_registers(struct kgsl_device *device,
 	kgsl_regwrite(device, A3XX_CP_PROTECT_REG_0 + *index, val);
 	*index = *index + 1;
 }
+
+#ifdef CONFIG_DEBUG_FS
+void adreno_debugfs_init(struct kgsl_device *device);
+#else
+static inline void adreno_debugfs_init(struct kgsl_device *device) { }
+#endif
 
 #endif /*__ADRENO_H */

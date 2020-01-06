@@ -65,7 +65,7 @@
 #endif
 
 #define SMARTDIM_MIN 20 	// 35% of max brightness
-#define SMARTDIM_PCC_MIN 6000	// minimum perceptible value of lowest brightness
+#define SMARTDIM_PCC_MIN 5000	// minimum perceptible value of lowest brightness
 #define PCC_MAX 32768
 
 #define MAX_FBI_LIST 32

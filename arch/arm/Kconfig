@@ -128,7 +128,7 @@ config STACKTRACE_SUPPORT
 config HAVE_LATENCYTOP_SUPPORT
 	bool
 	depends on !SMP
-	default y
+	default n
 
 config LOCKDEP_SUPPORT
 	bool
@@ -1757,7 +1757,7 @@ config THUMB2_KERNEL
 config THUMB2_AVOID_R_ARM_THM_JUMP11
 	bool "Work around buggy Thumb-2 short branch relocations in gas"
 	depends on THUMB2_KERNEL && MODULES
-	default y
+	default n
 	help
 	  Various binutils versions can resolve Thumb-2 branches to
 	  locally-defined, preemptible global symbols as short-range "b.n"

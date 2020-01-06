@@ -2774,7 +2774,7 @@ endmenu
 
 config SAMSUNG_PRODUCT_SHIP
 	bool "set up for product shipping"
-	default n
+	default y
 
 config SEC_LPDDR_6G
 	default n
@@ -4792,7 +4792,7 @@ config TIMA_RKP_30
        bool "Enable RKP TIMA 3.0 features"
        depends on (ARCH_MSM8974PRO || ARCH_MSM8226 || ARCH_MSM8926 || ARCH_MSM8926_LTE)
        depends on TIMA_RKP
-       default y
+       default n
        help
          RKP 3.0 features, enabled for msm8974pro only
 

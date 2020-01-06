@@ -61,20 +61,15 @@
 
 @ VFP hardware support entry point.
 @
-@  r0  = faulted instruction
-@  r2  = faulted PC+4
-@  r9  = successful returns
+@  r0  = instruction opcode (32-bit ARM or two 16-bit Thumb)
+@  r2  = PC value to resume execution after successful emulation
+@  r9  = normal "successful" return address
 @  r10 = vfp_state union
 @  r11 = CPU number
-@  lr  = failure return
-
+@  lr  = unrecognised instruction return address
+@  IRQs enabled.
 ENTRY(vfp_support_entry)
 	DBGSTR3	"instr %08x pc %08x state %p", r0, r2, r10
-
-    ldr	r3, [sp, #S_PSR]	@ Neither lazy restore nor FP exceptions
-	and	r3, r3, #MODE_MASK	@ are supported in kernel mode
-	teq	r3, #USR_MODE
-	bne	vfp_kmode_exception	@ Returns through lr
 
 	VFPFMRX	r1, FPEXC		@ Is the VFP enabled?
 	DBGSTR1	"fpexc %08x", r1

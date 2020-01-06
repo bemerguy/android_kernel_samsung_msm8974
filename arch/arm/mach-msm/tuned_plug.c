@@ -28,8 +28,8 @@ static struct delayed_work tunedplug_work;
 static unsigned int tunedplug_active __read_mostly = 1;
 module_param(tunedplug_active, uint, 0644);
 
-#define DEF_SAMPLING 10   *HZ/1000   	//10ms
-#define MAX_SAMPLING 1000 *HZ/1000	//1000ms
+#define DEF_SAMPLING	HZ/100 	//10ms
+#define MAX_SAMPLING	HZ/10	//1000ms
 
 /* frequency threshold to wake one more cpu */
 #define PMAX 1497600
@@ -159,7 +159,7 @@ static int __init tuned_plug_init(void)
 
 	sampling_time = DEF_SAMPLING;
 
-        queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, 50*HZ);
+        queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, 0);
 
 	initnotifier();
 

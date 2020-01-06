@@ -110,7 +110,7 @@ static void bdi_wakeup_flusher(struct backing_dev_info *bdi)
 static void bdi_queue_work(struct backing_dev_info *bdi,
 			   struct wb_writeback_work *work)
 {
-	trace_writeback_queue(bdi, work);
+	//trace_writeback_queue(bdi, work);
 
 	spin_lock_bh(&bdi->wb_lock);
 	list_add_tail(&work->list, &bdi->work_list);
@@ -133,7 +133,7 @@ __bdi_start_writeback(struct backing_dev_info *bdi, long nr_pages,
 	work = kzalloc(sizeof(*work), GFP_ATOMIC);
 	if (!work) {
 		if (bdi->wb.task) {
-			trace_writeback_nowork(bdi);
+			//trace_writeback_nowork(bdi);
 			wake_up_process(bdi->wb.task);
 		}
 		return;
@@ -626,7 +626,7 @@ static long writeback_sb_inodes(struct super_block *sb,
 		 * background threshold and other termination conditions.
 		 */
 		if (wrote) {
-			if (time_is_before_jiffies(start_time + HZ / 10UL))
+			if (time_is_before_jiffies(start_time + HZ / 5UL))
 				break;
 			if (work->nr_pages <= 0)
 				break;
@@ -779,14 +779,14 @@ static long wb_writeback(struct bdi_writeback *wb,
 		} else if (work->for_background)
 			oldest_jif = jiffies;
 
-		trace_writeback_start(wb->bdi, work);
+		//trace_writeback_start(wb->bdi, work);
 		if (list_empty(&wb->b_io))
 			queue_io(wb, work);
 		if (work->sb)
 			progress = writeback_sb_inodes(work->sb, wb, work);
 		else
 			progress = __writeback_inodes_wb(wb, work);
-		trace_writeback_written(wb->bdi, work);
+		//trace_writeback_written(wb->bdi, work);
 
 		wb_update_bandwidth(wb, wb_start);
 
@@ -811,7 +811,7 @@ static long wb_writeback(struct bdi_writeback *wb,
 		 * we'll just busyloop.
 		 */
 		if (!list_empty(&wb->b_more_io))  {
-			trace_writeback_wait(wb->bdi, work);
+			//trace_writeback_wait(wb->bdi, work);
 			inode = wb_inode(wb->b_more_io.prev);
 			spin_lock(&inode->i_lock);
 			inode_wait_for_writeback(inode, wb);
@@ -922,7 +922,7 @@ long wb_do_writeback(struct bdi_writeback *wb, int force_wait)
 		if (force_wait)
 			work->sync_mode = WB_SYNC_ALL;
 
-		trace_writeback_exec(bdi, work);
+		//trace_writeback_exec(bdi, work);
 
 		wrote += wb_writeback(wb, work);
 
@@ -965,7 +965,7 @@ int bdi_writeback_thread(void *data)
 	 */
 	set_user_nice(current, 0);
 
-	trace_writeback_thread_start(bdi);
+	//trace_writeback_thread_start(bdi);
 
 	while (!kthread_freezable_should_stop(NULL)) {
 		/*
@@ -976,7 +976,7 @@ int bdi_writeback_thread(void *data)
 
 		pages_written = wb_do_writeback(wb, 0);
 
-		trace_writeback_pages_written(pages_written);
+		//trace_writeback_pages_written(pages_written);
 
 		if (pages_written)
 			wb->last_active = jiffies;
@@ -1003,7 +1003,7 @@ int bdi_writeback_thread(void *data)
 	if (!list_empty(&bdi->work_list))
 		wb_do_writeback(wb, 1);
 
-	trace_writeback_thread_stop(bdi);
+	//trace_writeback_thread_stop(bdi);
 	return 0;
 }
 

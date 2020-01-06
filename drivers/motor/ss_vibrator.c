@@ -199,7 +199,6 @@ int vib_config_pwm_device(void)
 
 static void set_vibrator(struct ss_vib *vib)
 {
-	pr_info("[VIB]: %s, value[%d]\n", __func__, vib->state);
 	if (vib->state) {
 		if(vibrator_drvdata.is_pmic_vib_pwm){ //PMIC PWM
 			gpio_set_value(vibrator_drvdata.vib_pwm_gpio, \
@@ -226,7 +225,6 @@ static void set_vibrator(struct ss_vib *vib)
 					VIBRATION_ON);
 #endif
 		}
-		printk(KERN_DEBUG "[VIB] : %s\n", __func__);
 		if (vibrator_drvdata.power_onoff) {
 			if (!vibrator_drvdata.changed_chip)
 				vibrator_drvdata.power_onoff(1);
@@ -268,7 +266,6 @@ static void set_vibrator(struct ss_vib *vib)
 					VIBRATION_OFF);
 #endif
 		}
-		printk(KERN_DEBUG "[VIB] : %s\n", __func__);
 		if (vibrator_drvdata.power_onoff) {
 			if (!vibrator_drvdata.changed_chip)
 				vibrator_drvdata.power_onoff(0);
@@ -297,11 +294,8 @@ static void vibrator_enable(struct timed_output_dev *dev, int value)
 	hrtimer_cancel(&vib->vib_timer);
 
 	if (value == 0) {
-		pr_info("[VIB]: OFF\n");
 		vib->state = 0;
 	} else {
-		pr_info("[VIB]: ON, Duration : %d msec, intensity : %d\n",
-			value, vib->intensity);
 		vib->state = 1;
 		vib->timevalue = value;
 	}
@@ -342,8 +336,6 @@ static int ss_vibrator_suspend(struct device *dev)
 {
 	struct ss_vib *vib = dev_get_drvdata(dev);
 
-	pr_info("[VIB]: %s\n", __func__);
-
 	hrtimer_cancel(&vib->vib_timer);
 	cancel_work_sync(&vib->work);
 	/* turn-off vibrator */
@@ -367,8 +359,6 @@ static int ss_vibrator_suspend(struct device *dev)
 static int ss_vibrator_resume(struct device *dev)
 {
 	struct ss_vib *vib = dev_get_drvdata(dev);
-
-	pr_info("[VIB]: %s, intensity : %d\n", __func__, vib->intensity);
 
 #if defined(CONFIG_MOTOR_DRV_MAX77803)
 	max77803_vibtonz_en(1);
@@ -492,7 +482,6 @@ static void max77803_haptic_power_onoff(int onoff)
 			printk(KERN_ERR"enable l23 failed, rc=%d\n", ret);
 			return;
 		}
-		printk(KERN_DEBUG"haptic power_on is finished.\n");
 	} else {
 		if (regulator_is_enabled(reg_l23)) {
 			ret = regulator_disable(reg_l23);
@@ -502,7 +491,6 @@ static void max77803_haptic_power_onoff(int onoff)
 				return;
 			}
 		}
-		printk(KERN_DEBUG"haptic power_off is finished.\n");
 	}
 }
 #endif
@@ -551,7 +539,6 @@ static void max77803_haptic_power_onoff(int onoff)
 				return;
 			}
 		}
-		printk(KERN_DEBUG"haptic power_off is finished.\n");
 	}
 #else
 	static struct regulator *reg_l17;
@@ -573,7 +560,6 @@ static void max77803_haptic_power_onoff(int onoff)
 			printk(KERN_ERR"enable l17 failed, rc=%d\n", ret);
 			return;
 		}
-		printk(KERN_DEBUG"haptic power_on is finished.\n");
 	} else {
 		if (regulator_is_enabled(reg_l17)) {
 			ret = regulator_disable(reg_l17);
@@ -583,7 +569,6 @@ static void max77803_haptic_power_onoff(int onoff)
 				return;
 			}
 		}
-		printk(KERN_DEBUG"haptic power_off is finished.\n");
 	}
 #endif
 }

@@ -25,6 +25,21 @@
 
 #define IOMEM(x)	(x)
 
+ /*
+ * Assembly version of "adr rd, BSYM(sym)".  This should only be used to
+ * reference local symbols in the same assembly file which are to be
+ * resolved by the assembler.  Other usage is undefined.
+ */
+	.irp	c,,eq,ne,cs,cc,mi,pl,vs,vc,hi,ls,ge,lt,gt,le,hs,lo
+	.macro	badr\c, rd, sym
+#ifdef CONFIG_THUMB2_KERNEL
+	adr\c	\rd, \sym + 1
+#else
+	adr\c	\rd, \sym
+#endif
+	.endm
+	.endr
+
 /*
  * Endian independent macros for shifting bytes within registers.
  */
