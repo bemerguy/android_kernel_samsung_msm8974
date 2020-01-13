@@ -1,6 +1,8 @@
 #!/system/bin/sh
 sleep 2
-echo "524288000" > /sys/block/vnswap0/disksize
+sysctl -w vm.drop_caches=3
+sysctl -w vm.compact_memory=1
+echo "536870912" > /sys/block/vnswap0/disksize
 busybox mkswap /dev/block/vnswap0
 swapon /dev/block/vnswap0
 echo 0 > /sys/module/selinux/parameters/force_permissive

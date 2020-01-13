@@ -298,7 +298,7 @@ static unsigned long get_init_ra_size(unsigned long size, unsigned long max)
 
 	return newsize;
 #else
-	return 4;
+	return 64;
 #endif
 }
 
@@ -310,7 +310,7 @@ static unsigned long get_next_ra_size(struct file_ra_state *ra,
 						unsigned long max)
 {
 #if 1
-	return 8;
+	return 32;
 #else
 	unsigned long cur = ra->size;
 	unsigned long newsize;
@@ -583,8 +583,9 @@ page_cache_async_readahead(struct address_space *mapping,
 	 * Defer asynchronous read-ahead on IO congestion.
 	 */
 //test
-#if 0
+#if 1
 	if (bdi_read_congested(mapping->backing_dev_info)) {
+		printk("IO CONGESTION %s\n", filp->f_dentry->d_name.name);
 		return;
 	}
 #endif

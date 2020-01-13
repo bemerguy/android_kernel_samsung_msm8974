@@ -359,12 +359,6 @@ static void row_add_request(struct request_queue *q,
 		}
 		diff_ms = ktime_to_ms(ktime_sub(ktime_get(),
 				rqueue->idle_data.last_insert_time));
-		if (unlikely(diff_ms < 0)) {
-			pr_err("%s(): time delta error: diff_ms < 0",
-				__func__);
-			rqueue->idle_data.begin_idling = false;
-			return;
-		}
 		if (diff_ms > rd->rd_idle_data.freq_ms) {
 			rqueue->idle_data.begin_idling = true;
 			row_log_rowq(rd, rqueue->prio, "Enable idling");

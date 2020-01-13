@@ -53,7 +53,6 @@ int wireless_level = WIRELESS_CHARGE_LEVEL_DEFAULT;
 char charge_info_text[30] = "";
 int charge_level_nom = 0;		// default is no charger connected
 int charge_level_cur = 0;
-int charge_stock_logic = 1;		// default is stock charging logic
 #endif
 
 struct max77804k_charger_data {
@@ -1113,7 +1112,6 @@ static int sec_chg_set_property(struct power_supply *psy,
 		}
 
 #ifdef CONFIG_CHARGE_LEVEL
-			charge_stock_logic = 1;
 			charge_level_nom = 9999;	// virtual charge rate for stock logic as we do not know the rate
 
 			switch(charger->cable_type)
@@ -1127,7 +1125,6 @@ static int sec_chg_set_property(struct power_supply *psy,
 					sprintf(charge_info_text, "AC charger");
 					if (ac_level != 0)
 					{
-						charge_stock_logic = 0;
 						charge_level_nom = ac_level;
 						set_charging_current = ac_level;
 						set_charging_current_max = ac_level;
@@ -1143,7 +1140,6 @@ static int sec_chg_set_property(struct power_supply *psy,
 					sprintf(charge_info_text, "USB charger");
 					if (usb_level != 0)
 					{
-						charge_stock_logic = 0;
 						charge_level_nom = usb_level;
 						set_charging_current = usb_level;
 						set_charging_current_max = usb_level;
@@ -1154,7 +1150,6 @@ static int sec_chg_set_property(struct power_supply *psy,
 					sprintf(charge_info_text, "Wireless charger");
 					if (wireless_level != 0)
 					{
-						charge_stock_logic = 0;
 						charge_level_nom = wireless_level;
 						set_charging_current = wireless_level;
 						set_charging_current_max = wireless_level;
@@ -1166,7 +1161,7 @@ static int sec_chg_set_property(struct power_supply *psy,
 					break;
 			}
 
-			pr_info("Boeffla-Kernel: charge level type: %s, stock logic: %d, nominal mA: %d\n", charge_info_text, charge_stock_logic, charge_level_nom);
+			pr_info("Boeffla-Kernel: charge level type: %s, stock logic: %d, nominal mA: %d\n", charge_info_text, charge_level_nom);
 #endif
 
 		max77804k_set_charger_state(charger, charger->is_charging);
@@ -1207,10 +1202,6 @@ static int sec_chg_set_property(struct power_supply *psy,
 				val->intval);
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
-#ifdef CONFIG_CHARGE_LEVEL
-		if (charge_stock_logic == 0)
-			break;
-#endif
 		charger->siop_level = val->intval;
 		if (charger->is_charging) {
 			/* decrease the charging current according to siop level */
@@ -1218,8 +1209,7 @@ static int sec_chg_set_property(struct power_supply *psy,
 				charger->charging_current * val->intval / 100;
 
 			/* do forced set charging current */
-			if (current_now > 0 &&
-					current_now < usb_charging_current)
+			if (current_now > 0 && current_now < usb_charging_current)
 				current_now = usb_charging_current;
 
 			if (charger->cable_type == POWER_SUPPLY_TYPE_MAINS) {
@@ -1230,11 +1220,9 @@ static int sec_chg_set_property(struct power_supply *psy,
 						charger->charging_current_max;
 				}
 
-				if (charger->siop_level < 100 &&
-						current_now > SIOP_CHARGING_LIMIT_CURRENT)
+				if (charger->siop_level < 100 && current_now > SIOP_CHARGING_LIMIT_CURRENT)
 					current_now = SIOP_CHARGING_LIMIT_CURRENT;
-				max77804k_set_input_current(charger,
-					set_charging_current_max);
+				max77804k_set_input_current(charger, set_charging_current_max);
 			} else if (charger->cable_type == POWER_SUPPLY_TYPE_WIRELESS) {
 				if (charger->siop_level < 100 ) {
 					set_charging_current_max = SIOP_WIRELESS_INPUT_LIMIT_CURRENT;
@@ -1243,11 +1231,9 @@ static int sec_chg_set_property(struct power_supply *psy,
 						charger->charging_current_max;
 				}
 
-				if (charger->siop_level < 100 &&
-						current_now > SIOP_WIRELESS_CHARGING_LIMIT_CURRENT)
+				if (charger->siop_level < 100 && current_now > SIOP_WIRELESS_CHARGING_LIMIT_CURRENT)
 					current_now = SIOP_WIRELESS_CHARGING_LIMIT_CURRENT;
-				max77804k_set_input_current(charger,
-					set_charging_current_max);
+				max77804k_set_input_current(charger, set_charging_current_max);
 			}
 
 			max77804k_set_charge_current(charger, current_now);

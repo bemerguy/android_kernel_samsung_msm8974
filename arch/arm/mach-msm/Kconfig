@@ -4814,7 +4814,7 @@ config TIMA_RKP_L1_TABLES
 config TIMA_RKP_L2_TABLES
        bool
        depends on TIMA_RKP
-       default y
+       default n
        help
          TIMA taking over management L2 tables too.
 
@@ -4829,7 +4829,7 @@ config TIMA_RKP_L2_GROUP
 config TIMA_RKP_LAZY_MMU
 	bool
 	depends on TIMA_RKP_L2_TABLES
-	default y
+	default n
 	help
 	 TIMA lazy MMU for L2 pages
 

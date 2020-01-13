@@ -119,13 +119,6 @@ static ssize_t charge_info_show(struct kobject *kobj, struct kobj_attribute *att
 {
 
 	// print charge info
-	if (charge_stock_logic == 1)
-		if (charge_level_nom == 0)
-			return sprintf(buf, "No charger");
-		else
-			return sprintf(buf, "%s: %d (SL) mA", charge_info_text, charge_level_cur);
-	
-	else
 		if (charge_level_nom == 0)
 			return sprintf(buf, "No charger");
 		else

@@ -1183,9 +1183,7 @@ page_ok:
 #ifdef CONFIG_SCFS_LOWER_PAGECACHE_INVALIDATION
 			if (!(filp->f_flags & O_SCFSLOWER))
 				mark_page_accessed(page);
-		}
 #else
-#if 0
 			if (filp->f_dentry->d_name.len > 3) {
 				if (filp->f_dentry->d_name.name[filp->f_dentry->d_name.len-2] == 'd' &&
 				   filp->f_dentry->d_name.name[filp->f_dentry->d_name.len-1] == 'b') {
@@ -1195,7 +1193,6 @@ page_ok:
 			}
 #endif
 		}
-#endif
 		prev_index = index;
 
 		/*

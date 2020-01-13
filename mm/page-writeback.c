@@ -1241,6 +1241,7 @@ static void balance_dirty_pages(struct address_space *mapping,
 					global_page_state(NR_UNSTABLE_NFS);
 		nr_dirty = nr_reclaimable + global_page_state(NR_WRITEBACK);
 
+#if 0
 		global_dirty_limits(&background_thresh, &dirty_thresh);
 
 		/*
@@ -1257,9 +1258,10 @@ static void balance_dirty_pages(struct address_space *mapping,
 				dirty_poll_interval(nr_dirty, dirty_thresh);
 			break;
 		}
-
+#endif
 		if (unlikely(!writeback_in_progress(bdi)))
 			bdi_start_background_writeback(bdi);
+
 
 		/*
 		 * bdi_thresh is not treated as some limiting factor as
@@ -1300,17 +1302,19 @@ static void balance_dirty_pages(struct address_space *mapping,
 				  (nr_dirty > dirty_thresh);
 		if (dirty_exceeded && !bdi->dirty_exceeded)
 			bdi->dirty_exceeded = 1;
-
+#if 0
 		bdi_update_bandwidth(bdi, dirty_thresh, background_thresh,
 				     nr_dirty, bdi_thresh, bdi_dirty,
 				     start_time);
 
+#endif
 		dirty_ratelimit = bdi->dirty_ratelimit;
 		pos_ratio = bdi_position_ratio(bdi, dirty_thresh,
 					       background_thresh, nr_dirty,
 					       bdi_thresh, bdi_dirty);
 		task_ratelimit = ((u64)dirty_ratelimit * pos_ratio) >>
 							RATELIMIT_CALC_SHIFT;
+
 		max_pause = bdi_max_pause(bdi, bdi_dirty);
 		min_pause = bdi_min_pause(bdi, max_pause,
 					  task_ratelimit, dirty_ratelimit,
@@ -1321,6 +1325,7 @@ static void balance_dirty_pages(struct address_space *mapping,
 			pause = max_pause;
 			goto pause;
 		}
+
 		period = HZ * pages_dirtied / task_ratelimit;
 		pause = period;
 		if (current->dirty_paused_when)
@@ -1332,6 +1337,7 @@ static void balance_dirty_pages(struct address_space *mapping,
 		 * future periods by updating the virtual time; otherwise just
 		 * do a reset, as it may be a light dirtier.
 		 */
+
 		if (pause < min_pause) {
 			trace_balance_dirty_pages(bdi,
 						  dirty_thresh,
@@ -1360,7 +1366,6 @@ static void balance_dirty_pages(struct address_space *mapping,
 			now += min(pause - max_pause, max_pause);
 			pause = max_pause;
 		}
-
 pause:
 		trace_balance_dirty_pages(bdi,
 					  dirty_thresh,

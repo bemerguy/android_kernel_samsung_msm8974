@@ -19,14 +19,13 @@ extern int wireless_level;
 extern char charge_info_text[30];
 extern int charge_level_nom;
 extern int charge_level_cur;
-extern int charge_stock_logic;
 
 
-#define AC_CHARGE_LEVEL_DEFAULT 0	// stock charge logic is default
+#define AC_CHARGE_LEVEL_DEFAULT 2000	// stock charge logic is default
 #define AC_CHARGE_LEVEL_MIN 0
 #define AC_CHARGE_LEVEL_MAX 2200
 
-#define USB_CHARGE_LEVEL_DEFAULT 0	// stock charge logic is default
+#define USB_CHARGE_LEVEL_DEFAULT 2000	// stock charge logic is default
 #define USB_CHARGE_LEVEL_MIN 0
 #define USB_CHARGE_LEVEL_MAX 2000
 

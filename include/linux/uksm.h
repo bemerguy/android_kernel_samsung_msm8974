@@ -84,10 +84,6 @@ static inline void uksm_cow_pte(struct vm_area_struct *vma, pte_t pte)
 
 static inline int uksm_flags_can_scan(unsigned long vm_flags)
 {
-#ifdef VM_SAO
-		if (vm_flags & VM_SAO)
-			return 0;
-#endif
 
 	return !(vm_flags & (VM_PFNMAP | VM_IO  | VM_DONTEXPAND |
 			     VM_HUGETLB | VM_MIXEDMAP | VM_SHARED
