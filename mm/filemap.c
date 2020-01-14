@@ -34,7 +34,6 @@
 #include <linux/hardirq.h> /* for BUG_ON(!in_atomic()) only */
 #include <linux/memcontrol.h>
 #include <linux/cleancache.h>
-#include <linux/dcache.h>
 #include "internal.h"
 
 /*
@@ -1121,11 +1120,13 @@ find_page:
 			if (unlikely(page == NULL))
 				goto no_cached_page;
 		}
+#if 0
 		if (PageReadahead(page)) {
 			page_cache_async_readahead(mapping,
 					ra, filp, page,
 					index, last_index - index);
 		}
+#endif
 		if (!PageUptodate(page)) {
 			if (inode->i_blkbits == PAGE_CACHE_SHIFT ||
 					!mapping->a_ops->is_partially_uptodate)
@@ -1179,20 +1180,11 @@ page_ok:
 		 * When a sequential read accesses a page several times,
 		 * only mark it as accessed the first time.
 		 */
-		if (prev_index != index || offset != prev_offset) {
+		if (prev_index != index || offset != prev_offset)
 #ifdef CONFIG_SCFS_LOWER_PAGECACHE_INVALIDATION
 			if (!(filp->f_flags & O_SCFSLOWER))
-				mark_page_accessed(page);
-#else
-			if (filp->f_dentry->d_name.len > 3) {
-				if (filp->f_dentry->d_name.name[filp->f_dentry->d_name.len-2] == 'd' &&
-				   filp->f_dentry->d_name.name[filp->f_dentry->d_name.len-1] == 'b') {
-					//printk("Page accessed: %s\n", filp->f_dentry->d_name.name);
-					mark_page_accessed(page);
-				}
-			}
 #endif
-		}
+			mark_page_accessed(page);
 		prev_index = index;
 
 		/*
@@ -1591,7 +1583,7 @@ static int page_cache_read(struct file *file, pgoff_t offset)
 	return ret;
 }
 
-#define MMAP_LOTSAMISS  (50)
+#define MMAP_LOTSAMISS  (100)
 
 /*
  * Synchronous readahead happens when we don't even find

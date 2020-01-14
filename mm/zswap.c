@@ -808,15 +808,11 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
 	}
 #if 0
 	if ((dlen * 100 / PAGE_SIZE) > zswap_max_compression_ratio) {
-#else
-	if (dlen > 3072) {
-#endif
-
 		zswap_reject_compress_poor++;
 		ret = -E2BIG;
 		goto freepage;
 	}
-
+#endif
 	/* store */
 	handle = zs_malloc(tree->pool, dlen,
 		__GFP_NORETRY | __GFP_HIGHMEM | __GFP_NOMEMALLOC |

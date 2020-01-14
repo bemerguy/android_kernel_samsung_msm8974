@@ -53,7 +53,7 @@
 /*
  * Estimate write bandwidth at 500ms intervals.
  */
-#define BANDWIDTH_INTERVAL	HZ
+#define BANDWIDTH_INTERVAL	HZ/2
 
 #define RATELIMIT_CALC_SHIFT	10
 
@@ -1241,7 +1241,6 @@ static void balance_dirty_pages(struct address_space *mapping,
 					global_page_state(NR_UNSTABLE_NFS);
 		nr_dirty = nr_reclaimable + global_page_state(NR_WRITEBACK);
 
-#if 0
 		global_dirty_limits(&background_thresh, &dirty_thresh);
 
 		/*
@@ -1258,7 +1257,7 @@ static void balance_dirty_pages(struct address_space *mapping,
 				dirty_poll_interval(nr_dirty, dirty_thresh);
 			break;
 		}
-#endif
+
 		if (unlikely(!writeback_in_progress(bdi)))
 			bdi_start_background_writeback(bdi);
 
@@ -1302,12 +1301,11 @@ static void balance_dirty_pages(struct address_space *mapping,
 				  (nr_dirty > dirty_thresh);
 		if (dirty_exceeded && !bdi->dirty_exceeded)
 			bdi->dirty_exceeded = 1;
-#if 0
+
 		bdi_update_bandwidth(bdi, dirty_thresh, background_thresh,
 				     nr_dirty, bdi_thresh, bdi_dirty,
 				     start_time);
 
-#endif
 		dirty_ratelimit = bdi->dirty_ratelimit;
 		pos_ratio = bdi_position_ratio(bdi, dirty_thresh,
 					       background_thresh, nr_dirty,
@@ -1607,14 +1605,12 @@ void laptop_sync_completion(void)
 
 void writeback_set_ratelimit(void)
 {
-#if 0
 	unsigned long background_thresh;
 	unsigned long dirty_thresh;
 	global_dirty_limits(&background_thresh, &dirty_thresh);
 	ratelimit_pages = dirty_thresh / (num_online_cpus() * 32);
 	if (ratelimit_pages < 16)
 		ratelimit_pages = 16;
-#endif
 }
 
 static int __cpuinit
