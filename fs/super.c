@@ -76,6 +76,7 @@ static int prune_super(struct shrinker *shrink, struct shrink_control *sc)
 
 	total_objects = sb->s_nr_dentry_unused +
 			sb->s_nr_inodes_unused + fs_objects + 1;
+
 	if (!total_objects)
 		total_objects = 1;
 
@@ -104,10 +105,12 @@ static int prune_super(struct shrinker *shrink, struct shrink_control *sc)
 		}
 		total_objects = sb->s_nr_dentry_unused +
 				sb->s_nr_inodes_unused + fs_objects;
+		printk("%s nr: %d, total objects: %d\n", __FUNCTION__, sc->nr_to_scan, total_objects);
 	}
 
 	total_objects = (total_objects / 100) * sysctl_vfs_cache_pressure;
 	drop_super(sb);
+
 	return total_objects;
 }
 

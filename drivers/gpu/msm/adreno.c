@@ -82,7 +82,7 @@ static void adreno_input_work(struct work_struct *work);
 
 static struct devfreq_msm_adreno_tz_data adreno_tz_data = {
 	.bus = {
-		.max = 450,
+		.max = 350,
 	},
 	.device_id = KGSL_DEVICE_3D0,
 };
@@ -134,8 +134,10 @@ static struct adreno_device device_3d0 = {
 	.ft_pf_policy = KGSL_FT_PAGEFAULT_DEFAULT_POLICY,
 	.fast_hang_detect = 1,
 	.long_ib_detect = 1,
+#if 0
 	.input_work = __WORK_INITIALIZER(device_3d0.input_work,
 		adreno_input_work),
+#endif
 };
 
 unsigned int ft_detect_regs[FT_DETECT_REGS_COUNT];
@@ -1739,13 +1741,13 @@ static int adreno_of_get_pdata(struct platform_device *pdev)
 	if (of_property_read_u32(pdev->dev.of_node,
 		"qcom,pm-qos-active-latency",
 		&pdata->pm_qos_active_latency))
-		pdata->pm_qos_active_latency = 501;
+		pdata->pm_qos_active_latency = 1000;
 
 	/* get pm-qos-wakeup-latency, set it to default if not found */
 	if (of_property_read_u32(pdev->dev.of_node,
 		"qcom,pm-qos-wakeup-latency",
 		&pdata->pm_qos_wakeup_latency))
-		pdata->pm_qos_wakeup_latency = 490;
+		pdata->pm_qos_wakeup_latency = 100;
 
 	if (adreno_of_read_property(pdev->dev.of_node, "qcom,idle-timeout",
 		&pdata->idle_timeout))
@@ -2092,10 +2094,10 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 		 */
 		adreno_dev->gpudev->soft_reset(adreno_dev);
 	}
-#if 0
+
 	/* Restore performance counter registers with saved values */
 	adreno_perfcounter_restore(adreno_dev);
-#endif
+
 	/* Start the GPU */
 	adreno_dev->gpudev->start(adreno_dev);
 
@@ -2105,11 +2107,9 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 	status = adreno_ringbuffer_cold_start(&adreno_dev->ringbuffer);
 	if (status)
 		goto error_irq_off;
-#if 0
 	status = adreno_perfcounter_start(adreno_dev);
 	if (status)
 		goto error_rb_stop;
-#endif
 
 	/* Start the dispatcher */
 	adreno_dispatcher_start(device);

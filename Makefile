@@ -365,11 +365,11 @@ OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision
                 --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
                 --param=max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
-                --param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=inline-min-speedup=10 --param=max-pending-list-length=320 \
-                -fschedule-fusion -ftree-lrs
+                --param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=max-pending-list-length=320 \
+                -fschedule-fusion -ftree-lrs -fno-inline-functions
 
-# -fmerge-all-constants
 
+#--param=inline-min-speedup=9
 #-floop-nest-optimize -fgraphite -fgraphite-identity
 
 #to get code smaller: -fno-unroll-loops -fno-inline-functions -fno-unswitch-loops -fno-prefetch-loop-arrays

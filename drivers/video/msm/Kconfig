@@ -36,7 +36,7 @@ config FB_MSM_LCDC_HW
 
 config FB_MSM_TRIPLE_BUFFER
 	bool "Support for triple frame buffer"
-	default y
+	default n
 
 config FB_MSM_MDP_HW
 	bool

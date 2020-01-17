@@ -1,5 +1,5 @@
 #!/system/bin/sh
-sleep 2
+sleep 30
 sysctl -w vm.drop_caches=3
 sysctl -w vm.compact_memory=1
 echo "536870912" > /sys/block/vnswap0/disksize
