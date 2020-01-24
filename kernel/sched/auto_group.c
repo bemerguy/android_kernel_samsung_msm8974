@@ -1,4 +1,5 @@
 #ifdef CONFIG_SCHED_AUTOGROUP
+#define DEBUG 1
 
 #include "sched.h"
 

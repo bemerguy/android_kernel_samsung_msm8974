@@ -20,7 +20,7 @@ if FB_MSM
 
 config FB_MSM_BACKLIGHT
 	bool "Support for backlight control"
-	default n
+	default y
 	---help---
 	  Say Y here if you want to control the backlight of your display.
 

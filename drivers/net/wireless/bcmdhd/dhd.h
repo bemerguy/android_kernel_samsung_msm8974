@@ -111,7 +111,7 @@ enum dhd_op_flags {
 #define POWERUP_MAX_RETRY	3 /* how many times we retry to power up the chip */
 #endif
 #ifndef POWERUP_WAIT_MS
-#define POWERUP_WAIT_MS		1000 /* ms: time out in waiting wifi to come up */
+#define POWERUP_WAIT_MS		2000 /* ms: time out in waiting wifi to come up */
 #endif
 
 enum dhd_bus_wake_state {
@@ -410,7 +410,7 @@ typedef struct dhd_pub {
 				wait_event_interruptible_timeout(a, !dhd_mmc_suspend, 1); \
 			} \
 		} 	while (0)
-	#define DHD_PM_RESUME_WAIT(a) 		_DHD_PM_RESUME_WAIT(a, 2000)
+	#define DHD_PM_RESUME_WAIT(a) 		_DHD_PM_RESUME_WAIT(a, 200)
 	#define DHD_PM_RESUME_WAIT_FOREVER(a) 	_DHD_PM_RESUME_WAIT(a, ~0)
 	#ifdef CUSTOMER_HW4
 		#define DHD_PM_RESUME_RETURN_ERROR(a)   do { \
@@ -566,8 +566,8 @@ inline static void MUTEX_UNLOCK_SOFTAP_SET(dhd_pub_t * dhdp)
 
 #define DHD_OS_WD_WAKE_LOCK(pub)		dhd_os_wd_wake_lock(pub)
 #define DHD_OS_WD_WAKE_UNLOCK(pub)		dhd_os_wd_wake_unlock(pub)
-#define DHD_PACKET_TIMEOUT_MS	300
-#define DHD_EVENT_TIMEOUT_MS	500
+#define DHD_PACKET_TIMEOUT_MS	500
+#define DHD_EVENT_TIMEOUT_MS	1500
 
 
 /* interface operations (register, remove) should be atomic, use this lock to prevent race
@@ -854,7 +854,7 @@ extern uint dhd_force_tx_queueing;
 #ifndef CUSTOM_GLOM_SETTING
 #define CUSTOM_GLOM_SETTING 	DEFAULT_GLOM_VALUE
 #endif
-#define WL_AUTO_ROAM_TRIGGER -65
+#define WL_AUTO_ROAM_TRIGGER -75
 /* hooks for custom Roaming Trigger  setting via Makefile */
 #define DEFAULT_ROAM_TRIGGER_VALUE -65 /* dBm default roam trigger all band */
 #define DEFAULT_ROAM_TRIGGER_SETTING 	-1
@@ -863,7 +863,7 @@ extern uint dhd_force_tx_queueing;
 #endif
 
 /* hooks for custom Roaming Romaing  setting via Makefile */
-#define DEFAULT_ROAM_DELTA_VALUE  5 /* dBm default roam delta all band */
+#define DEFAULT_ROAM_DELTA_VALUE  10 /* dBm default roam delta all band */
 #define DEFAULT_ROAM_DELTA_SETTING 	-1
 #ifndef CUSTOM_ROAM_DELTA_SETTING
 #define CUSTOM_ROAM_DELTA_SETTING 	DEFAULT_ROAM_DELTA_VALUE

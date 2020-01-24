@@ -1501,7 +1501,7 @@ shrink_inactive_list(unsigned long nr_to_scan, struct mem_cgroup_zone *mz,
 	 */
 	if (nr_writeback && nr_writeback >=
 			(nr_taken >> (DEF_PRIORITY - sc->priority)))
-		wait_iff_congested(zone, BLK_RW_ASYNC, HZ/8);
+		wait_iff_congested(zone, BLK_RW_ASYNC, HZ/11);
 
 #ifdef CONFIG_RUNTIME_COMPCACHE
 	if (!file) {
@@ -2493,7 +2493,7 @@ static unsigned long do_try_to_free_pages(struct zonelist *zonelist,
 			first_zones_zonelist(zonelist, gfp_zone(sc->gfp_mask),
 						&cpuset_current_mems_allowed,
 						&preferred_zone);
-			wait_iff_congested(preferred_zone, BLK_RW_ASYNC, HZ/8);
+			wait_iff_congested(preferred_zone, BLK_RW_ASYNC, HZ/11);
 		}
 	} while (--sc->priority >= 0);
 

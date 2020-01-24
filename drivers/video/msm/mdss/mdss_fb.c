@@ -64,6 +64,8 @@
 #define MDSS_FB_NUM 2
 #endif
 
+int backlight_min = 0;
+module_param(backlight_min, int, 0644);
 #define SMARTDIM_MIN 20 	// 35% of max brightness
 #define SMARTDIM_PCC_MIN 5000	// minimum perceptible value of lowest brightness
 #define PCC_MAX 32768
@@ -289,6 +291,10 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 
 	if (value > mfd->panel_info->brightness_max)
 		value = mfd->panel_info->brightness_max;
+
+        // Boeffla: apply min limits for LCD backlight (0 is exception for display off)
+        if (value != 0 && value < backlight_min)
+                value = backlight_min;
 
 	bl_to_pcc(value);
 

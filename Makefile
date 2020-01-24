@@ -316,7 +316,7 @@ ifneq ($(filter s% -s%,$(MAKEFLAGS)),)
   quiet=silent_
 endif
 
-export quiet Q KBUILD_VERBOSE
+#export quiet Q KBUILD_VERBOSE
 
 
 # Look for make include files relative to root of kernel src
@@ -358,9 +358,9 @@ CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 
-OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap \
+OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=unlimited \
                 -fgcse-sm -fgcse-las -fipa-pta -ftree-lrs \
-                -fschedule-fusion -freorder-blocks-algorithm=simple -fira-loop-pressure \
+                -fschedule-fusion -freorder-blocks-algorithm=stc -fira-loop-pressure \
                 -ftracer -funroll-loops \
                 --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \

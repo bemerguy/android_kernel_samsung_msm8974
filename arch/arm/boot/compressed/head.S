@@ -385,7 +385,6 @@ dtb_check_done:
 		add	sp, sp, r6
 #endif
 
-		bl	cache_clean_flush
 		tst	r4, #1
 		bleq	cache_clean_flush
 

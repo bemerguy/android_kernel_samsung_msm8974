@@ -3411,7 +3411,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		set_opt(sb, ERRORS_RO);
 	if (def_mount_opts & EXT4_DEFM_BLOCK_VALIDITY)
 		set_opt(sb, BLOCK_VALIDITY);
-	if (def_mount_opts & EXT4_DEFM_DISCARD)
+//	if (def_mount_opts & EXT4_DEFM_DISCARD)
 		set_opt(sb, DISCARD);
 
 	sbi->s_resuid = le16_to_cpu(es->s_def_resuid);
@@ -3421,7 +3421,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	sbi->s_max_batch_time = EXT4_DEF_MAX_BATCH_TIME;
 
 	if ((def_mount_opts & EXT4_DEFM_NOBARRIER) == 0)
-		set_opt(sb, BARRIER);
+//		set_opt(sb, BARRIER);
 
 	/*
 	 * enable delayed allocation by default

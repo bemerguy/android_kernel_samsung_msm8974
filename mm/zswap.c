@@ -79,11 +79,6 @@ module_param_named(enabled, zswap_enabled, bool, 0);
 static char *zswap_compressor = ZSWAP_COMPRESSOR_DEFAULT;
 module_param_named(compressor, zswap_compressor, charp, 0);
 
-/* The maximum percentage of memory that the compressed pool can occupy */
-static unsigned int zswap_max_pool_percent = 100;
-module_param_named(max_pool_percent,
-			zswap_max_pool_percent, uint, 0644);
-
 /*
  * Maximum compression ratio, as as percentage, for an acceptable
  * compressed page. Any pages that do not compress by at least
@@ -179,7 +174,7 @@ static void zswap_comp_exit(void)
  *            be held while changing the refcount.  Since the lock must
  *            be held, there is no reason to also make refcount atomic.
  * type - the swap type for the entry.  Used to map back to the zswap_tree
- *        structure that contains the entry.
+  *        structure that contains the entry.
  * offset - the swap offset for the entry.  Index into the red-black tree.
  * handle - zsmalloc allocation handle that stores the compressed page data
  * length - the length in bytes of the compressed page data.  Needed during
@@ -383,11 +378,6 @@ cleanup:
 * zsmalloc callbacks
 **********************************/
 static mempool_t *zswap_page_pool;
-
-static inline unsigned int zswap_max_pool_pages(void)
-{
-	return zswap_max_pool_percent * totalram_pages / 100;
-}
 
 static inline int zswap_page_pool_create(void)
 {

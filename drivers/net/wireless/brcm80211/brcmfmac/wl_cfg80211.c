@@ -593,7 +593,7 @@ static s32 brcmf_do_iscan(struct brcmf_cfg80211_priv *cfg_priv)
 		cfg_priv->iscan_kickstart = false;
 		return err;
 	}
-	mod_timer(&iscan->timer, jiffies + iscan->timer_ms * HZ / 1000);
+	mod_timer(&iscan->timer, jiffies + msecs_to_jiffies(iscan->timer_ms));
 	iscan->timer_on = 1;
 	return err;
 }
@@ -2366,7 +2366,7 @@ static s32 brcmf_iscan_pending(struct brcmf_cfg80211_priv *cfg_priv)
 	s32 err = 0;
 
 	/* Reschedule the timer */
-	mod_timer(&iscan->timer, jiffies + iscan->timer_ms * HZ / 1000);
+	mod_timer(&iscan->timer, jiffies + msecs_to_jiffies(iscan->timer_ms));
 	iscan->timer_on = 1;
 
 	return err;
@@ -2380,7 +2380,7 @@ static s32 brcmf_iscan_inprogress(struct brcmf_cfg80211_priv *cfg_priv)
 	brcmf_inform_bss(cfg_priv);
 	brcmf_run_iscan(iscan, NULL, BRCMF_SCAN_ACTION_CONTINUE);
 	/* Reschedule the timer */
-	mod_timer(&iscan->timer, jiffies + iscan->timer_ms * HZ / 1000);
+	mod_timer(&iscan->timer, jiffies + msecs_to_jiffies(iscan->timer_ms));
 	iscan->timer_on = 1;
 
 	return err;
