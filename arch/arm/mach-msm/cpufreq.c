@@ -651,11 +651,12 @@ static int cpufreq_parse_dt(struct device *dev)
 
 		freq_table[i].index = i;
 		freq_table[i].frequency = f;
+		printk("Tuned adding freq_table %d (%d)\n", f, i);
 
 		if (l2_clk) {
 			f = clk_round_rate(l2_clk, data[j++] * 1000);
 			if (IS_ERR_VALUE(f)) {
-				pr_err("Error finding L2 rate for CPU %d KHz\n",
+				printk("Tuned Error finding L2 rate for CPU %d KHz\n",
 					freq_table[i].frequency);
 				freq_table[i].frequency = CPUFREQ_ENTRY_INVALID;
 			} else {
@@ -666,7 +667,6 @@ static int cpufreq_parse_dt(struct device *dev)
 
 		mem_bw[i] = data[j++];
 	}
-
 	freq_table[i].index = i;
 	freq_table[i].frequency = CPUFREQ_TABLE_END;
 
@@ -679,8 +679,10 @@ static int cpufreq_parse_dt(struct device *dev)
 	if (!dts_freq_table)
 		return -ENOMEM;
 
-	for (i = 0, j = 0; i < nf; i++, j += 3)
+	for (i = 0, j = 0; i < nf; i++, j += 3) {
 		dts_freq_table[i].frequency = data[j];
+		printk("Tuned adding dts_freq_table %d\n", data[j]);
+	}
 	dts_freq_table[i].frequency = CPUFREQ_TABLE_END;
 #endif
 

@@ -18,7 +18,7 @@
 #include <linux/hrtimer.h>
 
 #define CONFIG_SUSPEND_HELPER //etinum.test
-#define SUSPEND_WAKEUP_BOOST
+//#define SUSPEND_WAKEUP_BOOST
 
 #ifdef SUSPEND_WAKEUP_BOOST
 #include <linux/sched.h>
@@ -84,7 +84,7 @@ static ssize_t pm_async_store(struct kobject *kobj, struct kobj_attribute *attr,
 {
 	unsigned long val;
 
-	if (kstrtoul(buf, 10, &val))
+	if (strict_strtoul(buf, 10, &val))
 		return -EINVAL;
 
 	if (val > 1)
@@ -314,7 +314,11 @@ static ssize_t state_show(struct kobject *kobj, struct kobj_attribute *attr,
 static suspend_state_t decode_state(const char *buf, size_t n)
 {
 #ifdef CONFIG_SUSPEND
-	suspend_state_t state = PM_SUSPEND_MIN;
+#ifdef CONFIG_EARLYSUSPEND
+	suspend_state_t state = PM_SUSPEND_ON;
+#else
+	suspend_state_t state = PM_SUSPEND_STANDBY;
+#endif
 	const char * const *s;
 #endif
 	char *p;

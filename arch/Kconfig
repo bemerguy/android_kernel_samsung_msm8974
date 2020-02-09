@@ -302,7 +302,7 @@ config HAVE_ARCH_SECCOMP_FILTER
 	  - seccomp syscall wired up
 
 config SECCOMP_FILTER
-	def_bool y
+	def_bool n
 	depends on HAVE_ARCH_SECCOMP_FILTER && SECCOMP && NET
 	help
 	  Enable tasks to build secure computing environments defined

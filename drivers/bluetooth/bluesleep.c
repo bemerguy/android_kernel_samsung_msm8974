@@ -108,8 +108,8 @@ DECLARE_DELAYED_WORK(uart_awake_workqueue, bluesleep_uart_awake_work);
 #define bluesleep_tx_idle()     schedule_delayed_work(&sleep_workqueue, 0)
 #define bluesleep_uart_work()     schedule_delayed_work(&uart_awake_workqueue, 0)
 
-/* 5 second timeout */
-#define TX_TIMER_INTERVAL  5
+/* 3 second timeout */
+#define TX_TIMER_INTERVAL  3
 
 /* state variable names and bit positions */
 #define BT_PROTO	 0x01
@@ -220,8 +220,7 @@ static void hsuart_power(int on)
 int bluesleep_can_sleep(void)
 {
 	/* check if WAKE_BT_GPIO and BT_WAKE_GPIO are both deasserted */
-        return ((gpio_get_value(bsi->host_wake) != bsi->irq_polarity) &&
-                (test_bit(BT_EXT_WAKE, &flags)) &&
+	return (!gpio_get_value(bsi->host_wake) &&
 		(bsi->uport != NULL));
 }
 
@@ -234,9 +233,9 @@ void bluesleep_sleep_wakeup(void)
 		wake_lock(&bsi->wake_lock);
 		/* Start the timer */
 		mod_timer(&tx_timer,
-		          jiffies + (HZ * TX_TIMER_INTERVAL));
+		          jiffies + msecs_to_jiffies(TX_TIMER_INTERVAL * 1000));
 		if (bsi->has_ext_wake == 1) {
-			gpio_set_value(bsi->ext_wake, 0);
+			gpio_set_value(bsi->ext_wake, 1);
 		}
 		set_bit(BT_EXT_WAKE, &flags);
 		clear_bit(BT_ASLEEP, &flags);
@@ -244,7 +243,7 @@ void bluesleep_sleep_wakeup(void)
 	else {
 		BT_DBG("bluesleep_sleep_wakeup : already wake up, so start timer...");
 		mod_timer(&tx_timer,
-		          jiffies + (HZ * TX_TIMER_INTERVAL));
+		          jiffies + msecs_to_jiffies(TX_TIMER_INTERVAL * 1000));
 	}
 }
 
@@ -256,17 +255,17 @@ static void bluesleep_tx_data_wakeup(void)
 		wake_lock(&bsi->wake_lock);
 		/* Start the timer */
 		mod_timer(&tx_timer,
-		          jiffies + (HZ * TX_TIMER_INTERVAL));
+		          jiffies + msecs_to_jiffies(TX_TIMER_INTERVAL * 1000));
 		if (bsi->has_ext_wake == 1) {
-			gpio_set_value(bsi->ext_wake, 0);
+			gpio_set_value(bsi->ext_wake, 1);
 		}
-		clear_bit(BT_EXT_WAKE, &flags);
+		set_bit(BT_EXT_WAKE, &flags);
 		clear_bit(BT_ASLEEP, &flags);
 	}
 	else {
 		BT_DBG("bluesleep_tx_data_wakeup : already wake up, so start timer...");
 		mod_timer(&tx_timer,
-		          jiffies + (HZ * TX_TIMER_INTERVAL));
+		          jiffies + msecs_to_jiffies(TX_TIMER_INTERVAL * 1000));
 	}
 }
 
@@ -312,7 +311,7 @@ static void bluesleep_sleep_work(struct work_struct *work)
 				BT_DBG("TXDATA remained. Wait until timer expires.");
 
 				mod_timer(&tx_timer,
-				          jiffies + (HZ * TX_TIMER_INTERVAL));
+				          jiffies + msecs_to_jiffies(TX_TIMER_INTERVAL * 1000));
 				mutex_unlock(&bluesleep_mutex);
 				return;
 			}
@@ -332,24 +331,24 @@ static void bluesleep_sleep_work(struct work_struct *work)
 			/* UART clk is not turned off immediately. Release
 			* wakelock after 500 ms.
 			*/
-			wake_lock_timeout(&bsi->wake_lock, HZ / 2);
+			wake_lock_timeout(&bsi->wake_lock, msecs_to_jiffies(500));
 			} else {
 			BT_DBG("host can enter sleep but some tx remained.");
 
 			mod_timer(&tx_timer,
-			          jiffies + (HZ * TX_TIMER_INTERVAL));
+			          jiffies + msecs_to_jiffies(TX_TIMER_INTERVAL * 1000));
 			mutex_unlock(&bluesleep_mutex);
 			return;
 		}
-	} else if (test_bit(BT_EXT_WAKE, &flags)
+	} else if (!test_bit(BT_EXT_WAKE, &flags)
 			&& !test_bit(BT_ASLEEP, &flags)) {
 		BT_DBG("host_wake high and BT_EXT_WAKE & BT_ASLEEP already freed.");
 		mod_timer(&tx_timer,
-		          jiffies + (HZ * TX_TIMER_INTERVAL));
+		          jiffies + msecs_to_jiffies(TX_TIMER_INTERVAL * 1000));
 		if (bsi->has_ext_wake == 1) {
-			gpio_set_value(bsi->ext_wake, 0);
+			gpio_set_value(bsi->ext_wake, 1);
 		}
-		clear_bit(BT_EXT_WAKE, &flags);
+		set_bit(BT_EXT_WAKE, &flags);
 	} else {
 		bluesleep_sleep_wakeup();
 	}
@@ -415,7 +414,7 @@ static void bluesleep_start(void)
 	}
 
 	/* start the timer */
-	mod_timer(&tx_timer, jiffies + (HZ * TX_TIMER_INTERVAL));
+	mod_timer(&tx_timer, jiffies + msecs_to_jiffies(TX_TIMER_INTERVAL * 1000));
 
 	/* assert BT_WAKE */
 	if (bsi->has_ext_wake == 1) {
@@ -452,7 +451,7 @@ static void bluesleep_abnormal_stop(void)
 	if (disable_irq_wake(bsi->host_wake_irq))
 		BT_ERR("Couldn't disable hostwake IRQ wakeup mode\n");
 
-	wake_lock_timeout(&bsi->wake_lock, HZ / 2);
+	wake_lock_timeout(&bsi->wake_lock, msecs_to_jiffies(500));
 
 	clear_bit(BT_TXDATA, &flags);
 	bsi->uport = NULL;
@@ -484,7 +483,7 @@ static void bluesleep_stop(void)
 	if (disable_irq_wake(bsi->host_wake_irq))
 		BT_ERR("Couldn't disable hostwake IRQ wakeup mode\n");
 
-	wake_lock_timeout(&bsi->wake_lock, HZ / 2);
+	wake_lock_timeout(&bsi->wake_lock, msecs_to_jiffies(500));
 
 	bsi->uport = NULL;
 }
@@ -583,7 +582,7 @@ static void bluesleep_tx_timer_expire(unsigned long data)
 	} else {
 		BT_DBG("Tx data during last period");
 		mod_timer(&tx_timer,
-		          jiffies + (HZ * TX_TIMER_INTERVAL));
+		          jiffies + msecs_to_jiffies(TX_TIMER_INTERVAL * 1000));
 	}
 
 	/* clear the incoming data flag */

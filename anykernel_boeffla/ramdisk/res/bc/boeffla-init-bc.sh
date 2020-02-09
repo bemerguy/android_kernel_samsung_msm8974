@@ -79,12 +79,9 @@
 
 # Apply Boeffla-Kernel default settings 1
 
-	# Ext4 tweaks default to on
-	/sbin/busybox sync
-	mount -o remount,commit=5,noatime $CACHE_DEVICE /cache
-	/sbin/busybox sync
-	mount -o remount,commit=5,noatime $DATA_DEVICE /data
-	/sbin/busybox sync
+        # Sdcard buffer tweaks default to 32 kb
+        echo 32 > /sys/block/mmcblk0/bdi/read_ahead_kb
+        echo 32 > /sys/block/mmcblk1/bdi/read_ahead_kb
 
 	echo $(date) Boeffla-Kernel default settings 1 applied >> $BOEFFLA_LOGFILE
 
@@ -111,10 +108,6 @@
 	/sbin/busybox sleep 10
 
 # Apply Boeffla-Kernel default settings 2
-
-	# Sdcard buffer tweaks default to 64 kb
-	echo 64 > /sys/block/mmcblk0/bdi/read_ahead_kb
-	echo 64 > /sys/block/mmcblk1/bdi/read_ahead_kb
 
 	echo $(date) Boeffla-Kernel default settings 2 applied >> $BOEFFLA_LOGFILE
 

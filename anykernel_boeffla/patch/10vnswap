@@ -1,9 +1,15 @@
 #!/system/bin/sh
-sleep 30
-sysctl -w vm.drop_caches=3
-sysctl -w vm.compact_memory=1
-echo "536870912" > /sys/block/vnswap0/disksize
-busybox mkswap /dev/block/vnswap0
-swapon /dev/block/vnswap0
-echo 0 > /sys/module/selinux/parameters/force_permissive
-setenforce 1
+grep -q TUNED /proc/version
+
+if [ $? -eq 0 ]; then
+   sleep 30
+   stop mpdecision
+   sysctl -w vm.drop_caches=3
+   sysctl -w vm.compact_memory=1
+   echo "536870912" > /sys/block/vnswap0/disksize
+   busybox mkswap /dev/block/vnswap0
+   /sbin/.magisk/busybox/mkswap /dev/block/vnswap0
+   swapon /dev/block/vnswap0
+   echo 0 > /sys/module/selinux/parameters/force_permissive
+   setenforce 1
+fi

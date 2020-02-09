@@ -447,7 +447,7 @@ static ssize_t store_##file_name					\
 									\
 	if (!strcmp(current->comm, "mpdecision"))                       \
 		return ret;						\
-									\
+	printk("%s changing min/max frequency\n", current->comm);	\
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);		\
 	if (ret)							\
 		return -EINVAL;						\

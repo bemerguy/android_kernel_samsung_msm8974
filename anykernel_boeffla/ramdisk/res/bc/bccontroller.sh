@@ -311,9 +311,9 @@ fi
 
 if [ "param_readahead" == "$1" ]; then
 	# Internal sd (min/max/steps)
-	echo "32;1024;32;"
+	echo "32;2048;32;"
 	# External sd (min/max/steps)
-	echo "32;1024;32"
+	echo "32;2048;32"
 	exit 0
 fi
 
@@ -331,7 +331,7 @@ fi
 
 if [ "param_cpu_uv" == "$1" ]; then
 	# CPU UV min/max/steps
-	echo "500;1500;25"
+	echo "525;1450;5"
 	exit 0
 fi
 
@@ -706,7 +706,7 @@ if [ "apply_governor_profile" == "$1" ]; then
 		echo "10000 1497600:100000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
 		echo "100" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
 		echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-		echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+		echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
 		echo "80" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
@@ -720,7 +720,7 @@ if [ "apply_governor_profile" == "$1" ]; then
                 echo "20000 1497600:120000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "100" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
@@ -734,7 +734,7 @@ if [ "apply_governor_profile" == "$1" ]; then
                 echo "40000 1497600:200000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "110" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "30000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "98" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
@@ -748,7 +748,7 @@ if [ "apply_governor_profile" == "$1" ]; then
                 echo "10000 1497600:80000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "100000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
                 echo "70" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads

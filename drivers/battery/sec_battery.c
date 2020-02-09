@@ -10,8 +10,8 @@
  * published by the Free Software Foundation.
  */
 
-#define DEBUG 1
-#define VERBOSE_DEBUG 1
+//#define DEBUG 1
+//#define VERBOSE_DEBUG 1
 
 #include <linux/battery/sec_battery.h>
 #if defined(CONFIG_SENSORS_QPNP_ADC_VOLTAGE)
