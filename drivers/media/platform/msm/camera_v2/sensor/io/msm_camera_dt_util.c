@@ -21,8 +21,6 @@
 static struct regulator *sub_ldo3, *sub_ldo4;
 #endif
 
-#define CONFIG_MSM_CAMERA_DT_DEBUG
-
 #undef CDBG
 #ifdef CONFIG_MSM_CAMERA_DT_DEBUG
 #define CDBG(fmt, args ...) pr_err(fmt, ## args)

@@ -231,7 +231,7 @@ step4_prepare_anykernel()
 	{
 		# copy dtb (if we have one)
 		if [ "y" == "$COMPILE_DTB" ]; then
-			cp $BUILD_PATH/$OUTPUT_FOLDER/arch/$ARCHITECTURE/boot/dt.img $REPACK_PATH/dtb
+			cp $BUILD_PATH/$OUTPUT_FOLDER/arch/$ARCHITECTURE/boot/dt.img $REPACK_PATH/dt
 		fi
 
 		# copy modules to either modules folder (CM and derivates) or directly in ramdisk (Samsung stock)
@@ -287,13 +287,13 @@ step5_create_anykernel_zip()
 		rm $BOEFFLA_FILENAME.zip_signed
 	fi
 
-	md5sum $BOEFFLA_FILENAME.zip > $BOEFFLA_FILENAME.zip.md5
+#	md5sum $BOEFFLA_FILENAME.zip > $BOEFFLA_FILENAME.zip.md5
 
 	# Creating additional files for load&flash
 	echo -e ">>> create load&flash files\n"
 
-	cp $BOEFFLA_FILENAME.zip cm-kernel.zip
-	md5sum cm-kernel.zip > checksum
+#	cp $BOEFFLA_FILENAME.zip cm-kernel.zip
+#	md5sum cm-kernel.zip > checksum
 }
 
 step7_analyse_log()

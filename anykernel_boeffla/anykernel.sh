@@ -1,16 +1,15 @@
-# AnyKernel2 Script
-#
-# Original and credits: osm0sis @ xda-developers
-#
-# Modified by sunilpaulmathew @ xda-developers.com
+# AnyKernel3 Ramdisk Mod Script
+# osm0sis @ xda-developers
 
-############### AnyKernel setup start ############### 
-
-# EDIFY properties
+## AnyKernel setup
+# begin properties
+properties() { '
+kernel.string=Tuned Kernel by fbs@xda-developers
 do.devicecheck=1
-do.initd=1
 do.modules=0
+do.systemless=1
 do.cleanup=1
+do.cleanuponabort=0
 device.name1=kltexx
 device.name2=kltelra
 device.name3=kltetmo
@@ -25,57 +24,66 @@ device.name11=kltektt
 device.name12=kltekdi
 device.name13=kltedv
 device.name14=kltespr
-device.name15=
-# end properties
+supported.versions=
+supported.patchlevels=
+'; } # end properties
 
 # shell variables
 block=/dev/block/platform/msm_sdcc.1/by-name/boot;
-add_seandroidenforce=1
-supersu_exclusions=""
 is_slot_device=0;
 ramdisk_compression=auto;
 
-############### AnyKernel setup end ############### 
 
 ## AnyKernel methods (DO NOT CHANGE)
 # import patching functions/variables - see for reference
-. /tmp/anykernel/tools/ak2-core.sh;
+. tools/ak3-core.sh;
+
 
 ## AnyKernel file attributes
 # set permissions/ownership for included ramdisk files
-chmod -R 750 $ramdisk/*;
-chown -R root:root $ramdisk/*;
+set_perm_recursive 0 0 755 644 $ramdisk/*;
+set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
 
-chmod 775 $ramdisk/res
-chmod -R 755 $ramdisk/res/bc
-chmod -R 755 $ramdisk/res/misc
 
-# dump current kernel
+## AnyKernel install
 dump_boot;
 
-############### Ramdisk customization start ###############
-
-mount -o rw,remount /system;
+# begin ramdisk changes
 
 ASD=$(cat /system/build.prop | grep ro.build.version.sdk | cut -d "=" -f 2)
-
 if [ "$ASD" == "24" ] || [ "$ASD" == "25" ]; then
  ui_print "Android 7.0/7.1 detected!";
  touch $ramdisk/nougat;
 fi;
 
+mount -o rw,remount /system
+mount -o rw,remount /system_root
+
+if [ -d /system_root ]; then
+ ui_print "Android 10+ detected! System-On-Root";
+ cp -r res/* /system_root/res
+ cp sbin/busybox /system_root/sbin
+ chmod 755 /system_root/sbin/busybox
+ chmod -R 755 /system_root/res/bc
+ remove_line /system/vendor/etc/init/hw/init.qcom.rc scaling_min_freq
+ remove_line /system/vendor/etc/init/hw/init.qcom.rc scaling_min_freq
+ remove_line /system/vendor/etc/init/hw/init.qcom.rc scaling_min_freq
+ remove_line /system/vendor/etc/init/hw/init.qcom.rc scaling_min_freq
+fi;
+
+mkdir -p /system/etc/init.d
+
 replace_file /system/etc/init.d/10vnswap 755 10vnswap
 replace_file /system/etc/init/init_d.rc 755 init_d.rc
 replace_file /system/bin/sysinit 755 sysinit
 
-remove_line init.qcom.rc scaling_min_freq;
-remove_line init.qcom.rc scaling_min_freq;
-remove_line init.qcom.rc scaling_min_freq;
-remove_line init.qcom.rc scaling_min_freq;
-remove_line init.qcom.rc "start mpdecision";
-remove_line init.qcom.rc "start mpdecision";
+remove_line init.qcom.rc scaling_min_freq
+remove_line init.qcom.rc scaling_min_freq
+remove_line init.qcom.rc scaling_min_freq
+remove_line init.qcom.rc scaling_min_freq
 
-############### Ramdisk customization end ###############
+# end ramdisk changes
 
-# write new kernel
 write_boot;
+## end install
+
