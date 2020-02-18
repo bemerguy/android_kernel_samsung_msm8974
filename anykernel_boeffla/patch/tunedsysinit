@@ -1,6 +1,7 @@
 #!/system/bin/sh
 #added init.d support
 export PATH=${PATH}:/system/bin:/system/xbin
+chmod -R 755 /res/bc
 mount -o remount,rw -t auto /system
 mount -o remount,rw -t auto /
 chmod -R 755 /system/etc/init.d

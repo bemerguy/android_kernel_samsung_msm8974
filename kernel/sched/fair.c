@@ -43,8 +43,8 @@
  * (to see the precise effective timeslice length of your workload,
  *  run vmstat and monitor the context-switches (cs) field)
  */
-unsigned int sysctl_sched_latency = 2000000ULL;
-unsigned int normalized_sysctl_sched_latency = 2000000ULL;
+unsigned int sysctl_sched_latency = 6000000ULL;
+unsigned int normalized_sysctl_sched_latency = 6000000ULL;
 
 /*
  * The initial- and re-scaling of tunables is configurable
@@ -617,14 +617,10 @@ calc_delta_fair(unsigned long delta, struct sched_entity *se)
  */
 static inline u64 __sched_period(unsigned long nr_running)
 {
-#if 0
  	if (unlikely(nr_running > sched_nr_latency))
 		return nr_running * sysctl_sched_min_granularity;
 	else
 		return sysctl_sched_latency;
-#else
-	return nr_running * sysctl_sched_min_granularity;
-#endif
 }
 
 /*

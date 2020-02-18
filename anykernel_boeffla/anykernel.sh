@@ -41,9 +41,9 @@ ramdisk_compression=auto;
 
 ## AnyKernel file attributes
 # set permissions/ownership for included ramdisk files
-set_perm_recursive 0 0 755 644 $ramdisk/*;
+#<owner> <group> <dir_mode> <file_mode> <dir>
+set_perm_recursive 0 0 755 755 $ramdisk/*;
 set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
-
 
 ## AnyKernel install
 dump_boot;
@@ -65,22 +65,7 @@ if [ -d /system_root ]; then
  cp sbin/busybox /system_root/sbin
  chmod 755 /system_root/sbin/busybox
  chmod -R 755 /system_root/res/bc
- remove_line /system/vendor/etc/init/hw/init.qcom.rc scaling_min_freq
- remove_line /system/vendor/etc/init/hw/init.qcom.rc scaling_min_freq
- remove_line /system/vendor/etc/init/hw/init.qcom.rc scaling_min_freq
- remove_line /system/vendor/etc/init/hw/init.qcom.rc scaling_min_freq
 fi;
-
-mkdir -p /system/etc/init.d
-
-replace_file /system/etc/init.d/10vnswap 755 10vnswap
-replace_file /system/etc/init/init_d.rc 755 init_d.rc
-replace_file /system/bin/sysinit 755 sysinit
-
-remove_line init.qcom.rc scaling_min_freq
-remove_line init.qcom.rc scaling_min_freq
-remove_line init.qcom.rc scaling_min_freq
-remove_line init.qcom.rc scaling_min_freq
 
 # end ramdisk changes
 

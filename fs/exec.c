@@ -66,6 +66,7 @@
 
 #include <trace/events/sched.h>
 
+extern unsigned int tunedplug_active;
 int core_uses_pid;
 char core_pattern[CORENAME_MAX_SIZE] = "core";
 unsigned int core_pipe_limit;
@@ -806,6 +807,7 @@ struct file *open_exec(const char *name)
 
 	if (file->f_path.mnt->mnt_flags & MNT_NOEXEC)
 		goto exit;
+
 
 	fsnotify_open(file);
 

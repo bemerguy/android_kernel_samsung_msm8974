@@ -50,6 +50,7 @@ static DEFINE_PER_CPU(struct cpufreq_cpu_save_data, cpufreq_policy_save);
 #endif
 static DEFINE_SPINLOCK(cpufreq_driver_lock);
 
+static unsigned int max_freq_hardlimit;
 
 bool call_in_progress=false;
 
@@ -445,7 +446,7 @@ static ssize_t store_##file_name					\
 	unsigned int ret = -EINVAL;					\
 	struct cpufreq_policy new_policy;				\
 									\
-	if (!strcmp(current->comm, "mpdecision"))                       \
+	if (!strcmp(current->comm, "mpdecision") || !strcmp(current->comm, "init")) \
 		return ret;						\
 	printk("%s changing min/max frequency\n", current->comm);	\
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);		\
@@ -468,8 +469,34 @@ static ssize_t store_##file_name					\
 	return ret ? ret : count;					\
 }
 
+/**
+ * show_scaling_max_freq_hardlimit - maximum scaling frequency hard limit
+ */
+static ssize_t show_scaling_max_freq_hardlimit(struct cpufreq_policy *policy, char *buf)
+{                                                      \
+       return sprintf(buf, "%u\n", max_freq_hardlimit);
+}
+
 store_one(scaling_min_freq, min);
 store_one(scaling_max_freq, max);
+
+/**
+ * store_scaling_max_freq_hardlimit() - maximum scaling frequency hard limit
+ */
+static ssize_t store_scaling_max_freq_hardlimit(struct cpufreq_policy *policy, const char *buf, size_t count)
+{
+       unsigned int ret = -EINVAL;
+       unsigned int input;
+       int i;
+       struct cpufreq_frequency_table *table;
+
+       ret = sscanf(buf, "%u", &input);
+       if (ret != 1)
+               return -EINVAL;
+
+       max_freq_hardlimit = input;
+       return count;
+}
 
 /**
  * show_cpuinfo_cur_freq - current CPU frequency as detected by hardware
@@ -685,6 +712,7 @@ cpufreq_freq_attr_rw(scaling_min_freq);
 cpufreq_freq_attr_rw(UV_mV_table);
 #endif
 cpufreq_freq_attr_rw(scaling_max_freq);
+cpufreq_freq_attr_rw(scaling_max_freq_hardlimit);
 cpufreq_freq_attr_rw(scaling_governor);
 cpufreq_freq_attr_rw(scaling_setspeed);
 
@@ -694,6 +722,7 @@ static struct attribute *default_attrs[] = {
 	&cpuinfo_transition_latency.attr,
 	&scaling_min_freq.attr,
 	&scaling_max_freq.attr,
+	&scaling_max_freq_hardlimit.attr,
 	&affected_cpus.attr,
 	&cpu_utilization.attr,
 #ifdef CONFIG_SEC_PM

@@ -25,7 +25,7 @@ static struct notifier_block lcd_notif;
 static struct workqueue_struct *tunedplug_wq;
 static struct delayed_work tunedplug_work;
 
-static unsigned int tunedplug_active __read_mostly = 1;
+unsigned int tunedplug_active __read_mostly = 1;
 module_param(tunedplug_active, uint, 0644);
 
 #define DEF_SAMPLING	HZ/100 	//10ms

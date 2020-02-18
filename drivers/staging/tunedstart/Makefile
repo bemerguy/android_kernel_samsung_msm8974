@@ -1,0 +1,1 @@
+obj-y	+= tunedstart.o

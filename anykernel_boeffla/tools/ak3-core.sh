@@ -16,7 +16,7 @@ split_img=$home/split_img;
 ui_print() {
   until [ ! "$1" ]; do
     echo -e "ui_print $1
-      ui_print" > /proc/self/fd/$OUTFD;
+      ui_print" >> /proc/self/fd/$OUTFD;
     shift;
   done;
 }
@@ -168,6 +168,7 @@ unpack_ramdisk() {
 
   test -d $ramdisk && mv -f $ramdisk $home/rdtmp;
   mkdir -p $ramdisk;
+  chmod 755 $ramdisk;
 
   cd $ramdisk;
   EXTRACT_UNSAFE_SYMLINKS=1 cpio -d -F $split_img/ramdisk.cpio -i;
@@ -177,7 +178,6 @@ unpack_ramdisk() {
   if [ -d "$home/rdtmp" ]; then
     cp -af $home/rdtmp/* .;
   fi;
-  chmod -R 755 ./res/bc;
 }
 ### dump_boot (dump and split image, then extract ramdisk)
 dump_boot() {

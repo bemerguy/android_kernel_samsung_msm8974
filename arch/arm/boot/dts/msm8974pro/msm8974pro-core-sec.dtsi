@@ -1648,18 +1648,18 @@
 		reg = <0 4>;
 		compatible = "qcom,msm-cpufreq";
 		qcom,cpufreq-table =
-			<  268800  268800  381 >,
-			<  300000  300000  381 >,
-			<  422400  422400  572 >,
-			<  652800  499200  572 >,
-			<  729600  576000  762 >,
-			<  883200  960000  762 >,
-			<  960000 1036800 1144 >,
-			< 1036800 1267200 1525 >,
-			< 1190400 1497600 2342 >,
-			< 1267200 1574400 3509 >,
-			< 1497600 1651200 4684 >,
-			< 1574400 1728000 6103 >,
+			<  268800  652800  381 >,
+			<  300000  729600  381 >,
+			<  422400  883200  572 >,
+			<  652800  960000  572 >,
+			<  729600 1036800  762 >,
+			<  883200 1190400  762 >,
+			<  960000 1267200 1144 >,
+			< 1036800 1497600 1525 >,
+			< 1190400 1574400 2342 >,
+			< 1267200 1728000 3509 >,
+			< 1497600 1958400 4684 >,
+			< 1574400 2265600 6103 >,
 			< 1728000 2419200 7102 >,
 			< 1958400 2457600 7674 >,
 			< 2265600 2534400 7674 >,
@@ -2352,11 +2352,11 @@
 		compatible = "qcom,msm-thermal";
 		qcom,sensor-id = <5>;
 		qcom,poll-ms = <500>;
-		qcom,limit-temp = <85>;
+		qcom,limit-temp = <90>;
 		qcom,temp-hysteresis = <5>;
-		qcom,freq-step = <3>;
+		qcom,freq-step = <1>;
 		qcom,freq-control-mask = <0xf>;
-		qcom,core-limit-temp = <90>;
+		qcom,core-limit-temp = <95>;
 		qcom,core-temp-hysteresis = <5>;
 		qcom,core-control-mask = <0xe>;
 		qcom,hotplug-temp = <110>;
@@ -2369,8 +2369,8 @@
 		qcom,freq-mitigation-control-mask = <0x01>;
 		qcom,vdd-restriction-temp = <5>;
 		qcom,vdd-restriction-temp-hysteresis = <10>;
-		qcom,pmic-sw-mode-temp = <85>;
-		qcom,pmic-sw-mode-temp-hysteresis = <75>;
+		qcom,pmic-sw-mode-temp = <90>;
+		qcom,pmic-sw-mode-temp-hysteresis = <85>;
 		qcom,pmic-sw-mode-regs = "vdd-dig";
 		vdd-dig-supply = <&pm8841_s2_floor_corner>;
 		vdd-gfx-supply = <&pm8841_s4_floor_corner>;
