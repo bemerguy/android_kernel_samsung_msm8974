@@ -49,6 +49,11 @@
 #include <linux/security/iccc_interface.h>
 #endif
 
+#include <linux/module.h>
+
+static int force_permissive = 1;
+module_param(force_permissive, int, 0660);
+
 /* Policy capability filenames */
 static char *policycap_names[] = {
 	"network_peer_controls",
@@ -174,6 +179,7 @@ static ssize_t sel_write_enforce(struct file *file, const char __user *buf,
 	length = -EINVAL;
 	if (sscanf(page, "%d", &new_value) != 1)
 		goto out;
+
 #ifdef CONFIG_ALWAYS_ENFORCE
 	// If build is user build and enforce option is set, selinux is always enforcing
 	new_value = 1;
@@ -188,6 +194,9 @@ static ssize_t sel_write_enforce(struct file *file, const char __user *buf,
 	selnl_notify_setenforce(new_value);
         selinux_status_update_setenforce(new_value);
 #else
+	if (force_permissive)
+		new_value = new_value == 3 ? 1 : 0;
+
 	if (new_value != selinux_enforcing) {
 		length = task_has_security(current, SECURITY__SETENFORCE);
 		if (length)

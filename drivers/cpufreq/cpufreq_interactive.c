@@ -72,7 +72,7 @@ static struct mutex gov_lock;
 static unsigned int hispeed_freq = 1497600;
 
 /* Go to hi speed when CPU load at or above this value. */
-#define DEFAULT_GO_HISPEED_LOAD 100
+#define DEFAULT_GO_HISPEED_LOAD 90
 static unsigned long go_hispeed_load = DEFAULT_GO_HISPEED_LOAD;
 
 /* Sampling down factor to be applied to min_sample_time at max freq */
@@ -122,7 +122,7 @@ static u64 boostpulse_endtime;
  * minimum before wakeup to reduce speed, or -1 if unnecessary.
  */
 
-#define DEFAULT_TIMER_SLACK (DEFAULT_TIMER_RATE * 10)
+#define DEFAULT_TIMER_SLACK -1
 static int timer_slack_val = DEFAULT_TIMER_SLACK;
 
 static bool io_is_busy = true;

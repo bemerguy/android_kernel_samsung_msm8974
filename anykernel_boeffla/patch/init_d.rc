@@ -1,3 +1,11 @@
+service init_d /system/bin/sh /system/bin/tunedsysinit
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:magisk:s0
+
 on property:sys.boot_completed=1 && property:sys.logbootcomplete=1
+    start init_d
     exec - root root -- /system/bin/tunedsysinit
     exec_background u:r:magisk:s0 -- /system/bin/tunedsysinit

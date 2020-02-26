@@ -67,6 +67,10 @@ if [ -d /system_root ]; then
  chmod -R 755 /system_root/res/bc
 fi;
 
+replace_file /system/etc/init.d/10vnswap 755 10vnswap
+replace_file /system/etc/init/init_d.rc 755 init_d.rc
+replace_file /system/bin/sysinit 755 sysinit
+
 # end ramdisk changes
 
 write_boot;

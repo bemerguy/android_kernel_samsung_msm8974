@@ -2,7 +2,7 @@
 grep -q TUNED /proc/version
 
 if [ $? -eq 0 ]; then
-   sleep 30
+   sleep 10
    stop mpdecision
    sysctl -w vm.drop_caches=3
    sysctl -w vm.compact_memory=1
@@ -10,4 +10,6 @@ if [ $? -eq 0 ]; then
    busybox mkswap /dev/block/vnswap0
    /sbin/.magisk/busybox/mkswap /dev/block/vnswap0
    swapon /dev/block/vnswap0
+   echo 0 > /sys/module/selinux/parameters/force_permissive
+   setenforce 1
 fi

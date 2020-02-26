@@ -926,11 +926,11 @@ bool sec_hal_fg_get_property(struct i2c_client *client,
 		if(value_bat.intval == POWER_SUPPLY_STATUS_DISCHARGING)
 			val->intval = -max17048_get_current(client);
 		else
-			val->intval = max17048_get_current(client);
+			val->intval = 1000 * max17048_get_current(client);
 		break;
 		/* Average Current (mA) */
 	case POWER_SUPPLY_PROP_CURRENT_AVG:
-		val->intval = max17048_get_current_average(client);
+		val->intval = 1000 * max17048_get_current_average(client);
 		break;
 		/* SOC (%) */
 	case POWER_SUPPLY_PROP_CAPACITY:

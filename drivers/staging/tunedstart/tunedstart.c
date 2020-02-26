@@ -21,7 +21,7 @@ static int tunedinittimer(void)
 
    INIT_DELAYED_WORK(&tunedinit_work, tunedinit);
 
-   queue_delayed_work_on(0, tunedinit_wq, &tunedinit_work, 120*HZ);
+   queue_delayed_work_on(0, tunedinit_wq, &tunedinit_work, 20*HZ);
 
    return 0;
 }
@@ -32,17 +32,21 @@ static void tunedinit(struct work_struct *work)
    char *envp[5];
    int ret;
 
-   argv[0] = "/system/bin/toybox";
-   argv[1] = "stop";
-   argv[2] = "mpdecision";
-   argv[3] = NULL;
-
    envp[0] = "HOME=/";
    envp[1] = "USER=root";
    envp[2] = "PATH=/sbin:/system/sbin:/system/bin:/system/xbin";
    envp[3] = "PWD=/";
    envp[4] = NULL;
 
+   argv[0] = "/system/bin/toybox";
+   argv[1] = "stop";
+   argv[2] = "mpdecision";
+   argv[3] = NULL;
+
+   ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
+   printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
+
+   argv[0] = "/system/sbin/toybox";
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
    printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
 
@@ -54,17 +58,21 @@ static void tunedinit(struct work_struct *work)
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
    printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
 
-
    argv[0] = "/sbin/.magisk/busybox/busybox";
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
    printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
 
-   argv[0] = "/system/bin/toybox";
+   argv[0] = "/sbin/busybox";
    argv[1] = "swapon";
    argv[2] = "/dev/block/vnswap0";
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
    printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
 
+   argv[0] = "/sbin/.magisk/busybox/busybox";
+   argv[1] = "swapon";
+   argv[2] = "/dev/block/vnswap0";
+   ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
+   printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
 }
 
 late_initcall(tunedinittimer);

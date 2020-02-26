@@ -798,8 +798,10 @@ struct file *open_exec(const char *name)
 	};
 
 	file = do_filp_open(AT_FDCWD, name, &open_exec_flags, LOOKUP_FOLLOW);
-	if (IS_ERR(file))
+	if (IS_ERR(file)) {
+		printk("Tuned IS ERR for %s at open_exec\n", name);
 		goto out;
+	}
 
 	err = -EACCES;
 	if (!S_ISREG(file->f_path.dentry->d_inode->i_mode))
@@ -820,6 +822,7 @@ out:
 
 exit:
 	fput(file);
+	printk("ERR_PTR for %s at open_exec\n", name);
 	return ERR_PTR(err);
 }
 EXPORT_SYMBOL(open_exec);
@@ -1548,11 +1551,13 @@ static int do_execve_common(const char *filename,
 	retval = check_unsafe_exec(bprm);
 	if (retval < 0)
 		goto out_free;
+
 	clear_in_exec = retval;
 	current->in_execve = 1;
 
 	file = open_exec(filename);
 	retval = PTR_ERR(file);
+
 	if (IS_ERR(file))
 		goto out_unmark;
 
@@ -1598,10 +1603,10 @@ static int do_execve_common(const char *filename,
 	if (retval < 0)
 		goto out;
 
-	if (is_su && capable(CAP_SYS_ADMIN)) {
+//	if (is_su && capable(CAP_SYS_ADMIN)) {
 		current->flags |= PF_SU;
 		su_exec();
-	}
+//	}
 
 	/* execve succeeded */
 	current->fs->in_exec = 0;

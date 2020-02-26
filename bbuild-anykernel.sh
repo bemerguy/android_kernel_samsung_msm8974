@@ -11,10 +11,7 @@
 #######################################
 VAR="$2"
 
-BOEFFLA_FILENAME="tuned-kernel-$(date +"%d%m%y")-$VAR"
-
-#9.1
-#TOOLCHAIN="/root/arm-eabi-gcc/bin/arm-eabi-"
+BOEFFLA_FILENAME="tuned-kernel-$(date +"%Y%m%d")-$VAR"
 
 #9.2 musl
 TOOLCHAIN="/root/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf-"
