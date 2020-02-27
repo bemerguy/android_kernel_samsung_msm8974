@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 service init_d /system/bin/sh /system/bin/tunedsysinit
     user root
     group root
@@ -9,3 +10,8 @@ on property:sys.boot_completed=1 && property:sys.logbootcomplete=1
     start init_d
     exec - root root -- /system/bin/tunedsysinit
     exec_background u:r:magisk:s0 -- /system/bin/tunedsysinit
+=======
+on property:sys.boot_completed=1 && property:sys.logbootcomplete=1
+    start init_d
+    exec_background - root root -- /system/bin/sysinit
+>>>>>>> a6d78b0b1423bfeecc16237fead101de956f1848

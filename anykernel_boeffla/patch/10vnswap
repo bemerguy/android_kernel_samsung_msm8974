@@ -2,7 +2,11 @@
 grep -q TUNED /proc/version
 
 if [ $? -eq 0 ]; then
+<<<<<<< HEAD
    sleep 10
+=======
+   sleep 30
+>>>>>>> a6d78b0b1423bfeecc16237fead101de956f1848
    stop mpdecision
    sysctl -w vm.drop_caches=3
    sysctl -w vm.compact_memory=1
