@@ -115,7 +115,7 @@ static int boost_val;
 /* Duration of a boot pulse in usecs */
 static int boostpulse_duration_val = DEFAULT_MIN_SAMPLE_TIME;
 /* End time of boost pulse in ktime converted to usecs */
-static u64 boostpulse_endtime;
+u64 boostpulse_endtime;
 
 /*
  * Max additional time to wait in idle, beyond timer_rate, at speeds above
@@ -953,6 +953,8 @@ static void cpufreq_interactive_boost(void)
 	int anyboost = 0;
 	unsigned long flags;
 	struct cpufreq_interactive_cpuinfo *pcpu;
+
+	printk("cpufreq_interactive_boost\n");
 
 	spin_lock_irqsave(&speedchange_cpumask_lock, flags);
 
