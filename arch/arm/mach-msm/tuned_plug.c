@@ -32,7 +32,7 @@ module_param(tunedplug_active, uint, 0644);
 #define MAX_SAMPLING	HZ/10	//1000ms
 
 /* frequency threshold to wake one more cpu */
-#define PMAX 1497600
+#define PMAX 1267200
 
 /* up threshold. lower means more delay */
 static const int u[] = { -45, -20, 0 };

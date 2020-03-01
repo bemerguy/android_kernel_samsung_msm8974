@@ -703,9 +703,9 @@ if [ "apply_governor_profile" == "$1" ]; then
 	fi
 
 	if [ "Tuned - standard" == "$2" ]; then
-		echo "10000 1497600:100000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+		echo "10000 1267200:100000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
 		echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
-		echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+		echo "1267200" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
 		echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
 		echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
@@ -714,9 +714,9 @@ if [ "apply_governor_profile" == "$1" ]; then
 	fi
 
 	if [ "Tuned - battery" == "$2" ]; then
-                echo "20000 1497600:120000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "20000 1267200:120000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "100" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
-                echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+                echo "1267200" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
                 echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
@@ -725,9 +725,9 @@ if [ "apply_governor_profile" == "$1" ]; then
 	fi
 
 	if [ "Tuned - battery extreme" == "$2" ]; then
-                echo "40000 1497600:200000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "40000 1267200:200000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "110" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
-                echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+                echo "1267200" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
                 echo "80000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq
@@ -736,9 +736,9 @@ if [ "apply_governor_profile" == "$1" ]; then
 	fi
 
 	if [ "Tuned - performance" == "$2" ]; then
-                echo "10000 1497600:80000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "10000 1267200:80000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
-                echo "1497600" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
+                echo "1267200" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
                 echo "100000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sampling_down_factor
                 echo "0" > /sys/devices/system/cpu/cpufreq/Tuned/sync_freq

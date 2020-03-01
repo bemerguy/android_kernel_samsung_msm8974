@@ -69,7 +69,7 @@ static spinlock_t speedchange_cpumask_lock;
 static struct mutex gov_lock;
 
 /* Hi speed to bump to from lo speed when load burst (default max) */
-static unsigned int hispeed_freq = 1497600;
+static unsigned int hispeed_freq = 1267200;
 
 /* Go to hi speed when CPU load at or above this value. */
 #define DEFAULT_GO_HISPEED_LOAD 90
@@ -205,7 +205,7 @@ extern bool displayon;
 #endif
 
 #define DYN_DEFER (1)
-		
+
 #ifndef CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVE
 static
 #endif
@@ -284,7 +284,7 @@ static void cpufreq_interactive_timer_resched(
 	if (displayon)
 		expires = jiffies + HZ/100;
 	else
-		expires = jiffies + HZ;
+		expires = jiffies + HZ/4;
 #else
 	expires = jiffies + usecs_to_jiffies(timer_rate);
 #endif
