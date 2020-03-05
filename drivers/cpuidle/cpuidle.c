@@ -153,23 +153,17 @@ int cpuidle_idle_call(void)
 	if (!dev || !dev->enabled)
 		return -EBUSY;
 
-#if 0
-	/* shows regressions, re-enable for 2.6.29 */
-	/*
-	 * run any timers that can be run now, at this point
-	 * before calculating the idle duration etc.
-	 */
-	hrtimer_peek_ahead_timers();
-#endif
-
 	/* ask the governor for the next state */
 	next_state = cpuidle_curr_governor->select(drv, dev);
 	if (need_resched()) {
+		dev->last_residency = 0;
+		/* give the governor an opportunity to reflect on the outcome */
+		if (cpuidle_curr_governor->reflect)
+			cpuidle_curr_governor->reflect(dev, next_state);
 		local_irq_enable();
 		return 0;
 	}
 
-	trace_power_start_rcuidle(POWER_CSTATE, next_state, dev->cpu);
 	trace_cpu_idle_rcuidle(next_state, dev->cpu);
 
 	if (cpuidle_state_is_coupled(dev, drv, next_state))
@@ -178,7 +172,6 @@ int cpuidle_idle_call(void)
 	else
 		entered_state = cpuidle_enter_state(dev, drv, next_state);
 
-	trace_power_end_rcuidle(dev->cpu);
 	trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, dev->cpu);
 
 	/* give the governor an opportunity to reflect on the outcome */
@@ -197,6 +190,7 @@ void cpuidle_install_idle_handler(void)
 		/* Make sure all changes finished before we switch to new idle */
 		smp_wmb();
 		initialized = 1;
+		kick_all_cpus_sync();
 	}
 }
 
@@ -370,7 +364,7 @@ EXPORT_SYMBOL_GPL(cpuidle_enable_device);
  */
 void cpuidle_disable_device(struct cpuidle_device *dev)
 {
-	if (!dev || !dev->enabled)
+	if (!dev->enabled)
 		return;
 	if (!cpuidle_get_driver() || !cpuidle_curr_governor)
 		return;
@@ -560,10 +554,12 @@ EXPORT_SYMBOL_GPL(cpuidle_register);
 
 #ifdef CONFIG_SMP
 
+#if 0
 static void smp_callback(void *v)
 {
 	/* we already woke the CPU up, nothing more to do */
 }
+#endif
 
 /*
  * This function gets called when a part of the kernel has a new latency
@@ -574,7 +570,15 @@ static void smp_callback(void *v)
 static int cpuidle_latency_notify(struct notifier_block *b,
 		unsigned long l, void *v)
 {
+#if 0
+	/* when drivers request new latency requirement, it does not necessary
+	 * to immediately wake up another cpu by sending cross-cpu IPI, we can
+	 * consider the new latency to be taken into effect after next wakeup
+	 * from idle, this can save the unnecessary wakeup cost, and reduce the
+	 * risk that drivers may request latency in irq disabled context.
+	 */
 	smp_call_function(smp_callback, NULL, 1);
+#endif
 	return NOTIFY_OK;
 }
 
