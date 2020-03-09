@@ -85,8 +85,7 @@ static int lowmem_shrink(void)
 	short min_score_adj = OOM_SCORE_ADJ_MAX + 1;
 	int minfree = 0, oom_score, tki = 0;
 	int array_size = ARRAY_SIZE(lowmem_adj);
-	int other_free = global_page_state(NR_FREE_PAGES) - totalreserve_pages;
-	int other_file = global_page_state(NR_FILE_PAGES);
+	int free = global_page_state(NR_FREE_PAGES) + global_page_state(NR_FILE_PAGES) - 25;
 
 	static unsigned int expire=0, count=0;
 
@@ -94,9 +93,10 @@ static int lowmem_shrink(void)
 		array_size = lowmem_adj_size;
 	if (lowmem_minfree_size < array_size)
 		array_size = lowmem_minfree_size;
+
 	for (i = 0; i < array_size; i++) {
 		minfree = lowmem_minfree[i];
-		if (other_free+other_file < minfree) {
+		if (free < minfree) {
 			min_score_adj = lowmem_adj[i];
 			break;
 		}
@@ -105,13 +105,13 @@ static int lowmem_shrink(void)
 	if (++expire > 20) { expire=0; count=0; }
 
 	if (min_score_adj == OOM_SCORE_ADJ_MAX + 1) {
-		lowmem_print(3, "min_score_adj = %d. We still have %ldKb that can be used\n",
-			min_score_adj, (other_file+other_free) * (long)(PAGE_SIZE / 1024));
+		lowmem_print(3, "min_score_adj = %d. We still have %ldKb free\n",
+			min_score_adj, free * (long)(PAGE_SIZE / 1024));
 		return 0;
 	}
 	else {
 		lowmem_print(1, "############### LOW MEMORY KILLER: %ldKb less than adj %d's minimum: %ldKb.\n",
-			(other_file+other_free) * (long)(PAGE_SIZE / 1024), min_score_adj, minfree*(long)(PAGE_SIZE / 1024));
+			free * (long)(PAGE_SIZE / 1024), min_score_adj, minfree*(long)(PAGE_SIZE / 1024));
 	}
 	rcu_read_lock();
 
@@ -141,7 +141,7 @@ static int lowmem_shrink(void)
 		}
 	}
 
-	if (tki!=-1) lowmem_print(3, "NOW start killing %d process(es)", tki+1);
+	if (tki!=-1) lowmem_print(1, "NOW start killing %d process(es)", tki+1);
 
 	while (tki >=0) {
 		task_lock(tokill[tki]);
@@ -190,7 +190,7 @@ static void timelylmk(struct work_struct *work)
 		queue_delayed_work(system_nrt_freezable_wq, dwork, HZ*2);
 	else
 #endif
-		queue_delayed_work(system_nrt_freezable_wq, dwork, HZ*4);
+		queue_delayed_work(system_nrt_freezable_wq, dwork, HZ*5);
 }
 
 static int __init lowmem_init(void)
@@ -209,6 +209,7 @@ static void __exit lowmem_exit(void)
 
 module_param_array_named(adj, lowmem_adj, short, &lowmem_adj_size,
 			 S_IRUGO | S_IWUSR);
+
 module_param_array_named(minfree, lowmem_minfree, uint, &lowmem_minfree_size,
 			 S_IRUGO | S_IWUSR);
 module_param_named(debug_level, lowmem_debug_level, uint, S_IRUGO | S_IWUSR);
