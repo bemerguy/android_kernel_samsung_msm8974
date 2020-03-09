@@ -440,7 +440,7 @@ static void zswap_free_entry(struct zswap_tree *tree, struct zswap_entry *entry)
 /*******************************************
 * page pool for temporary compression result
 ********************************************/
-#define ZSWAP_TMPPAGE_POOL_PAGES 16
+#define ZSWAP_TMPPAGE_POOL_PAGES 4
 static LIST_HEAD(zswap_tmppage_list);
 static DEFINE_SPINLOCK(zswap_tmppage_lock);
 
