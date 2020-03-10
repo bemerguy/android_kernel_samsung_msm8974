@@ -34,7 +34,6 @@ struct cpuidle_driver;
 struct cpuidle_state_usage {
 	void		*driver_data;
 
-	unsigned long long	disable;
 	unsigned long long	usage;
 	unsigned long long	time; /* in US */
 };
@@ -47,6 +46,7 @@ struct cpuidle_state {
 	unsigned int	exit_latency; /* in US */
 	int		power_usage; /* in mW */
 	unsigned int	target_residency; /* in US */
+	unsigned int    disable;
 
 	int (*enter)	(struct cpuidle_device *dev,
 			struct cpuidle_driver *drv,
@@ -131,9 +131,9 @@ struct cpuidle_driver {
 	const char		*name;
 	struct module 		*owner;
 
+	unsigned int		power_specified:1;
 	/* set to 1 to use the core cpuidle time keeping (for all states). */
 	unsigned int		en_core_tk_irqen:1;
-	/* states array must be ordered in decreasing power consumption */
 	struct cpuidle_state	states[CPUIDLE_STATE_MAX];
 	int			state_count;
 	int			safe_state_index;
@@ -152,8 +152,6 @@ extern int cpuidle_register(struct cpuidle_driver *drv,
 extern void cpuidle_unregister(struct cpuidle_driver *drv);
 extern void cpuidle_pause_and_lock(void);
 extern void cpuidle_resume_and_unlock(void);
-extern void cpuidle_pause(void);
-extern void cpuidle_resume(void);
 extern int cpuidle_enable_device(struct cpuidle_device *dev);
 extern void cpuidle_disable_device(struct cpuidle_device *dev);
 extern int cpuidle_wrap_enter(struct cpuidle_device *dev,
@@ -178,8 +176,6 @@ static inline int cpuidle_register(struct cpuidle_driver *drv,
 static inline void cpuidle_unregister(struct cpuidle_driver *drv) { }
 static inline void cpuidle_pause_and_lock(void) { }
 static inline void cpuidle_resume_and_unlock(void) { }
-static inline void cpuidle_pause(void) { }
-static inline void cpuidle_resume(void) { }
 static inline int cpuidle_enable_device(struct cpuidle_device *dev)
 {return -ENODEV; }
 static inline void cpuidle_disable_device(struct cpuidle_device *dev) { }

@@ -12,7 +12,7 @@
  */
 
 #define pr_fmt(fmt) "%s: " fmt, __func__
-
+#define DEBUG
 #include <linux/module.h>
 #include <linux/clocksource.h>
 #include <linux/clockchips.h>

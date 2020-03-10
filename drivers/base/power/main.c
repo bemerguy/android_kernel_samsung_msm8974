@@ -28,10 +28,8 @@
 #include <linux/sched.h>
 #include <linux/async.h>
 #include <linux/suspend.h>
-#include <linux/cpuidle.h>
 #include <linux/timer.h>
 
-#include <linux/cpuidle.h>
 #include "../base.h"
 #include "power.h"
 
@@ -66,17 +64,20 @@ struct dpm_watchdog {
 static int async_error;
 
 /**
- * device_pm_sleep_init - Initialize system suspend-related device fields.
+ * device_pm_init - Initialize the PM-related part of a device object.
  * @dev: Device object being initialized.
  */
-void device_pm_sleep_init(struct device *dev)
+void device_pm_init(struct device *dev)
 {
 	dev->power.is_prepared = false;
 	dev->power.is_suspended = false;
 	init_completion(&dev->power.completion);
 	complete_all(&dev->power.completion);
 	dev->power.wakeup = NULL;
+	spin_lock_init(&dev->power.lock);
+	pm_runtime_init(dev);
 	INIT_LIST_HEAD(&dev->power.entry);
+	dev->power.power_state = PMSG_INVALID;
 }
 
 /**
@@ -108,6 +109,7 @@ void device_pm_add(struct device *dev)
 		dev_warn(dev, "parent %s should not be sleeping\n",
 			dev_name(dev->parent));
 	list_add_tail(&dev->power.entry, &dpm_list);
+	dev_pm_qos_constraints_init(dev);
 	mutex_unlock(&dpm_list_mtx);
 }
 
@@ -121,6 +123,7 @@ void device_pm_remove(struct device *dev)
 		 dev->bus ? dev->bus->name : "No Bus", dev_name(dev));
 	complete_all(&dev->power.completion);
 	mutex_lock(&dpm_list_mtx);
+	dev_pm_qos_constraints_destroy(dev);
 	list_del_init(&dev->power.entry);
 	mutex_unlock(&dpm_list_mtx);
 	device_wakeup_disable(dev);
@@ -521,7 +524,6 @@ static void dpm_resume_noirq(pm_message_t state)
 	mutex_unlock(&dpm_list_mtx);
 	dpm_show_time(starttime, state, "noirq");
 	resume_device_irqs();
-	cpuidle_resume();
 }
 
 /**
@@ -572,10 +574,6 @@ static int device_resume_early(struct device *dev, pm_message_t state)
 static void dpm_resume_early(pm_message_t state)
 {
 	ktime_t starttime = ktime_get();
-
-#ifdef CONFIG_BOEFFLA_WL_BLOCKER
-	pm_print_active_wakeup_sources();
-#endif
 
 	mutex_lock(&dpm_list_mtx);
 	while (!list_empty(&dpm_late_early_list)) {
@@ -926,7 +924,6 @@ static int dpm_suspend_noirq(pm_message_t state)
 	ktime_t starttime = ktime_get();
 	int error = 0;
 
-	cpuidle_pause();
 	suspend_device_irqs();
 	mutex_lock(&dpm_list_mtx);
 	while (!list_empty(&dpm_late_early_list)) {
@@ -974,7 +971,6 @@ static int device_suspend_late(struct device *dev, pm_message_t state)
 {
 	pm_callback_t callback = NULL;
 	char *info = NULL;
-	int error = 0;
 
 	if (dev->pm_domain) {
 		info = "late power domain ";
@@ -995,15 +991,7 @@ static int device_suspend_late(struct device *dev, pm_message_t state)
 		callback = pm_late_early_op(dev->driver->pm, state);
 	}
 
-	error = dpm_run_callback(callback, dev, state, info);
-	if (error)
-		/*
-		 * dpm_resume_early wouldn't be run for this failed device,
-		 * hence enable runtime_pm now
-		 */
-		pm_runtime_enable(dev);
-
-	return error;
+	return dpm_run_callback(callback, dev, state, info);
 }
 
 /**

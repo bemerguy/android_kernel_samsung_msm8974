@@ -4429,7 +4429,7 @@ int kgsl_device_platform_probe(struct kgsl_device *device)
 				status);
 		goto error_close_mmu;
 	}
-
+#if 0
 	/*
 	 * The default request type PM_QOS_REQ_ALL_CORES is
 	 * applicable to all CPU cores that are online and
@@ -4444,10 +4444,10 @@ int kgsl_device_platform_probe(struct kgsl_device *device)
 	device->pwrctrl.pm_qos_req_dma.irq = device->pwrctrl.interrupt_num;
 
 #endif
+#endif
 	pm_qos_add_request(&device->pwrctrl.pm_qos_req_dma,
 				PM_QOS_CPU_DMA_LATENCY,
 				PM_QOS_DEFAULT_VALUE);
-
 
 	device->events_wq = create_workqueue("kgsl-events");
 
