@@ -11,6 +11,7 @@
 static void tunedinit(struct work_struct *work);
 static struct workqueue_struct *tunedinit_wq;
 static struct delayed_work tunedinit_work;
+extern int selinux_enforcing;
 
 static int tunedinittimer(void)
 {
@@ -43,12 +44,20 @@ static void tunedinit(struct work_struct *work)
    argv[2] = "mpdecision";
    argv[3] = NULL;
 
+   selinux_enforcing = 0;
+
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
    printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
 
    argv[0] = "/system/sbin/toybox";
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
    printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
+
+   argv[0] = "/system/bin/toybox";
+   argv[2] = "thermal-engine";
+   ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
+   argv[0] = "/system/sbin/toybox";
+   ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
 
    vnswap_init_disksize(536870912);
 
@@ -73,6 +82,8 @@ static void tunedinit(struct work_struct *work)
    argv[2] = "/dev/block/vnswap0";
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
    printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
+
+//   selinux_enforcing = 1;
 }
 
 late_initcall(tunedinittimer);

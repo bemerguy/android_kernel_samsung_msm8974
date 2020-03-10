@@ -76,7 +76,7 @@ static unsigned int hispeed_freq = 1267200;
 static unsigned long go_hispeed_load = DEFAULT_GO_HISPEED_LOAD;
 
 /* Sampling down factor to be applied to min_sample_time at max freq */
-static unsigned int sampling_down_factor = 0;
+static unsigned int sampling_down_factor = 10000;
 
 /* Target load.  Lower values result in higher CPU speeds. */
 #define DEFAULT_TARGET_LOAD 80
@@ -204,8 +204,6 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 extern bool displayon;
 #endif
 
-#define DYN_DEFER (1)
-
 #ifndef CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVE
 static
 #endif
@@ -239,22 +237,6 @@ static inline cputime64_t get_cpu_idle_time_jiffy(unsigned int cpu,
 	return jiffies_to_usecs(idle_time);
 }
 
-#ifdef DYN_DEFER
-static inline void timer_set_nondeferrable(struct timer_list *timer)
-{
-       timer->base =
-               ((struct tvec_base *)((unsigned long)timer->base &
-                       ~TBASE_DEFERRABLE_FLAG));
-}
-
-static inline void timer_set_deferrable(struct timer_list *timer)
-{
-       timer->base =
-               ((struct tvec_base *)((unsigned long)timer->base |
-                       TBASE_DEFERRABLE_FLAG));
-}
-#endif
-
 static inline cputime64_t get_cpu_idle_time(unsigned int cpu,
 					    cputime64_t *wall)
 {
@@ -282,16 +264,11 @@ static void cpufreq_interactive_timer_resched(
 	pcpu->cputime_speedadj_timestamp = pcpu->time_in_idle_timestamp;
 #ifdef CONFIG_TUNED_PLUG
 	if (displayon)
-		expires = jiffies + HZ/100;
+		expires = jiffies + usecs_to_jiffies(timer_rate);
 	else
-		expires = jiffies + HZ/4;
+		expires = jiffies + usecs_to_jiffies(timer_rate*5);
 #else
 	expires = jiffies + usecs_to_jiffies(timer_rate);
-#endif
-
-#ifdef DYN_DEFER
-       if (pcpu->target_freq <= pcpu->policy->min)
-               timer_set_deferrable(&pcpu->cpu_timer);
 #endif
 
 	mod_timer_pinned(&pcpu->cpu_timer, expires);
