@@ -798,10 +798,8 @@ struct file *open_exec(const char *name)
 	};
 
 	file = do_filp_open(AT_FDCWD, name, &open_exec_flags, LOOKUP_FOLLOW);
-	if (IS_ERR(file)) {
-		printk("Tuned IS ERR for %s at open_exec\n", name);
+	if (IS_ERR(file))
 		goto out;
-	}
 
 	err = -EACCES;
 	if (!S_ISREG(file->f_path.dentry->d_inode->i_mode))
@@ -822,7 +820,6 @@ out:
 
 exit:
 	fput(file);
-	printk("ERR_PTR for %s at open_exec\n", name);
 	return ERR_PTR(err);
 }
 EXPORT_SYMBOL(open_exec);
