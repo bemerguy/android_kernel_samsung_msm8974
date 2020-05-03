@@ -150,8 +150,10 @@ static struct adreno_device device_3d0 = {
 	.ft_pf_policy = KGSL_FT_PAGEFAULT_DEFAULT_POLICY,
 	.fast_hang_detect = 1,
 	.long_ib_detect = 1,
+#if 0
 	.input_work = __WORK_INITIALIZER(device_3d0.input_work,
 		adreno_input_work),
+#endif
 };
 
 unsigned int ft_detect_regs[FT_DETECT_REGS_COUNT];
@@ -1886,8 +1888,10 @@ adreno_probe(struct platform_device *pdev)
 	 * It isn't fatal if we cannot register the input handler.  Sad,
 	 * perhaps, but not fatal
 	 */
+#if 0
 	if (input_register_handler(&adreno_input_handler))
 		KGSL_DRV_ERR(device, "Unable to register the input handler\n");
+#endif
 
 	return 0;
 
