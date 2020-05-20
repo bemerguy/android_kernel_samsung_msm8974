@@ -283,6 +283,7 @@ config ARCH_MSM8974
 	select ARCH_WANT_KMAP_ATOMIC_FLUSH
 	select KRAIT_REGULATOR
 	select ENABLE_VMALLOC_SAVINGS
+	select HAS_MACH_MEMUTILS
 
 config ARCH_MSM8974PRO
 	bool "MSM8974PRO"
@@ -4939,6 +4940,11 @@ config CHARGE_LEVEL
 	help
 	  Allows configuration of ac, usb and wireless charging levels
 
+config HAS_MACH_MEMUTILS
+	default n
+	bool "Motorola MSM memcpy enhancements"
+	help
+	Faster memcpy performance for Krait
 endif
 
 config KERNEL_TEXT_MPU_PROT
