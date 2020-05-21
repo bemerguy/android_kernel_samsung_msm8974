@@ -20,6 +20,7 @@
 #include <linux/cpufreq.h>
 #include <linux/delay.h>
 #include <linux/lcd_notify.h>
+#include <linux/mm.h>
 
 static struct notifier_block lcd_notif;
 static struct workqueue_struct *tunedplug_wq;
@@ -29,7 +30,7 @@ unsigned int tunedplug_active __read_mostly = 1;
 module_param(tunedplug_active, uint, 0644);
 
 #define DEF_SAMPLING	HZ/100 	//10ms
-#define MAX_SAMPLING	HZ/10	//1000ms
+#define MAX_SAMPLING	HZ/50	//20ms
 
 /* frequency threshold to wake one more cpu */
 #define PMAX 1267200
@@ -38,7 +39,7 @@ module_param(tunedplug_active, uint, 0644);
 static const int u[] = { -45, -20, 0 };
 
 /* down threshold. higher means more delay */
-static const int d[] = { 40, 100, 170 };
+static const int d[] = { 30, 60, 100 };
 
 
 static const unsigned long max_sampling = MAX_SAMPLING;
@@ -55,8 +56,8 @@ static void inline down_one(void){
 		if (i) {
 			if (down[i] > d[i-1]) {
                                 cpu_down(i);
-                                pr_info("tunedplug: DOWN cpu %d. (%d > %d) sampling: %lu\n",
-					i, down[i], d[i-1], sampling_time);
+                                pr_info("tunedplug: DOWN cpu %d. (%d > %d) sampling: %lums\n",
+					i, down[i], d[i-1], jiffies_to_msecs(sampling_time));
                                 down[i]=0;
 				return;
                 	}
@@ -71,13 +72,15 @@ static void inline up_one(void){
                         if (down[i] < u[i-1]) {
                                 struct cpufreq_policy policy, *p = &policy;
 
-                                pr_info("tunedplug: UP cpu %d. (%d < %d) sampling: %lu\n",
-					i, down[i], u[i-1], sampling_time);
+                                pr_info("tunedplug: UP cpu %d. (%d < %d) HZ: %lu, sampling: %lums\n",
+					i, down[i], u[i-1], HZ, jiffies_to_msecs(sampling_time));
 
                                 cpu_up(i);
 
-                                if (cpufreq_get_policy(&policy, i) != 0)
+                                if (cpufreq_get_policy(&policy, i) != 0) {
                                         pr_info("tunedplug: no policy for cpu %d ?", i);
+					down[i]=600;
+				}
                                 else
                                         __cpufreq_driver_target(p, p->max, CPUFREQ_RELATION_H);
 
@@ -93,8 +96,9 @@ static void tunedplug_work_fn(struct work_struct *work)
 {
 	unsigned int i, status[3] = { 0 };
 	struct cpufreq_policy policy;
+        struct delayed_work *dwork = to_delayed_work(work);
 
-	queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, sampling_time);
+	queue_delayed_work(system_nrt_freezable_wq, dwork, sampling_time);
 
         if (!tunedplug_active)
                 return;
@@ -151,15 +155,13 @@ static void initnotifier(void)
 static int __init tuned_plug_init(void)
 {
 
-	tunedplug_wq = alloc_workqueue("tunedplugv2", WQ_HIGHPRI | WQ_FREEZABLE, 1);
-        if (!tunedplug_wq)
-                return -ENOMEM;
-
-        INIT_DELAYED_WORK(&tunedplug_work, tunedplug_work_fn);
+	struct delayed_work *dwork;
 
 	sampling_time = DEF_SAMPLING;
 
-        queue_delayed_work_on(0, tunedplug_wq, &tunedplug_work, 0);
+        dwork = kmalloc(sizeof(*dwork), GFP_KERNEL);
+        INIT_DELAYED_WORK_DEFERRABLE(dwork, tunedplug_work_fn);
+        queue_delayed_work(system_nrt_freezable_wq, dwork, 30000);
 
 	initnotifier();
 
