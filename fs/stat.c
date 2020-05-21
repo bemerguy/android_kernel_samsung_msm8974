@@ -18,6 +18,7 @@
 #include <asm/uaccess.h>
 #include <asm/unistd.h>
 
+extern unsigned int tunedplug_active;
 void generic_fillattr(struct inode *inode, struct kstat *stat)
 {
 	stat->dev = inode->i_sb->s_dev;
@@ -92,10 +93,19 @@ int vfs_fstatat(int dfd, const char __user *filename, struct kstat *stat,
 	error = vfs_getattr(path.mnt, path.dentry, stat);
 	path_put(&path);
 
-        if (filename && (!strcmp(filename, "/vendor/bin/mpdecision") ||
-           !strcmp(filename, "/vendor/bin/thermal-engine") ||
-           !strcmp(filename, "/system/bin/mpdecision") ||
-           !strcmp(filename, "/system/bin/thermal-engine"))) {
+	if (!filename)
+		return error;
+
+#ifdef CONFIG_TUNED_PLUG
+	if (tunedplug_active && (
+		!strcmp(filename, "/vendor/bin/mpdecision") ||
+		!strcmp(filename, "/system/bin/mpdecision"))) {
+			printk("Tuned: Blocking %s (%d)\n", filename, error);
+			error = -EINVAL;
+	}
+#endif
+	if (!strcmp(filename, "/vendor/bin/thermal-engine") ||
+		!strcmp(filename, "/system/bin/thermal-engine")) {
                 printk("Tuned: Blocking %s (%d)\n", filename, error);
 		error = -EINVAL;
         }
