@@ -93,10 +93,10 @@ static struct nightmare_tuners {
 	atomic_t down_sf_step;
 #endif
 } nightmare_tuners_ins = {
-	.sampling_rate = ATOMIC_INIT(60000),
-	.inc_cpu_load_at_min_freq = ATOMIC_INIT(60),
-	.inc_cpu_load = ATOMIC_INIT(70),
-	.dec_cpu_load = ATOMIC_INIT(50),
+	.sampling_rate = ATOMIC_INIT(30000),
+	.inc_cpu_load_at_min_freq = ATOMIC_INIT(80),
+	.inc_cpu_load = ATOMIC_INIT(90),
+	.dec_cpu_load = ATOMIC_INIT(60),
 #ifdef CONFIG_CPU_EXYNOS4210
 	.freq_for_responsiveness = ATOMIC_INIT(200000),
 	.freq_for_responsiveness_max = ATOMIC_INIT(1200000),
