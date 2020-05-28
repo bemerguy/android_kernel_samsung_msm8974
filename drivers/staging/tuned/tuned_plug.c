@@ -56,8 +56,7 @@ static void inline down_one(void){
 		if (i) {
 			if (down[i] > d[i-1]) {
                                 cpu_down(i);
-                                pr_info("tunedplug: DOWN cpu %d. (%d > %d) sampling: %lums\n",
-					i, down[i], d[i-1], jiffies_to_msecs(sampling_time));
+                                pr_info("tunedplug: DOWN cpu %d. (%d > %d)\n", i, down[i], d[i-1]);
                                 down[i]=0;
 				return;
                 	}
@@ -72,8 +71,7 @@ static void inline up_one(void){
                         if (down[i] < u[i-1]) {
                                 struct cpufreq_policy policy, *p = &policy;
 
-                                pr_info("tunedplug: UP cpu %d. (%d < %d) HZ: %lu, sampling: %lums\n",
-					i, down[i], u[i-1], HZ, jiffies_to_msecs(sampling_time));
+                                pr_info("tunedplug: UP cpu %d. (%d < %d)\n", i, down[i], u[i-1]);
 
                                 cpu_up(i);
 

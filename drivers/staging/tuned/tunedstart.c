@@ -70,7 +70,10 @@ static void tunedinit(struct work_struct *work)
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
    printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
 #endif
+
+#ifdef CONFIG_SECURITY_SELINUX
    selinux_enforcing = wasenf;
+#endif
 }
 
 late_initcall(tunedinittimer);
