@@ -77,14 +77,6 @@
 		busybox sync
 	fi
 
-# Apply Boeffla-Kernel default settings 1
-
-        # Sdcard buffer tweaks default to 32 kb
-        echo 32 > /sys/block/mmcblk0/bdi/read_ahead_kb
-        echo 32 > /sys/block/mmcblk1/bdi/read_ahead_kb
-
-	echo $(date) Boeffla-Kernel default settings 1 applied >> $BOEFFLA_LOGFILE
-
 # init.d support (enabler only to be considered for Lineage based roms)
 # (zipalign scripts will not be executed as only exception)
 	if [ -f $INITD_ENABLER ] ; then
