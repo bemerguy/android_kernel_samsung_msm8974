@@ -383,14 +383,15 @@ OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision
                 --param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=max-pending-list-length=320 \
                 -fno-inline-functions
 else
-OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=unlimited \
-                -fgcse-sm -fgcse-las -fipa-pta -ftree-lrs -fschedule-fusion -ftree-lrs \
-                -fschedule-fusion -freorder-blocks-algorithm=stc -fira-loop-pressure -ftracer -funroll-loops \
+OPTS           = -mno-thumb-interwork -ffast-math -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap \
+                -fgcse-sm -fgcse-las -fipa-pta -ftree-lrs -ftree-lrs -fgcse-after-reload -fpeel-loops -fpredictive-commoning \
+                -freorder-blocks-algorithm=simple -fira-loop-pressure -fsplit-loops -foptimize-strlen \
+		-fversion-loops-for-strides -fsplit-paths -funswitch-loops -ftree-slp-vectorize -floop-interchange \
                 --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
                 --param=max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
 		--param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=max-pending-list-length=320 \
-		-fno-inline-functions -mno-thumb-interwork --param=max-delay-slot-live-search=666
+		--param=max-delay-slot-live-search=666 --param=inline-min-speedup=10 --param=max-inline-insns-auto=1000 -flto
 endif
 
 #  inline-min-speedup          default 15 minimum 0 maximum 0
@@ -403,10 +404,11 @@ endif
 
 #to get code smaller: -fno-unroll-loops -fno-inline-functions -fno-unswitch-loops -fno-prefetch-loop-arrays
 GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
-GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier -Wno-stringop-overflow \
-                 -Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
-GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow -Wno-switch-bool \
-                 -Wno-int-in-bool-context -Wno-unused-function -Wno-stringop-truncation -Wno-restrict -Wno-sizeof-pointer-memaccess -Wno-address-of-packed-member -Wno-declaration-after-statement
+GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier \
+		 -Wno-stringop-overflow -Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
+GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow \
+		 -Wno-switch-bool -Wno-int-in-bool-context -Wno-unused-function -Wno-stringop-truncation -Wno-restrict -Wno-sizeof-pointer-memaccess \
+		 -Wno-address-of-packed-member -Wno-declaration-after-statement -Wno-misleading-indentation
 
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
@@ -653,17 +655,9 @@ endif # $(dot-config)
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
 
-ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
-KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
-else
-KBUILD_CFLAGS	+= -Ofast $(OPTS) $(GCC8WARNINGS)
-endif
+KBUILD_CFLAGS	+= -Os $(OPTS) $(GCC8WARNINGS)
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
-
-ifneq ($(CONFIG_FRAME_WARN),0)
-KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
-endif
 
 # Force gcc to behave correct even for buggy distributions
 ifndef CONFIG_CC_STACKPROTECTOR
@@ -704,10 +698,8 @@ endif
 KBUILD_CFLAGS  += $(call cc-option,-mlow-precision-recip-sqrt,) \
                   $(call cc-option,-mpc-relative-literal-loads,)
 
-
 # Disable format-truncation warnings
 KBUILD_CFLAGS   += $(call cc-disable-warning,format-truncation,)
-
 
 # Tell gcc to never replace conditional load with a non-conditional one
 KBUILD_CFLAGS  += $(call cc-option,--param=allow-store-data-races=0)
@@ -749,7 +741,7 @@ KBUILD_CFLAGS += $(call cc-disable-warning, pointer-sign)
 KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
 
 # conserve stack if available
-#KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
+KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
 
 # use the deterministic mode of AR if available
 KBUILD_ARFLAGS := $(call ar-option,D)
@@ -781,7 +773,7 @@ endif
 LDFLAGS_BUILD_ID = $(patsubst -Wl$(comma)%,%,\
 			      $(call cc-ldoption, -Wl$(comma)--build-id,))
 KBUILD_LDFLAGS_MODULE += $(LDFLAGS_BUILD_ID)
-LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID)
+LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID) -flto
 
 ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
 LDFLAGS_vmlinux	+= $(call ld-option, -X,)
