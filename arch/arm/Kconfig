@@ -39,6 +39,34 @@ config ARM
 	select CPU_PM if (SUSPEND || CPU_IDLE)
 	select GENERIC_PCI_IOMAP
 	select HAVE_BPF_JIT if NET
+        select ARCH_INLINE_SPIN_TRYLOCK
+        select ARCH_INLINE_SPIN_TRYLOCK_BH
+        select ARCH_INLINE_SPIN_LOCK
+        select ARCH_INLINE_SPIN_LOCK_BH
+        select ARCH_INLINE_SPIN_LOCK_IRQ
+        select ARCH_INLINE_SPIN_LOCK_IRQSAVE
+        select ARCH_INLINE_SPIN_UNLOCK
+        select ARCH_INLINE_SPIN_UNLOCK_BH
+        select ARCH_INLINE_SPIN_UNLOCK_IRQ
+        select ARCH_INLINE_SPIN_UNLOCK_IRQRESTORE
+        select ARCH_INLINE_READ_TRYLOCK
+        select ARCH_INLINE_READ_LOCK
+        select ARCH_INLINE_READ_LOCK_BH
+        select ARCH_INLINE_READ_LOCK_IRQ
+        select ARCH_INLINE_READ_LOCK_IRQSAVE
+        select ARCH_INLINE_READ_UNLOCK
+        select ARCH_INLINE_READ_UNLOCK_BH
+        select ARCH_INLINE_READ_UNLOCK_IRQ
+        select ARCH_INLINE_READ_UNLOCK_IRQRESTORE
+        select ARCH_INLINE_WRITE_TRYLOCK
+        select ARCH_INLINE_WRITE_LOCK
+        select ARCH_INLINE_WRITE_LOCK_BH
+        select ARCH_INLINE_WRITE_LOCK_IRQ
+        select ARCH_INLINE_WRITE_LOCK_IRQSAVE
+        select ARCH_INLINE_WRITE_UNLOCK
+        select ARCH_INLINE_WRITE_UNLOCK_BH
+        select ARCH_INLINE_WRITE_UNLOCK_IRQ
+        select ARCH_INLINE_WRITE_UNLOCK_IRQRESTORE
 	help
 	  The ARM series is a line of low-power-consumption RISC chip designs
 	  licensed by ARM Ltd and targeted at embedded applications and
