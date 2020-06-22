@@ -25,15 +25,15 @@
 enum { ASYNC, SYNC };
 
 /* Tunables */
-static const int sync_read_expire = HZ/4;	/* max time before a sync read is submitted. */
+static const int sync_read_expire = HZ/5;	/* max time before a sync read is submitted. */
 static const int sync_write_expire = HZ;	/* max time before a sync write is submitted. */
 
-static const int async_read_expire = HZ/2;	/* ditto for async, these limits are SOFT! */
-static const int async_write_expire = HZ*2;	/* ditto for async, these limits are SOFT! */
+static const int async_read_expire = HZ/4;	/* ditto for async, these limits are SOFT! */
+static const int async_write_expire = HZ;	/* ditto for async, these limits are SOFT! */
 
 static const int writes_starved = 2;		/* max times reads can starve a write */
-static const int async_reads_starved = 2;	/* max times sync reads can starve async reads */
-static const int fifo_batch     = 8;		/* # of sequential requests treated as one
+static const int async_reads_starved = 0;	/* max times sync reads can starve async reads */
+static const int fifo_batch     = 2;		/* # of sequential requests treated as one
 						   by the above parameters. For throughput. */
 
 /* Elevator data */
