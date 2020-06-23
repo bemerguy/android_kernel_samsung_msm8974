@@ -34,7 +34,7 @@ struct sg_io_hdr;
 struct bsg_job;
 
 #define BLKDEV_MIN_RQ	4
-#define BLKDEV_MAX_RQ	512	/* Default maximum */
+#define BLKDEV_MAX_RQ	128	/* Default maximum */
 
 struct request;
 typedef void (rq_end_io_fn)(struct request *, int);
@@ -81,7 +81,7 @@ enum rq_cmd_type_bits {
 struct request {
 	struct list_head queuelist;
 	struct call_single_data csd;
-
+	unsigned long fifo_time;
 	struct request_queue *q;
 
 	unsigned int cmd_flags;
@@ -1143,6 +1143,16 @@ static inline int queue_limit_discard_alignment(struct queue_limits *lim, sector
 
 	return (lim->discard_granularity + lim->discard_alignment - alignment)
 		& (lim->discard_granularity - 1);
+}
+
+static inline int bdev_discard_alignment(struct block_device *bdev)
+{
+	struct request_queue *q = bdev_get_queue(bdev);
+
+	if (bdev != bdev->bd_contains)
+		return bdev->bd_part->discard_alignment;
+
+	return q->limits.discard_alignment;
 }
 
 static inline unsigned int queue_discard_zeroes_data(struct request_queue *q)
