@@ -64,10 +64,8 @@
 #define MDSS_FB_NUM 2
 #endif
 
-int backlight_min = 0;
-module_param(backlight_min, int, 0644);
-#define SMARTDIM_MIN 20 	// 35% of max brightness
-#define SMARTDIM_PCC_MIN 5000	// minimum perceptible value of lowest brightness
+#define SMARTDIM_MIN 40
+#define SMARTDIM_PCC_MIN 6600
 #define PCC_MAX 32768
 
 #define MAX_FBI_LIST 32
@@ -119,6 +117,7 @@ static int mdss_fb_pan_idle(struct msm_fb_data_type *mfd);
 static int mdss_fb_send_panel_event(struct msm_fb_data_type *mfd,
 					int event, void *arg);
 static void mdss_fb_set_mdp_sync_pt_threshold(struct msm_fb_data_type *mfd);
+static unsigned int smartdim_enabled = 0;
 
 #if defined (CONFIG_FB_MSM_MIPI_SAMSUNG_TFT_VIDEO_WQXGA_PT_PANEL)|| \
 	defined (CONFIG_FB_MSM8x26_MDSS_CHECK_LCD_CONNECTION)
@@ -251,6 +250,41 @@ static int lcd_backlight_registered;
 
 static int pcc_r = 32768, pcc_g = 32768, pcc_b = 32768;
 
+static ssize_t smart_dim_show(struct device *dev,
+	struct device_attribute *attr, char *buf)
+{
+	sprintf(buf, "%u\n", smartdim_enabled);
+
+	return strlen(buf);
+}
+
+static ssize_t smart_dim_store(struct device *dev,
+	struct device_attribute *attr, const char *buf, size_t size)
+{
+	int rc, value;
+
+	rc = kstrtouint(buf, 0, &value);
+
+	if (rc < 0)
+		return rc;
+
+	if (smartdim_enabled != value)
+		smartdim_enabled = value;
+
+	return size;
+}
+
+static DEVICE_ATTR(smart_dim, 0664, smart_dim_show, smart_dim_store);
+
+static struct attribute *smart_dim_attrs[] = {
+	&dev_attr_smart_dim.attr,
+	NULL,
+};
+
+static struct attribute_group smart_dim_attr_group = {
+	.attrs = smart_dim_attrs,
+};
+
 static int pcc_ratio(int pcc_old, int pcc_new)
 {
 
@@ -292,11 +326,8 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	if (value > mfd->panel_info->brightness_max)
 		value = mfd->panel_info->brightness_max;
 
-        // Boeffla: apply min limits for LCD backlight (0 is exception for display off)
-        if (value != 0 && value < backlight_min)
-                value = backlight_min;
-
-	bl_to_pcc(value);
+	if (smartdim_enabled)
+		bl_to_pcc(value);
 
 	if (value < SMARTDIM_MIN && value != 0)
 		value = SMARTDIM_MIN;
@@ -734,6 +765,10 @@ static struct attribute_group mdss_fb_attr_group = {
 static int mdss_fb_create_sysfs(struct msm_fb_data_type *mfd)
 {
 	int rc;
+
+	rc = sysfs_create_group(&mfd->fbi->dev->kobj, &smart_dim_attr_group);
+	if (rc)
+		pr_err("sysfs group creation failed, rc=%d\n", rc);
 
 	rc = sysfs_create_group(&mfd->fbi->dev->kobj, &mdss_fb_attr_group);
 	if (rc)
@@ -2599,9 +2634,14 @@ static int __mdss_fb_display_thread(void *data)
 
 	while (1) {
 		ATRACE_BEGIN(__func__);
-		wait_event(mfd->commit_wait_q,
+		ret = wait_event_interruptible(mfd->commit_wait_q,
 				(atomic_read(&mfd->commits_pending) ||
 				 kthread_should_stop()));
+
+		if (ret) {
+			pr_info("%s: interrupted", __func__);
+			continue;
+		}
 
 		if (kthread_should_stop())
 			break;
@@ -3402,5 +3442,6 @@ int mdss_fb_suspres_panel(struct device *dev, void *data)
 		pr_warn("unable to %s fb%d (%d)\n",
 			event == MDSS_EVENT_RESUME ? "resume" : "suspend",
 			mfd->index, rc);
+
 	return rc;
 }
