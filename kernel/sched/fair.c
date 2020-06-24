@@ -43,8 +43,8 @@
  * (to see the precise effective timeslice length of your workload,
  *  run vmstat and monitor the context-switches (cs) field)
  */
-unsigned int sysctl_sched_latency = 2000000ULL;
-unsigned int normalized_sysctl_sched_latency = 2000000ULL;
+unsigned int sysctl_sched_latency = 1000000ULL;
+unsigned int normalized_sysctl_sched_latency = 1000000ULL;
 
 /*
  * The initial- and re-scaling of tunables is configurable
@@ -92,10 +92,10 @@ unsigned int __read_mostly sysctl_sched_wake_to_idle;
  * and reduces their over-scheduling. Synchronous workloads will still
  * have immediate wakeup/sleep latencies.
  */
-unsigned int sysctl_sched_wakeup_granularity = 200000UL;
-unsigned int normalized_sysctl_sched_wakeup_granularity = 200000UL;
+unsigned int sysctl_sched_wakeup_granularity = 500000UL;
+unsigned int normalized_sysctl_sched_wakeup_granularity = 500000UL;
 
-const_debug unsigned int sysctl_sched_migration_cost = 250000UL;
+const_debug unsigned int sysctl_sched_migration_cost = 100000;
 
 /*
  * The exponential sliding  window over which load is averaged for shares
