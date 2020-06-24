@@ -347,15 +347,11 @@ include $(srctree)/scripts/Kbuild.include
 AS		= $(CROSS_COMPILE)as
 LD		= $(CROSS_COMPILE)ld
 REAL_CC		= $(CROSS_COMPILE)gcc
-LDFINAL	= $(LD)
+LDFINAL		= $(LD)
 CC		= $(CROSS_COMPILE)gcc
 CPP		= $(CC) -E
-ifdef CONFIG_LTO_SLIM
 AR		= $(CROSS_COMPILE)gcc-ar
-else
-AR		= $(CROSS_COMPILE)ar
-endif
-NM		= $(CROSS_COMPILE)nm
+NM		= $(CROSS_COMPILE)gcc-nm
 STRIP		= $(CROSS_COMPILE)strip
 OBJCOPY		= $(CROSS_COMPILE)objcopy
 OBJDUMP		= $(CROSS_COMPILE)objdump
@@ -390,13 +386,13 @@ OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision
 else
 OPTS           = -mno-thumb-interwork -ffast-math -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap \
                 -fgcse-sm -fgcse-las -fipa-pta -ftree-lrs -ftree-lrs -fgcse-after-reload -fpeel-loops -fpredictive-commoning \
-                -freorder-blocks-algorithm=simple -fira-loop-pressure -fsplit-loops -foptimize-strlen \
-		-fversion-loops-for-strides -fsplit-paths -funswitch-loops -ftree-slp-vectorize -floop-interchange \
+                -freorder-blocks-algorithm=simple -fira-loop-pressure -fsplit-loops -foptimize-strlen -funroll-loops \
+		-fversion-loops-for-strides -fsplit-paths -funswitch-loops -ftree-slp-vectorize -floop-interchange -ftracer \
                 --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
                 --param=max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
 		--param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=max-pending-list-length=320 \
-		--param=max-delay-slot-live-search=666 --param=inline-min-speedup=10 --param=max-inline-insns-auto=1000 -flto
+		--param=max-delay-slot-live-search=666 --param=inline-min-speedup=10 --param=early-inlining-insns=11
 endif
 
 #  inline-min-speedup          default 15 minimum 0 maximum 0
@@ -660,8 +656,9 @@ endif # $(dot-config)
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
 
-KBUILD_CFLAGS	+= -Os $(OPTS) $(GCC8WARNINGS)
+KBUILD_CFLAGS	+= -Os $(GCC8WARNINGS)
 
+#$(OPTS)
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
 # Force gcc to behave correct even for buggy distributions
@@ -780,7 +777,7 @@ endif
 LDFLAGS_BUILD_ID = $(patsubst -Wl$(comma)%,%,\
 			      $(call cc-ldoption, -Wl$(comma)--build-id,))
 KBUILD_LDFLAGS_MODULE += $(LDFLAGS_BUILD_ID)
-LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID) -flto
+LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID)
 
 ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
 LDFLAGS_vmlinux	+= $(call ld-option, -X,)
