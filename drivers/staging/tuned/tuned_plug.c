@@ -30,7 +30,7 @@ unsigned int tunedplug_active __read_mostly = 1;
 module_param(tunedplug_active, uint, 0644);
 
 #define DEF_SAMPLING	HZ/100 	//10ms
-#define MAX_SAMPLING	HZ/50	//20ms
+#define MAX_SAMPLING	HZ/25	//40ms
 
 /* frequency threshold to wake one more cpu */
 #define PMAX 1267200
@@ -39,7 +39,7 @@ module_param(tunedplug_active, uint, 0644);
 static const int u[] = { -45, -20, 0 };
 
 /* down threshold. higher means more delay */
-static const int d[] = { 30, 60, 100 };
+static const int d[] = { 25, 50, 90 };
 
 
 static const unsigned long max_sampling = MAX_SAMPLING;
@@ -159,7 +159,7 @@ static int __init tuned_plug_init(void)
 
         dwork = kmalloc(sizeof(*dwork), GFP_KERNEL);
         INIT_DELAYED_WORK_DEFERRABLE(dwork, tunedplug_work_fn);
-        queue_delayed_work(system_nrt_freezable_wq, dwork, 30000);
+        queue_delayed_work(system_nrt_freezable_wq, dwork, msecs_to_jiffies(60000));
 
 	initnotifier();
 
