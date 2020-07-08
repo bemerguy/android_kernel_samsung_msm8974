@@ -93,7 +93,7 @@ static struct nightmare_tuners {
 	atomic_t down_sf_step;
 #endif
 } nightmare_tuners_ins = {
-	.sampling_rate = ATOMIC_INIT(30000),
+	.sampling_rate = ATOMIC_INIT(20000),
 	.inc_cpu_load_at_min_freq = ATOMIC_INIT(80),
 	.inc_cpu_load = ATOMIC_INIT(90),
 	.dec_cpu_load = ATOMIC_INIT(60),
@@ -104,8 +104,8 @@ static struct nightmare_tuners {
 	.freq_for_responsiveness = ATOMIC_INIT(1190400),
 	.freq_for_responsiveness_max = ATOMIC_INIT(2457600),
 #endif
-	.freq_step_at_min_freq = ATOMIC_INIT(20),
-	.freq_step = ATOMIC_INIT(20),
+	.freq_step_at_min_freq = ATOMIC_INIT(5),
+	.freq_step = ATOMIC_INIT(3),
 	.freq_up_brake_at_min_freq = ATOMIC_INIT(30),
 	.freq_up_brake = ATOMIC_INIT(30),
 	.freq_step_dec = ATOMIC_INIT(10),

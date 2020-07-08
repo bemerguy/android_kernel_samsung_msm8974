@@ -63,7 +63,7 @@ extern int tegra_input_boost (struct cpufreq_policy *policy,
 #define DEFAULT_MIN_CPU_LOAD 50
 #define DEFAULT_UP_RATE 30000
 #define DEFAULT_DOWN_RATE 60000
-#define DEFAULT_SAMPLING_RATE 30000
+#define DEFAULT_SAMPLING_RATE 20000
 // default to 3 * sampling_rate
 #define DEFAULT_INPUT_BOOST_DURATION 90000
 #define DEFAULT_TOUCH_POKE_FREQ 910000
@@ -77,7 +77,7 @@ extern int tegra_input_boost (struct cpufreq_policy *policy,
  * Mike Chan (androidlcom) calis this is also not true for ARM.
  */
 #define DEFAULT_IO_IS_BUSY 0
-#define DEFAULT_IGNORE_NICE 1
+#define DEFAULT_IGNORE_NICE 0
 #endif
 
 #ifdef CONFIG_CPU_FREQ_GOV_SMARTMAX_PRIMOU
