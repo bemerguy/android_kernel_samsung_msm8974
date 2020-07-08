@@ -53,7 +53,9 @@
 
 static struct msm_thermal_data msm_thermal_info;
 static struct delayed_work check_temp_work;
+#ifdef CONFIG_THERMAL_MONITOR_LOG
 static struct delayed_work temp_log_work;
+#endif
 static bool core_control_enabled;
 static uint32_t cpus_offlined;
 static DEFINE_MUTEX(core_control_mutex);
@@ -1364,6 +1366,10 @@ static void __ref check_temp(struct work_struct *work)
 		goto reschedule;
 	}
 
+        do_core_control(temp);
+        do_psm();
+        do_ocr();
+
 	if (!limit_init) {
 		ret = msm_thermal_get_freq_table();
 		if (ret)
@@ -1372,10 +1378,7 @@ static void __ref check_temp(struct work_struct *work)
 			limit_init = 1;
 	}
 
-	do_core_control(temp);
 	do_vdd_restriction();
-	do_psm();
-	do_ocr();
 	do_freq_control(temp);
 
 reschedule:
@@ -1385,6 +1388,7 @@ reschedule:
 }
 
 
+#ifdef CONFIG_THERMAL_MONITOR_LOG
 static void __ref msm_therm_temp_log(struct work_struct *work)
 {
 
@@ -1409,6 +1413,7 @@ static void __ref msm_therm_temp_log(struct work_struct *work)
 	schedule_delayed_work(&temp_log_work,
 				HZ*5); //For every 5 seconds log the temperature values of all the msm thermistors.
 }
+#endif
 
 static int __ref msm_thermal_cpu_callback(struct notifier_block *nfb,
 		unsigned long action, void *hcpu)
@@ -2104,7 +2109,7 @@ done_cc:
 }
 
 static __refdata struct kobj_attribute cc_enabled_attr =
-__ATTR(enabled, 0644, show_cc_enabled, store_cc_enabled);
+__ATTR(enabled, 0444, show_cc_enabled, store_cc_enabled);
 
 static __refdata struct kobj_attribute cpus_offlined_attr =
 __ATTR(cpus_offlined, 0644, show_cpus_offlined, store_cpus_offlined);
@@ -3363,7 +3368,9 @@ static int msm_thermal_dev_exit(struct platform_device *inp_dev)
 		kfree(thresh);
 		thresh = NULL;
 	}
+#ifdef CONFIG_THERMAL_MONITOR_LOG
 	cancel_delayed_work_sync(&temp_log_work);
+#endif
 	return 0;
 }
 
@@ -3384,8 +3391,10 @@ static struct platform_driver msm_thermal_device_driver = {
 
 int __init msm_thermal_device_init(void)
 {
+#ifdef CONFIG_THERMAL_MONITOR_LOG
 	INIT_DELAYED_WORK(&temp_log_work, msm_therm_temp_log);
 	schedule_delayed_work(&temp_log_work, HZ*2);
+#endif
 
 	return platform_driver_register(&msm_thermal_device_driver);
 }
