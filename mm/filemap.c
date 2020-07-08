@@ -1120,13 +1120,13 @@ find_page:
 			if (unlikely(page == NULL))
 				goto no_cached_page;
 		}
-#if 0
+
 		if (PageReadahead(page)) {
 			page_cache_async_readahead(mapping,
 					ra, filp, page,
 					index, last_index - index);
 		}
-#endif
+
 		if (!PageUptodate(page)) {
 			if (inode->i_blkbits == PAGE_CACHE_SHIFT ||
 					!mapping->a_ops->is_partially_uptodate)
