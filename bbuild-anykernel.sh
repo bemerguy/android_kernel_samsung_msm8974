@@ -41,7 +41,7 @@ SMB_SHARE_BACKUP=""
 SMB_FOLDER_BACKUP=""
 SMB_AUTH_BACKUP=""
 
-NUM_CPUS=""   # number of cpu cores used for build (leave empty for auto detection)
+NUM_CPUS="8"   # number of cpu cores used for build (leave empty for auto detection)
 
 #######################################
 # automatic parameters, do not touch !
@@ -99,7 +99,7 @@ step0_copy_code()
 	cp -r $SOURCE_PATH/* $BUILD_PATH
 
 	# Replace version information in mkcompile_h with the one from x-settings.sh
-	sed "s/\`echo \$LINUX_COMPILE_BY | \$UTS_TRUNCATE\`/Boeffla-Kernel-4.1-TUNED/g" -i $BUILD_PATH/scripts/mkcompile_h
+	sed "s/\`echo \$LINUX_COMPILE_BY | \$UTS_TRUNCATE\`/Boeffla-Kernel-4.1/g" -i $BUILD_PATH/scripts/mkcompile_h
 	sed "s/\`echo \$LINUX_COMPILE_HOST | \$UTS_TRUNCATE\`/heilerbemerguy/g" -i $BUILD_PATH/scripts/mkcompile_h
 }
 
@@ -159,7 +159,6 @@ CONFIG_NFC_PN547
 CONFIG_NFC_PN547_PMC8974_CLK_REQ
 CONFIG_USE_VM_KEYBOARD_REJECT
 CONFIG_CHARGER_SMB1357
-CONFIG_CHARGER_MAX77804K
 CONFIG_FELICA
 CONFIG_NFC_FELICA
 CONFIG_CHARGE_LEVEL
@@ -173,7 +172,6 @@ CONFIG_MACH_KLTE_KDI=y
 # CONFIG_NFC_PN547_PMC8974_CLK_REQ is not set
 # CONFIG_USE_VM_KEYBOARD_REJECT is not set
 CONFIG_CHARGER_SMB1357=y
-# CONFIG_CHARGER_MAX77804K is not set
 CONFIG_FELICA=y
 CONFIG_NFC_FELICA=y
 # CONFIG_CHARGE_LEVEL is not set
