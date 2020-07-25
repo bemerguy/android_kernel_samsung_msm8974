@@ -386,14 +386,17 @@ OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision
 else
 OPTS           = -mno-thumb-interwork -ffast-math -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap \
                 -fgcse-sm -fgcse-las -fipa-pta -ftree-lrs -ftree-lrs -fgcse-after-reload -fpeel-loops -fpredictive-commoning \
-                -freorder-blocks-algorithm=simple -fira-loop-pressure -fsplit-loops -foptimize-strlen -funroll-loops \
-		-fversion-loops-for-strides -fsplit-paths -funswitch-loops -ftree-slp-vectorize -floop-interchange -ftracer \
+                -freorder-blocks-algorithm=simple -fira-loop-pressure -fsplit-loops -foptimize-strlen \
+		-fversion-loops-for-strides -ftree-slp-vectorize -floop-interchange -ftracer -funroll-loops -fsplit-paths -funswitch-loops \
                 --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
                 --param=max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
 		--param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=max-pending-list-length=320 \
-		--param=max-delay-slot-live-search=666 --param=inline-min-speedup=10 --param=early-inlining-insns=11
+		--param=max-delay-slot-live-search=666 -fno-inline-functions
 endif
+#-funroll-loops -fsplit-paths -funswitch-loops
+#--param=inline-min-speedup=15 --param=early-inlining-insns=14 \
+#		--param max-inline-insns-single=200 --param max-inline-insns-auto=30
 
 #  inline-min-speedup          default 15 minimum 0 maximum 0
 #  max-inline-insns-single     default 200 minimum 0 maximum 0
@@ -404,7 +407,7 @@ endif
 #-floop-nest-optimize -fgraphite -fgraphite-identity
 
 #to get code smaller: -fno-unroll-loops -fno-inline-functions -fno-unswitch-loops -fno-prefetch-loop-arrays
-GCC6WARNINGS   = -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
+GCC6WARNINGS   = -Wno-attributes -Wno-bool-compare -Wno-misleading-indentation -Wno-format -Wno-strict-aliasing -Wno-tautological-compare -Wno-discarded-array-qualifiers
 GCC7WARNINGS   = $(GCC6WARNINGS) -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-parentheses -Wno-bool-operation -Wno-duplicate-decl-specifier \
 		 -Wno-stringop-overflow -Wno-format-overflow -Wno-switch-unreachable -Wno-pointer-compare
 GCC8WARNINGS   = $(GCC7WARNINGS) -Wno-multistatement-macros -Wno-sizeof-pointer-div -Wno-logical-not-parentheses -Wno-packed-not-aligned -Wno-shift-overflow \
@@ -656,7 +659,7 @@ endif # $(dot-config)
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
 
-KBUILD_CFLAGS	+= -Os $(GCC8WARNINGS)
+KBUILD_CFLAGS	+= -Os $(OPTS) $(GCC8WARNINGS)
 KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
 
 #$(OPTS)
