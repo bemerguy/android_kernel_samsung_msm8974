@@ -138,6 +138,10 @@ static bool align_windows = true;
  */
 static unsigned int max_freq_hysteresis = DEFAULT_MIN_SAMPLE_TIME;
 
+#ifdef CONFIG_TUNED_PLUG
+extern bool displayon;
+#endif
+
 /* Round to starting jiffy of next evaluation window */
 static u64 round_to_nw_start(u64 jif)
 {
@@ -309,7 +313,15 @@ static unsigned int choose_freq(
 
 	do {
 		prevfreq = freq;
-		tl = freq_to_targetload(freq);
+
+#ifdef CONFIG_TUNED_PLUG
+        if (displayon)
+                tl = freq_to_targetload(freq);
+        else
+                tl = 99;
+#else
+                tl = freq_to_targetload(freq);
+#endif
 
 		/*
 		 * Find the lowest frequency where the computed load is less
@@ -1175,7 +1187,7 @@ static struct attribute *interactive_attributes[] = {
 
 static struct attribute_group interactive_attr_group = {
 	.attrs = interactive_attributes,
-	.name = "interactivex",
+	.name = "Tuned",
 };
 
 static int cpufreq_interactive_idle_notifier(struct notifier_block *nb,
@@ -1339,7 +1351,7 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 static
 #endif
 struct cpufreq_governor cpufreq_gov_interactivex = {
-	.name = "interactivex",
+	.name = "Tuned",
 	.governor = cpufreq_governor_interactive,
 	.max_transition_latency = 10000000,
 	.owner = THIS_MODULE,
@@ -1389,7 +1401,7 @@ static int __init cpufreq_interactive_init(void)
 	return cpufreq_register_governor(&cpufreq_gov_interactivex);
 }
 
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVE
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVEX
 fs_initcall(cpufreq_interactive_init);
 #else
 module_init(cpufreq_interactive_init);
@@ -1397,7 +1409,7 @@ module_init(cpufreq_interactive_init);
 
 static void __exit cpufreq_interactive_exit(void)
 {
-	cpufreq_unregister_governor(&cpufreq_gov_interactive);
+	cpufreq_unregister_governor(&cpufreq_gov_interactivex);
 	kthread_stop(speedchange_task);
 	put_task_struct(speedchange_task);
 	if (above_hispeed_delay != default_above_hispeed_delay)
