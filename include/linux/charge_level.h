@@ -21,11 +21,11 @@ extern int charge_level_nom;
 extern int charge_level_cur;
 
 
-#define AC_CHARGE_LEVEL_DEFAULT 2000	// stock charge logic is default
+#define AC_CHARGE_LEVEL_DEFAULT 1600	// stock charge logic is default
 #define AC_CHARGE_LEVEL_MIN 0
 #define AC_CHARGE_LEVEL_MAX 2200
 
-#define USB_CHARGE_LEVEL_DEFAULT 2000	// stock charge logic is default
+#define USB_CHARGE_LEVEL_DEFAULT 1600	// stock charge logic is default
 #define USB_CHARGE_LEVEL_MIN 0
 #define USB_CHARGE_LEVEL_MAX 2000
 
