@@ -64,8 +64,15 @@
 #define MDSS_FB_NUM 2
 #endif
 
-#define SMARTDIM_MIN 40
-#define SMARTDIM_PCC_MIN 6600
+int backlight_min = 0;
+module_param(backlight_min, int, 0644);
+
+int smartdim_min = 30;
+module_param(smartdim_min, int, 0644);
+
+int smartdim_pcc_min = 6400;
+module_param(smartdim_pcc_min, int, 0644);
+
 #define PCC_MAX 32768
 
 #define MAX_FBI_LIST 32
@@ -117,7 +124,7 @@ static int mdss_fb_pan_idle(struct msm_fb_data_type *mfd);
 static int mdss_fb_send_panel_event(struct msm_fb_data_type *mfd,
 					int event, void *arg);
 static void mdss_fb_set_mdp_sync_pt_threshold(struct msm_fb_data_type *mfd);
-static unsigned int smartdim_enabled = 0;
+static unsigned int smartdim_enabled = 1;
 
 #if defined (CONFIG_FB_MSM_MIPI_SAMSUNG_TFT_VIDEO_WQXGA_PT_PANEL)|| \
 	defined (CONFIG_FB_MSM8x26_MDSS_CHECK_LCD_CONNECTION)
@@ -298,19 +305,19 @@ static void bl_to_pcc(int value)
 	struct mdp_pcc_cfg_data pcc_cfg;
 	u32 copyback = 0;
 
-	int pcc_intp = PCC_MAX + ((PCC_MAX - SMARTDIM_PCC_MIN) * (value - SMARTDIM_MIN)) / (SMARTDIM_MIN - 1);
+	int pcc_intp = PCC_MAX + ((PCC_MAX - smartdim_pcc_min) * (value - smartdim_min)) / (smartdim_min - 1);
 
 	memset(&pcc_cfg, 0, sizeof(struct mdp_pcc_cfg_data));
 	pcc_cfg.block = MDP_LOGICAL_BLOCK_DISP_0;
 	pcc_cfg.ops = MDP_PP_OPS_ENABLE | MDP_PP_OPS_WRITE;
 
-	if (value < SMARTDIM_MIN && value != 0) {
+	if (value < smartdim_min && value != 0) {
 		pcc_cfg.r.r = pcc_ratio(pcc_r, pcc_intp);
 		pcc_cfg.g.g = pcc_ratio(pcc_g, pcc_intp);
 		pcc_cfg.b.b = pcc_ratio(pcc_b, pcc_intp);
 	} else if (value != 0) {
-		pcc_cfg.r.r = pcc_r;
-		pcc_cfg.g.g = pcc_g;
+                pcc_cfg.r.r = pcc_r;
+                pcc_cfg.g.g = pcc_g;
 		pcc_cfg.b.b = pcc_b;
 	}
 
@@ -326,11 +333,16 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	if (value > mfd->panel_info->brightness_max)
 		value = mfd->panel_info->brightness_max;
 
-	if (smartdim_enabled)
-		bl_to_pcc(value);
+	if (smartdim_enabled) {
+		// Boeffla: apply min limits for LCD backlight (0 is exception for display off)
+		if (value < backlight_min)
+			bl_to_pcc(backlight_min);
+		else
+			bl_to_pcc(value);
 
-	if (value < SMARTDIM_MIN && value != 0)
-		value = SMARTDIM_MIN;
+		if (value < smartdim_min && value != 0)
+			value = smartdim_min;
+	}
 
 	/* This maps android backlight level 0 to 255 into
 	   driver backlight level 0 to bl_max with rounding */
