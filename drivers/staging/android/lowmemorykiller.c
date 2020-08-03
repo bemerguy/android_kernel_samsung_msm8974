@@ -196,9 +196,10 @@ static void timelylmk(struct work_struct *work)
 static int __init lowmem_init(void)
 {
 	struct delayed_work *dwork;
+
 	dwork = kmalloc(sizeof(*dwork), GFP_KERNEL);
 	INIT_DELAYED_WORK_DEFERRABLE(dwork, timelylmk);
-	queue_delayed_work(system_nrt_freezable_wq, dwork, 30000);
+	queue_delayed_work(system_nrt_freezable_wq, dwork, HZ*60);
 
 	return 0;
 }
