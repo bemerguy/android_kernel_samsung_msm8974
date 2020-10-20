@@ -2314,14 +2314,14 @@ static int nl80211_parse_beacon(struct nlattr *attrs[],
 
 	memset(bcn, 0, sizeof(*bcn));
 
-	if (attrs[NL80211_ATTR_BEACON_HEAD]) {
-		int ret = validate_beacon_head(attrs[NL80211_ATTR_BEACON_HEAD]);
+	if (info->attrs[NL80211_ATTR_BEACON_HEAD]) {
+		int ret = validate_beacon_head(info->attrs[NL80211_ATTR_BEACON_HEAD]);
 
 		if (ret)
 			return ret;
 
-		bcn->head = nla_data(attrs[NL80211_ATTR_BEACON_HEAD]);
-		bcn->head_len = nla_len(attrs[NL80211_ATTR_BEACON_HEAD]);
+		bcn->head = nla_data(info->attrs[NL80211_ATTR_BEACON_HEAD]);
+		bcn->head_len = nla_len(info->attrs[NL80211_ATTR_BEACON_HEAD]);
 		if (!bcn->head_len)
 			return -EINVAL;
 		haveinfo = true;
