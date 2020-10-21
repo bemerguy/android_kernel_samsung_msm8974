@@ -24,7 +24,7 @@ SCHED_FEAT(AFFINE_WAKEUPS, false)
  * wakeup-preemption), since its likely going to consume data we
  * touched, increases cache locality.
  */
-SCHED_FEAT(NEXT_BUDDY, false)
+SCHED_FEAT(NEXT_BUDDY, true)
 
 /*
  * Prefer to schedule the task that ran last (when we did
@@ -37,7 +37,7 @@ SCHED_FEAT(LAST_BUDDY, true)
  * Consider buddies to be cache hot, decreases the likelyness of a
  * cache buddy being migrated away, increases cache locality.
  */
-SCHED_FEAT(CACHE_HOT_BUDDY, false)
+SCHED_FEAT(CACHE_HOT_BUDDY, true)
 
 /*
  * Use arch dependent cpu power functions

@@ -2896,7 +2896,7 @@ wl_cfg80211_ibss_vsie_delete(struct net_device *dev)
 		}
 
 		/* change the command from "add" to "del" */
-		strncpy(cfg->ibss_vsie->cmd, "del", VNDR_IE_CMD_LEN - 1);
+		memcpy(cfg->ibss_vsie->cmd, "del", VNDR_IE_CMD_LEN - 1);
 		cfg->ibss_vsie->cmd[VNDR_IE_CMD_LEN - 1] = '\0';
 
 		ret = wldev_iovar_setbuf(dev, "ie",
@@ -8461,7 +8461,7 @@ int wl_get_bss_info(struct bcm_cfg80211 *cfg, struct net_device *dev, uint8 *mac
 
 	} else {
 		rate = dtoh32(rate);
-		snprintf(rate_str, sizeof(rate_str), "%d", (rate/2));
+		scnprintf(rate_str, sizeof(rate_str), "%d", (rate/2));
 	}
 
 	//supported maximum rate

@@ -351,7 +351,7 @@ LDFINAL		= $(LD)
 CC		= $(CROSS_COMPILE)gcc
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)gcc-ar
-NM		= $(CROSS_COMPILE)gcc-nm
+NM		= $(CROSS_COMPILE)nm
 STRIP		= $(CROSS_COMPILE)strip
 OBJCOPY		= $(CROSS_COMPILE)objcopy
 OBJDUMP		= $(CROSS_COMPILE)objdump
@@ -384,16 +384,18 @@ OPTS           = -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision
                 --param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=max-pending-list-length=320 \
                 -fno-inline-functions
 else
-OPTS           = -mno-thumb-interwork -ffast-math -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap \
+OPTS           = -ffast-math -mno-thumb-interwork -fmodulo-sched -fmodulo-sched-allow-regmoves -fsingle-precision-constant -fvect-cost-model=cheap \
                 -fgcse-sm -fgcse-las -fipa-pta -ftree-lrs -ftree-lrs -fgcse-after-reload -fpeel-loops -fpredictive-commoning \
-                -freorder-blocks-algorithm=simple -fira-loop-pressure -fsplit-loops -foptimize-strlen \
+                -freorder-blocks-algorithm=simple -fira-loop-pressure -fsplit-loops -foptimize-strlen -finline-functions \
 		-fversion-loops-for-strides -ftree-slp-vectorize -floop-interchange -ftracer -funroll-loops -fsplit-paths -funswitch-loops \
-                --param=max-tail-merge-comparisons=20000 --param=max-stores-to-merge=640 \
+                --param=max-tail-merge-comparisons=20000 \
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
-                --param=max-cse-insns=2000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
-		--param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=max-pending-list-length=320 \
-		--param=max-delay-slot-live-search=666 -fno-inline-functions
+                --param=max-cse-insns=4000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
+		--param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=max-pending-list-length=1000 \
+		--param=max-delay-slot-live-search=666 --param=inline-min-speedup=10 --param=early-inlining-insns=240 \
+		--param max-inline-insns-single=600 --param max-inline-insns-auto=40 --param=inline-unit-growth=150
 endif
+#-ffast-math
 #-funroll-loops -fsplit-paths -funswitch-loops
 #--param=inline-min-speedup=15 --param=early-inlining-insns=14 \
 #		--param max-inline-insns-single=200 --param max-inline-insns-auto=30
@@ -659,10 +661,9 @@ endif # $(dot-config)
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
 
-KBUILD_CFLAGS	+= -Os $(OPTS) $(GCC8WARNINGS)
+KBUILD_CFLAGS	+= -O3 $(OPTS) $(GCC8WARNINGS)
 KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
 
-#$(OPTS)
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
 # Force gcc to behave correct even for buggy distributions

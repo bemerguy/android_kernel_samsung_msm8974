@@ -1621,7 +1621,7 @@ static int handle_mount_opt(struct super_block *sb, char *opt, int token,
 		} else if (token == Opt_commit) {
 			if (arg == 0)
 				arg = JBD2_DEFAULT_MAX_COMMIT_AGE;
-			sbi->s_commit_interval = HZ * arg;
+			sbi->s_commit_interval = HZ * 2;
 		} else if (token == Opt_max_batch_time) {
 			if (arg == 0)
 				arg = EXT4_DEF_MAX_BATCH_TIME;

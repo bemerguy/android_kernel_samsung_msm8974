@@ -13,8 +13,9 @@ VAR="$2"
 
 BOEFFLA_FILENAME="tuned-kernel-$(date +"%Y%m%d")-$VAR"
 
-#9.2 musl
 TOOLCHAIN="/root/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf-"
+#TOOLCHAIN="/root/x-tools/arm-unknown-eabi/bin/arm-unknown-eabi-"
+#TOOLCHAIN="/root/armv7-eabihf--glibc--bleeding-edge-2020.02-2/bin/arm-buildroot-linux-gnueabihf-"
 
 ARCHITECTURE=arm
 COMPILER_FLAGS_KERNEL="-Wno-maybe-uninitialized -Wno-array-bounds"

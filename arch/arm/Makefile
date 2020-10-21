@@ -21,6 +21,15 @@ GZFLAGS		:=-9
 # Explicitly specifiy 32-bit ARM ISA since toolchain default can be -mthumb:
 KBUILD_CFLAGS	+=$(call cc-option,-marm,)
 
+ifeq ($(cc-name),clang)
+# Clang options
+KBUILD_CPPFLAGS	+= $(call cc-option,-target $(CROSS_COMPILE:-=),)
+KBUILD_CFLAGS   += $(call cc-option,-fno-builtin,)
+KBUILD_CFLAGS   += $(call cc-disable-warning,asm-operand-widths)
+KBUILD_CFLAGS   += $(call cc-option,-Xassembler,)
+KBUILD_CFLAGS   += $(call cc-option,-mno-warn-deprecated,)
+endif
+
 # Never generate .eh_frame
 KBUILD_CFLAGS	+= $(call cc-option,-fno-dwarf2-cfi-asm)
 
@@ -31,6 +40,7 @@ KBUILD_DEFCONFIG := versatile_defconfig
 # defines filename extension depending memory management type.
 ifeq ($(CONFIG_MMU),)
 MMUEXT		:= -nommu
+KBUILD_CFLAGS	+= $(call cc-option,-mno-unaligned-access)
 endif
 
 ifeq ($(CONFIG_FRAME_POINTER),y)
@@ -42,11 +52,11 @@ KBUILD_CFLAGS	+=-fstack-protector
 endif
 
 ifeq ($(CONFIG_CPU_BIG_ENDIAN),y)
-KBUILD_CPPFLAGS	+= -mbig-endian
+KBUILD_CPPFLAGS	+= $(call cc-option,-mbig-endian,)
 AS		+= -EB
 LD		+= -EB
 else
-KBUILD_CPPFLAGS	+= -mlittle-endian
+KBUILD_CPPFLAGS	+= $(call cc-option,-mlittle-endian,)
 AS		+= -EL
 LD		+= -EL
 endif
@@ -65,7 +75,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-ipa-sra)
 # Note that GCC does not numerically define an architecture version
 # macro, but instead defines a whole series of macros which makes
 # testing for a specific architecture or later rather impossible.
-arch-$(CONFIG_CPU_32v7)		:=-D__LINUX_ARM_ARCH__=7 $(call cc-option,-march=armv7-a,-march=armv5t -Wa$(comma)-march=armv7-a)
+arch-$(CONFIG_CPU_32v7)		:=-D__LINUX_ARM_ARCH__=7 $(call cc-option,-march=armv7-a -mtune=cortex-a15 -Wa$(comma)-march=armv7-a)
 arch-$(CONFIG_CPU_32v6)		:=-D__LINUX_ARM_ARCH__=6 $(call cc-option,-march=armv6,-march=armv5t -Wa$(comma)-march=armv6)
 # Only override the compiler option if ARMv6. The ARMv6K extensions are
 # always available in ARMv7
@@ -87,9 +97,7 @@ arch-$(CONFIG_CPU_32v3)		:=-D__LINUX_ARM_ARCH__=3 -march=armv3
 # keep things simpler, we don't bother with a fallback option if the compiler
 # doesn't even support -march=armv7-a, since in that situation we would have
 # bigger problems.
-arch-$(CONFIG_ARCH_MSM_KRAIT)	:=-D__LINUX_ARM_ARCH__=7 $(call cc-option,-mcpu=cortex-a15,-march=armv7-a)
-arch-$(CONFIG_MSM_CORTEX_A7)	:=-D__LINUX_ARM_ARCH__=7 $(call cc-option,-mcpu=cortex-a15,-march=armv7-a)
-
+arch-$(CONFIG_ARCH_MSM_KRAIT)   :=-D__LINUX_ARM_ARCH__=7 -mcpu=cortex-a15 -mfpu=neon-vfpv4 -mvectorize-with-neon-quad
 # This selects how we optimise for the processor.
 tune-$(CONFIG_CPU_ARM610)	:=-mtune=arm610
 tune-$(CONFIG_CPU_ARM710)	:=-mtune=arm710
@@ -111,9 +119,14 @@ tune-$(CONFIG_CPU_XSC3)		:=$(call cc-option,-mtune=xscale,-mtune=strongarm110) -
 tune-$(CONFIG_CPU_FEROCEON)	:=$(call cc-option,-mtune=marvell-f,-mtune=xscale)
 tune-$(CONFIG_CPU_V6)		:=$(call cc-option,-mtune=arm1136j-s,-mtune=strongarm)
 tune-$(CONFIG_CPU_V6K)		:=$(call cc-option,-mtune=arm1136j-s,-mtune=strongarm)
+tune-$(CONFIG_ARCH_MSM_KRAIT)   :=-mtune=cortex-a15
 
 ifeq ($(CONFIG_AEABI),y)
-CFLAGS_ABI	:=-mabi=aapcs-linux -mno-thumb-interwork
+ifeq ($(cc-name),clang)
+CFLAGS_ABI	:=
+else
+CFLAGS_ABI	:=-mabi=aapcs-linux $(call cc-option,-mno-thumb-interwork,)
+endif
 else
 CFLAGS_ABI	:=$(call cc-option,-mapcs-32,-mabi=apcs-gnu) $(call cc-option,-mno-thumb-interwork,)
 endif
@@ -134,7 +147,11 @@ endif
 endif
 
 # Need -Uarm for gcc < 3.x
+ifeq ($(cc-name),clang)
+KBUILD_CFLAGS  +=$(CFLAGS_ABI) $(CFLAGS_THUMB2) $(arch-y) $(tune-y) -msoft-float
+else
 KBUILD_CFLAGS	+=$(CFLAGS_ABI) $(CFLAGS_THUMB2) $(arch-y) $(tune-y) $(call cc-option,-mshort-load-bytes,$(call cc-option,-malignment-traps,)) -msoft-float -Uarm
+endif
 KBUILD_AFLAGS	+=$(CFLAGS_ABI) $(AFLAGS_THUMB2) $(arch-y) $(tune-y) -include asm/unified.h -msoft-float
 
 CHECKFLAGS	+= -D__arm__

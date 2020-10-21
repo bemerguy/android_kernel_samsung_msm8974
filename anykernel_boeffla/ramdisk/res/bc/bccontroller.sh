@@ -703,39 +703,35 @@ if [ "apply_governor_profile" == "$1" ]; then
 	fi
 
 	if [ "Tuned - standard" == "$2" ]; then
-		echo "19000 1267200:50000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+		echo "18000 422400:19000 729600:50000 1190400:50000 1574400:70000 1728000:50000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
 		echo "100" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
 		echo "1267200" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
 		echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
-		echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
-		echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+		echo "10000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
 	fi
 
 	if [ "Tuned - battery" == "$2" ]; then
                 echo "30000 1267200:150000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "100" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "1267200" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
-                echo "95" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
-                echo "30000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+                echo "30000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
 	fi
 
 	if [ "Tuned - battery extreme" == "$2" ]; then
                 echo "40000 1267200:200000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "100" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "1267200" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "40000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
-                echo "98" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
-                echo "30000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+                echo "30000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "20000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
 	fi
 
 	if [ "Tuned - performance" == "$2" ]; then
-                echo "10000 1267200:80000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
+                echo "10000 422400:16000 729600:40000 1190400:40000 1574400:50000 1728000:40000" > /sys/devices/system/cpu/cpufreq/Tuned/above_hispeed_delay
                 echo "90" > /sys/devices/system/cpu/cpufreq/Tuned/go_hispeed_load
                 echo "1267200" > /sys/devices/system/cpu/cpufreq/Tuned/hispeed_freq
-                echo "100000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
-                echo "85" > /sys/devices/system/cpu/cpufreq/Tuned/target_loads
-                echo "15000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
+                echo "60000" > /sys/devices/system/cpu/cpufreq/Tuned/min_sample_time
+                echo "10000" > /sys/devices/system/cpu/cpufreq/Tuned/timer_rate
 	fi
 
 	if [ "wheatley - standard" == "$2" ]; then

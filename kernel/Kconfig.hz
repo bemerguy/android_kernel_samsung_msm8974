@@ -7,4 +7,5 @@ config HZ
         range 100 1000
 
 config SCHED_HRTICK
-	def_bool HIGH_RES_TIMERS && (!SMP || USE_GENERIC_SMP_HELPERS)
+	bool
+#	def_bool HIGH_RES_TIMERS && (!SMP || USE_GENERIC_SMP_HELPERS)

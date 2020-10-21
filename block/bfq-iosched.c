@@ -71,7 +71,7 @@
 #include "blk.h"
 
 /* Expiration time of sync (0) and async (1) requests, in jiffies. */
-static const int bfq_fifo_expire[2] = { HZ / 4, HZ / 8 };
+static const int bfq_fifo_expire[2] = { HZ / 8, HZ / 8 };
 
 /* Maximum backwards seek, in KiB. */
 static const int bfq_back_max = 16 * 1024;
@@ -80,7 +80,7 @@ static const int bfq_back_max = 16 * 1024;
 static const int bfq_back_penalty = 2;
 
 /* Idling period duration, in jiffies. */
-static int bfq_slice_idle = 0;
+static int bfq_slice_idle = HZ / 125;
 
 /* Default maximum budget values, in sectors and number of requests. */
 static const int bfq_default_max_budget = 16 * 1024;
@@ -243,7 +243,7 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
 		return rq1;
 	else if ((rq2->cmd_flags & REQ_META) && !(rq1->cmd_flags & REQ_META))
 		return rq2;
-
+#if 0
 	s1 = blk_rq_pos(rq1);
 	s2 = blk_rq_pos(rq2);
 
@@ -307,6 +307,9 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
 		else
 			return rq2;
 	}
+#else
+	return rq1;
+#endif
 }
 
 static struct bfq_queue *
@@ -4163,7 +4166,7 @@ static int __init bfq_init(void)
 	 * Can be 0 on HZ < 1000 setups.
 	 */
 	if (bfq_slice_idle == 0)
-		bfq_slice_idle = 0;
+		bfq_slice_idle = 1;
 
 	if (bfq_timeout_async == 0)
 		bfq_timeout_async = 1;

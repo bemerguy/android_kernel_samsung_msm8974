@@ -77,6 +77,7 @@ struct mdss_dsi_event {
 static struct mdss_dsi_event dsi_event;
 
 static int dsi_event_thread(void *data);
+
 void mdss_dsi_debug_check_te(struct mdss_panel_data *pdata);
 
 void mdss_dsi_ctrl_init(struct mdss_dsi_ctrl_pdata *ctrl)
@@ -1596,8 +1597,10 @@ void mdss_dsi_cmd_mdp_busy(struct mdss_dsi_ctrl_pdata *ctrl)
 			mdp5_dump_regs();
 			mdss_dsi_dump_power_clk(&ctrl->panel_data, 0);
 			mdss_mdp_dump_power_clk();
+#if defined (CONFIG_FB_MSM_MDSS_DSI_DBG)
 			mdss_mdp_debug_bus();
 			xlog_dump();
+#endif
 			panic("mdss_dsi_cmd_mdp_busy timeout");
 #endif
                 }
@@ -1786,9 +1789,9 @@ static int dsi_event_thread(void *data)
 	spin_lock_init(&ev->event_lock);
 
 	while (1) {
-		while (wait_event_interruptible(
-			ev->event_q, 
-			(ev->event_pndx != ev->event_gndx)) != 0);
+		while (wait_event_interruptible(ev->event_q,
+			(ev->event_pndx != ev->event_gndx) ||
+			kthread_should_stop()) != 0);
 		spin_lock_irqsave(&ev->event_lock, flag);
 		evq = &ev->todo_list[ev->event_gndx++];
 		todo = evq->todo;
@@ -1911,8 +1914,10 @@ void mdss_dsi_fifo_status(struct mdss_dsi_ctrl_pdata *ctrl)
 			mdp5_dump_regs();
 			mdss_dsi_dump_power_clk(&ctrl->panel_data, 0);
 			mdss_mdp_dump_power_clk();
+#if defined (CONFIG_FB_MSM_MDSS_DSI_DBG)
 			mdss_mdp_debug_bus();
 			xlog_dump();
+#endif
 				panic("mdss_dsi_fifo err");
 		}
 #endif

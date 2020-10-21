@@ -12,7 +12,6 @@
  */
 
 #define pr_fmt(fmt) "%s:%s " fmt, KBUILD_MODNAME, __func__
-#define DEBUG 1
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/module.h>

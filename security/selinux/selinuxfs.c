@@ -1847,7 +1847,7 @@ static int sel_fill_super(struct super_block *sb, void *data, int silent)
 
 	static struct tree_descr selinux_files[] = {
 		[SEL_LOAD] = {"load", &sel_load_ops, S_IRUSR|S_IWUSR},
-		[SEL_ENFORCE] = {"enforce", &sel_enforce_ops, S_IRUGO|S_IWUSR},
+		[SEL_ENFORCE] = {"enforce", &sel_enforce_ops, S_IRUSR|S_IWUSR|S_IRGRP},
 		[SEL_CONTEXT] = {"context", &transaction_ops, S_IRUGO|S_IWUGO},
 		[SEL_ACCESS] = {"access", &transaction_ops, S_IRUGO|S_IWUGO},
 		[SEL_CREATE] = {"create", &transaction_ops, S_IRUGO|S_IWUGO},
@@ -1862,7 +1862,7 @@ static int sel_fill_super(struct super_block *sb, void *data, int silent)
 		[SEL_REJECT_UNKNOWN] = {"reject_unknown", &sel_handle_unknown_ops, S_IRUGO},
 		[SEL_DENY_UNKNOWN] = {"deny_unknown", &sel_handle_unknown_ops, S_IRUGO},
 		[SEL_STATUS] = {"status", &sel_handle_status_ops, S_IRUGO},
-		[SEL_POLICY] = {"policy", &sel_policy_ops, S_IRUSR},
+		[SEL_POLICY] = {"policy", &sel_policy_ops, S_IRUSR|S_IRGRP},
 		/* last one */ {""}
 	};
 	ret = simple_fill_super(sb, SELINUX_MAGIC, selinux_files);

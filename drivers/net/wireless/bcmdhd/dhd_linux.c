@@ -4055,7 +4055,7 @@ dhd_allocate_if(dhd_pub_t *dhdpub, int ifidx, char *name,
 	}
 	memcpy(netdev_priv(ifp->net), &dhdinfo, sizeof(dhdinfo));
 	if (name && name[0]) {
-		strncpy(ifp->net->name, name, IFNAMSIZ);
+		memcpy(ifp->net->name, name, IFNAMSIZ);
 		ifp->net->name[IFNAMSIZ - 1] = '\0';
 	}
 #ifdef WL_CFG80211
@@ -5606,7 +5606,7 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 		/* Print fw version info */
 		DHD_ERROR(("Firmware version = %s\n", buf));
 #ifdef DHD_LOG_DUMP
-		strncpy(fw_version, buf, FW_VER_STR_LEN);
+		memcpy(fw_version, buf, FW_VER_STR_LEN);
 #endif /* DHD_LOG_DUMP */
 		dhd_set_version_info(dhd, buf);
 #if defined(CUSTOMER_HW4) && defined(WRITE_WLANINFO)
@@ -7460,10 +7460,10 @@ int dhd_os_wake_lock_timeout(dhd_pub_t *pub)
 #ifdef CONFIG_HAS_WAKELOCK
 		if (dhd->wakelock_rx_timeout_enable)
 			wake_lock_timeout(&dhd->wl_rxwake,
-				msecs_to_jiffies(dhd->wakelock_rx_timeout_enable));
+				msecs_to_jiffies(dhd->wakelock_rx_timeout_enable)/4);
 		if (dhd->wakelock_ctrl_timeout_enable)
 			wake_lock_timeout(&dhd->wl_ctrlwake,
-				msecs_to_jiffies(dhd->wakelock_ctrl_timeout_enable));
+				msecs_to_jiffies(dhd->wakelock_ctrl_timeout_enable)/4);
 #endif
 		dhd->wakelock_rx_timeout_enable = 0;
 		dhd->wakelock_ctrl_timeout_enable = 0;

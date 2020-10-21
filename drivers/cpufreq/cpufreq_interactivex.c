@@ -70,8 +70,8 @@ static unsigned int hispeed_freq = 1267200;
 static unsigned long go_hispeed_load = DEFAULT_GO_HISPEED_LOAD;
 
 /* Target load.  Lower values result in higher CPU speeds. */
-#define DEFAULT_TARGET_LOAD 90
-static unsigned int default_target_loads[] = {DEFAULT_TARGET_LOAD};
+#define DEFAULT_TARGET_LOAD 70
+static unsigned int default_target_loads[] = {100, 268800, 34, 422400, 52, 729600, 66, 1190400, 85, 1574400, 93, 1728000, 97};
 static spinlock_t target_loads_lock;
 static unsigned int *target_loads = default_target_loads;
 static int ntarget_loads = ARRAY_SIZE(default_target_loads);
@@ -94,7 +94,7 @@ static int nmin_sample_times = ARRAY_SIZE(default_min_sample_time);
 /*
  * The sample rate of the timer used to increase frequency
  */
-#define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
+#define DEFAULT_TIMER_RATE (10 * USEC_PER_MSEC)
 static unsigned long timer_rate = DEFAULT_TIMER_RATE;
 
 /*
@@ -102,8 +102,7 @@ static unsigned long timer_rate = DEFAULT_TIMER_RATE;
  * timer interval.
  */
 #define DEFAULT_ABOVE_HISPEED_DELAY DEFAULT_TIMER_RATE
-static unsigned int default_above_hispeed_delay[] = {		
-	DEFAULT_ABOVE_HISPEED_DELAY };
+static unsigned int default_above_hispeed_delay[] = {18000, 422400, 19000, 729600, 50000, 1190400, 50000, 1574400, 70000, 1728000, 50000};
 static spinlock_t above_hispeed_delay_lock;
 static unsigned int *above_hispeed_delay = default_above_hispeed_delay;
 static int nabove_hispeed_delay = ARRAY_SIZE(default_above_hispeed_delay);

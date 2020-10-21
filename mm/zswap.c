@@ -431,7 +431,7 @@ static void zswap_free_entry(struct zswap_tree *tree, struct zswap_entry *entry)
 /*******************************************
 * page pool for temporary compression result
 ********************************************/
-#define ZSWAP_TMPPAGE_POOL_PAGES 4
+#define ZSWAP_TMPPAGE_POOL_PAGES 16
 static LIST_HEAD(zswap_tmppage_list);
 static DEFINE_SPINLOCK(zswap_tmppage_lock);
 
@@ -532,6 +532,12 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
 		ret = -EINVAL;
 		goto freepage;
 	}
+
+        if (dlen > 3072) {
+                zswap_reject_compress_poor++;
+                ret = -E2BIG;
+                goto freepage;
+        }
 
 	/* store */
 	handle = zs_malloc(tree->pool, dlen,

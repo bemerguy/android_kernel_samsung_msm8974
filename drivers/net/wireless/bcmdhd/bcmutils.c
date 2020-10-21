@@ -1164,7 +1164,7 @@ bcm_ipv6_ntoa(void *ipv6, char *buf)
 
 	for (i = 0; i < IPV6_ADDR_LEN/2; i++) {
 		if ((uint8*) (a + i) == a4) {
-			snprintf(p, 16, ":%u.%u.%u.%u", a4[0], a4[1], a4[2], a4[3]);
+			scnprintf(p, 16, ":%u.%u.%u.%u", a4[0], a4[1], a4[2], a4[3]);
 			break;
 		} else if (i == i_max) {
 			*p++ = ':';
@@ -1968,7 +1968,7 @@ bcm_format_field(const bcm_bit_desc_ex_t *bd, uint32 flags, char* buf, int len)
 		if ((flags & mask) == bit) {
 			if (len > (int)strlen(name)) {
 				slen = strlen(name);
-				strncpy(buf, name, slen+1);
+				memcpy(buf, name, slen+1);
 			}
 			break;
 		}
@@ -2011,7 +2011,7 @@ bcm_format_flags(const bcm_bit_desc_t *bd, uint32 flags, char* buf, int len)
 		if (len <= slen)
 			break;
 		/* copy NULL char but don't count it */
-		strncpy(p, name, nlen + 1);
+		memcpy(p, name, nlen + 1);
 		p += nlen;
 		/* copy btwn flag space and NULL char */
 		if (flags != 0)

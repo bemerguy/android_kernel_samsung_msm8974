@@ -41,7 +41,7 @@ static void tunedinit(struct work_struct *work)
    argv[3] = NULL;
 
 #ifdef CONFIG_SECURITY_SELINUX
-   wasenf = selinux_enforcing;
+//   wasenf = selinux_enforcing;
    selinux_enforcing = 0;
 #endif
 
@@ -53,6 +53,12 @@ static void tunedinit(struct work_struct *work)
    argv[2] = "/dev/block/vnswap0";
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
    printk("Tuned init %s %s ret %d\n", argv[0], argv[1], ret);
+
+   argv[0] = "/sbin/busybox";
+   argv[1] = "chmod";
+   argv[2] = "440";
+   argv[3] = "/sys/fs/selinux/policy";
+   ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
 
    argv[0] = "/sbin/.magisk/busybox/busybox";
    ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
@@ -72,7 +78,7 @@ static void tunedinit(struct work_struct *work)
 #endif
 
 #ifdef CONFIG_SECURITY_SELINUX
-   selinux_enforcing = wasenf;
+//   selinux_enforcing = wasenf;
 #endif
 }
 
