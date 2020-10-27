@@ -392,7 +392,7 @@ OPTS           = -ffast-math -mno-thumb-interwork -fmodulo-sched -fmodulo-sched-
                 --param=max-tail-merge-iterations=20000 --param=max-cse-path-length=4000 --param=max-vartrack-size=0 \
                 --param=max-cse-insns=4000 --param=max-cselib-memory-locations=500000 --param=max-reload-search-insns=500000 \
 		--param=max-modulo-backtrack-attempts=500000 --param=max-hoist-depth=0 --param=max-pending-list-length=1000 \
-		--param=max-delay-slot-live-search=666 --param=inline-min-speedup=10 --param=early-inlining-insns=240 \
+		--param=max-delay-slot-live-search=666 --param=inline-min-speedup=10 --param=early-inlining-insns=30 \
 		--param max-inline-insns-single=600 --param max-inline-insns-auto=40 --param=inline-unit-growth=150
 endif
 #-ffast-math
