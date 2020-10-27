@@ -14,7 +14,7 @@ VAR="$2"
 BOEFFLA_FILENAME="tuned-kernel-$(date +"%Y%m%d")-$VAR"
 
 TOOLCHAIN="/root/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf-"
-#TOOLCHAIN="/root/x-tools/arm-unknown-eabi/bin/arm-unknown-eabi-"
+#TOOLCHAIN="/root/x-tools/arm-unknown-linux-androideabi/bin/arm-unknown-linux-androideabi-"
 #TOOLCHAIN="/root/armv7-eabihf--glibc--bleeding-edge-2020.02-2/bin/arm-buildroot-linux-gnueabihf-"
 
 ARCHITECTURE=arm

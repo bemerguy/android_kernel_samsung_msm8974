@@ -65,6 +65,15 @@ if [ -d /system_root ]; then
  cp sbin/busybox /system_root/sbin
  chmod 755 /system_root/sbin/busybox
  chmod -R 755 /system_root/res/bc
+ chcon u:object_r:system_file:s0 /system_root/boeffla-anykernel
+ chcon u:object_r:system_file:s0 /system_root/sbin/busybox
+ chcon -R u:object_r:system_file:s0 /system_root/res
+ chcon -R u:object_r:system_file:s0 /system_root/etc/init.d
+else
+ chcon u:object_r:system_file:s0 /boeffla-anykernel
+ chcon u:object_r:system_file:s0 /sbin/busybox
+ chcon -R u:object_r:system_file:s0 /res
+ chcon -R u:object_r:system_file:s0 /etc/init.d
 fi;
 
 replace_file /system/etc/init.d/10vnswap 755 10vnswap
